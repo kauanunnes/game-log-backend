@@ -3,6 +3,7 @@ package com.kauan.games_list.services;
 import com.kauan.games_list.dto.GameDTO;
 import com.kauan.games_list.dto.GameMinDTO;
 import com.kauan.games_list.entities.Game;
+import com.kauan.games_list.projections.GameMinProjection;
 import com.kauan.games_list.repositories.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,5 +26,11 @@ public class GameService {
     public GameDTO findById(Long id) {
         Game result =  gameRepository.findById(id).get();
         return new GameDTO(result);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GameMinDTO> findByList(Long listId) {
+        List<GameMinProjection> result = gameRepository.searchByList(listId);
+        return result.stream().map(GameMinDTO::new).toList();
     }
 }

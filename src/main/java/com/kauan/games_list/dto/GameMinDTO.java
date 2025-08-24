@@ -1,6 +1,7 @@
 package com.kauan.games_list.dto;
 
 import com.kauan.games_list.entities.Game;
+import com.kauan.games_list.projections.GameMinProjection;
 
 public class GameMinDTO {
     private Long id;
@@ -36,5 +37,12 @@ public class GameMinDTO {
         title = entity.getTitle();
         imgUrl = entity.getImgUrl();
         shortDescription = entity.getShortDescription();
+    }
+    public GameMinDTO(GameMinProjection projection) {
+        id = projection.getId();
+        year = projection.getYear();
+        title = projection.getTitle();
+        imgUrl = projection.getImgUrl();
+        shortDescription = projection.getShortDescription();
     }
 }
