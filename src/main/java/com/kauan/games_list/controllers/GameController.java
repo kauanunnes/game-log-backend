@@ -1,7 +1,6 @@
 package com.kauan.games_list.controllers;
 
 import com.kauan.games_list.dto.GameMinDTO;
-import com.kauan.games_list.entities.Game;
 import com.kauan.games_list.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
