@@ -89,7 +89,7 @@ A entrada é identificada por **usuário + jogo**. Por isso o `PUT` cria ou subs
 
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
-| GET | `/me/library` | usuário | Lista com filtros `status`, `favorite`, `genreId`, `platformId` (onde a pessoa jogou), `minRating`, `recommends`, `q`; ordena por `createdAt`, `updatedAt` (padrão, mais recentes primeiro), `rating`, `title`, `finishedOn` | 1 |
+| GET | `/me/library` | usuário | Lista com filtros `status`, `favorite`, `genreId`, `platformId` (onde a pessoa jogou), `minRating`, `recommends`, `completed` (zerou), `q`; ordena por `createdAt`, `updatedAt` (padrão, mais recentes primeiro), `rating`, `title`, `finishedOn` | 1 |
 | GET | `/me/library/{gameId}` | usuário | Minha entrada para o jogo; 404 se não existir | 1 |
 | PUT | `/me/library/{gameId}` | usuário | Cria (201) ou substitui (200) a entrada inteira | 1 |
 | PATCH | `/me/library/{gameId}` | usuário | Altera só os campos enviados (ex.: status ou favorito); `null` limpa o campo (JSON Merge Patch, RFC 7396) | 1 |

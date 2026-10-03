@@ -192,7 +192,8 @@ class LibraryControllerTests {
     void listsWithFiltersAndSorting() throws Exception {
         Account account = Account.register(mockMvc, "lib_hugo");
         add(account, "hollow-knight", """
-                {"status": "PLAYED", "favorite": true, "review": {"rating": 5, "recommends": true}}""");
+                {"status": "PLAYED", "favorite": true, "review": {"rating": 5, "recommends": true},
+                 "playthrough": {"completed": true}}""");
         add(account, "celeste", """
                 {"status": "PLAYED", "review": {"rating": 4.5, "recommends": true}}""");
         add(account, "hades", """
@@ -207,6 +208,10 @@ class LibraryControllerTests {
         list(account, "?recommends=true&minRating=4.75")
                 .andExpect(jsonPath("$.content[*].game.title", contains("Hollow Knight")));
         list(account, "?q=celes").andExpect(jsonPath("$.content[*].game.title", contains("Celeste")));
+        list(account, "?status=PLAYED&completed=true")
+                .andExpect(jsonPath("$.content[*].game.title", contains("Hollow Knight")));
+        list(account, "?status=PLAYED&completed=false")
+                .andExpect(jsonPath("$.content[*].game.title", contains("Celeste")));
         list(account, "?genreId=" + genre("platform") + "&sort=title")
                 .andExpect(jsonPath("$.content[*].game.title", contains("Celeste", "Hollow Knight")));
         list(account, "?sort=preco").andExpect(status().isUnprocessableContent());

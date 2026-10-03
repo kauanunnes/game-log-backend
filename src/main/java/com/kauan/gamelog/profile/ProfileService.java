@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 public class ProfileService {
-    private static final LibraryFilter FAVORITES = new LibraryFilter(null, true, null, null, null, null, null);
+    private static final LibraryFilter FAVORITES = new LibraryFilter(null, true, null, null, null, null, null, null);
 
     private final UserService users;
     private final LibraryService library;

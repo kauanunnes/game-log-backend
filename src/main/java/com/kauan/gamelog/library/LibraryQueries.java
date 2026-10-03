@@ -89,6 +89,10 @@ class LibraryQueries {
             conditions.add("e.recommends = :recommends");
             params.put("recommends", filter.recommends());
         }
+        if (filter.completed() != null) {
+            conditions.add("coalesce(e.completed, false) = :completed");
+            params.put("completed", filter.completed());
+        }
         if (filter.q() != null && !filter.q().isBlank()) {
             conditions.add("strpos(g.title_normalized, :q) > 0");
             params.put("q", TextNormalizer.normalize(filter.q()));

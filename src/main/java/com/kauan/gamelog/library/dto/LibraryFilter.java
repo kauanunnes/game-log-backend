@@ -11,6 +11,7 @@ import java.util.List;
  * Filtros da biblioteca. Listas vêm separadas por vírgula: {@code ?status=PLAYED,DROPPED}.
  *
  * @param platformId plataforma em que a pessoa jogou
+ * @param completed "zerou"; {@code false} também traz quem não respondeu
  * @param q parte do título do jogo
  */
 public record LibraryFilter(
@@ -23,6 +24,7 @@ public record LibraryFilter(
         BigDecimal minRating,
 
         Boolean recommends,
+        Boolean completed,
 
         @Size(max = 100, message = "use no máximo 100 caracteres")
         String q) {}
