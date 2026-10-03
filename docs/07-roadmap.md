@@ -22,11 +22,11 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 0.2 Atualizar a base
 
-- [ ] Spring Boot 3.5.5 → 4.1.x e Java 21 → 25 ([D1, D2](README.md#decisões)). O Boot 4 traz Spring Framework 7, Spring Security 7, Hibernate 7 e Jackson 3; com ~15 classes, a migração é barata agora.
-- [ ] Atualizar ou remover o `system.properties` (usado por buildpacks do Heroku/Railway).
-- [ ] Remover do `pom.xml` o `maven-resources-plugin 3.1.0` fixo (resquício do curso) e a dependência do H2.
-- [ ] Trocar o `@Autowired` em campo por injeção via construtor.
-- [ ] Renomear o back-end para game-log: `artifactId` e `name` no `pom.xml`, `spring.application.name`, pacote `com.kauan.gamelog` (classe `GameLogApplication`). Renomear o repositório no GitHub para `game-log-backend` é com você; o GitHub redireciona o endereço antigo.
+- [x] Spring Boot 3.5.5 → 4.1.x e Java 21 → 25 ([D1, D2](README.md#decisões)). O Boot 4 traz Spring Framework 7, Spring Security 7, Hibernate 7 e Jackson 3; com ~15 classes, a migração é barata agora.
+- [x] Atualizar ou remover o `system.properties` (usado por buildpacks do Heroku/Railway).
+- [x] Remover do `pom.xml` o `maven-resources-plugin 3.1.0` fixo (resquício do curso). O H2 ficou para a 0.4: até o Testcontainers entrar, é ele que dá banco aos testes.
+- [x] Trocar o `@Autowired` em campo por injeção via construtor.
+- [x] Renomear o back-end para game-log: `artifactId` e `name` no `pom.xml`, `spring.application.name`, pacote `com.kauan.gamelog` (classe `GameLogApplication`). No GitHub o repositório está como `gamelog-backend`; renomear para `game-log-backend` é com você.
 
 **Pronto quando:** `./mvnw verify` passa no Boot 4.
 
@@ -42,7 +42,7 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 - [ ] Tratamento global de erros com Problem Details. Hoje, `findById(id).get()` em `GameService` e `GameListService` responde 500 quando deveria responder 404.
 - [ ] springdoc-openapi (Swagger UI) e Actuator (`/actuator/health`).
-- [ ] Testcontainers com `@ServiceConnection` e o primeiro teste de integração.
+- [ ] Testcontainers com `@ServiceConnection` e o primeiro teste de integração; remover o H2 (os testes passam a usar PostgreSQL).
 - [ ] Spotless (formatação) e JaCoCo (cobertura).
 - [ ] GitHub Actions rodando `./mvnw verify` em cada PR, mais o Dependabot.
 - [ ] README do projeto (o que é, como rodar, link para `docs/`) e LICENSE.

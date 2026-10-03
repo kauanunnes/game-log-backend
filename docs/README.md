@@ -28,7 +28,7 @@ Referências de produto: Letterboxd (filmes), Backloggd e HowLongToBeat (jogos).
 | # | Decisão | Recomendação | Alternativa | Status |
 |---|---|---|---|---|
 | D1 | Linguagem | Java 25 (LTS) | — | aceita |
-| D2 | Framework | Spring Boot 4.1; a linha 3.5 saiu do suporte gratuito em 30/06/2026 | — | proposta |
+| D2 | Framework | Spring Boot 4.1; a linha 3.5 saiu do suporte gratuito em 30/06/2026 | — | aceita |
 | D3 | Fonte do catálogo | IGDB (Twitch), com cópia local no PostgreSQL | — | aceita |
 | D4 | Escala de nota | 0 a 5 estrelas, com frações de 0,25 (ex.: 4,75), guardada como `numeric(3,2)` | — | aceita |
 | D5 | Modelo da biblioteca | Uma entrada por usuário + jogo, com status (desejo → quero jogar → jogando → jogado) | Uma tabela por lista | proposta |
