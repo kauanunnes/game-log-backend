@@ -1,5 +1,6 @@
 package com.kauan.gamelog.lists;
 
+import com.kauan.gamelog.catalog.dto.GameMinDTO;
 import com.kauan.gamelog.lists.dto.GameListDTO;
 import com.kauan.gamelog.shared.NotFoundException;
 import java.util.List;
@@ -26,5 +27,17 @@ public class GameListService {
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException("Lista " + id + " não encontrada."));
         return new GameListDTO(result);
+    }
+
+    @Transactional(readOnly = true)
+    public List<GameMinDTO> findGames(Long listId) {
+        return gameListRepository.searchGames(listId).stream()
+                .map(game -> new GameMinDTO(
+                        game.getId(),
+                        game.getGameYear(),
+                        game.getTitle(),
+                        game.getImgUrl(),
+                        game.getShortDescription()))
+                .toList();
     }
 }

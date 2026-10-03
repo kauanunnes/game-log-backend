@@ -2,7 +2,6 @@ package com.kauan.gamelog.catalog;
 
 import com.kauan.gamelog.catalog.dto.GameDTO;
 import com.kauan.gamelog.catalog.dto.GameMinDTO;
-import com.kauan.gamelog.lists.GameMinProjection;
 import com.kauan.gamelog.shared.NotFoundException;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -27,11 +26,5 @@ public class GameService {
         Game result =
                 gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Jogo " + id + " não encontrado."));
         return new GameDTO(result);
-    }
-
-    @Transactional(readOnly = true)
-    public List<GameMinDTO> findByList(Long listId) {
-        List<GameMinProjection> result = gameRepository.searchByList(listId);
-        return result.stream().map(GameMinDTO::new).toList();
     }
 }

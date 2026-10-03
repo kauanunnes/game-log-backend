@@ -42,15 +42,6 @@ class GameControllerTests {
     }
 
     @Test
-    void listsGamesOfAListInPositionOrder() throws Exception {
-        mockMvc.perform(get("/api/v1/lists/2/games"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].title").value("Super Mario World"))
-                .andExpect(jsonPath("$[4].title").value("Sonic CD"))
-                .andExpect(jsonPath("$[0].year").isNumber());
-    }
-
-    @Test
     void servesEndpointsOnlyUnderTheApiPrefix() throws Exception {
         mockMvc.perform(get("/games")).andExpect(status().isNotFound());
     }

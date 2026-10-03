@@ -1,6 +1,5 @@
 package com.kauan.gamelog.lists;
 
-import com.kauan.gamelog.catalog.GameService;
 import com.kauan.gamelog.catalog.dto.GameMinDTO;
 import com.kauan.gamelog.lists.dto.GameListDTO;
 import java.util.List;
@@ -13,11 +12,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/lists")
 public class GameListController {
     private final GameListService gameListService;
-    private final GameService gameService;
 
-    public GameListController(GameListService gameListService, GameService gameService) {
+    public GameListController(GameListService gameListService) {
         this.gameListService = gameListService;
-        this.gameService = gameService;
     }
 
     @GetMapping(value = "/{id}")
@@ -26,8 +23,8 @@ public class GameListController {
     }
 
     @GetMapping(value = "/{listId}/games")
-    public List<GameMinDTO> findByList(@PathVariable Long listId) {
-        return gameService.findByList(listId);
+    public List<GameMinDTO> findGames(@PathVariable Long listId) {
+        return gameListService.findGames(listId);
     }
 
     @GetMapping
