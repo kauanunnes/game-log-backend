@@ -31,3 +31,18 @@ build/
 
 ### VS Code ###
 .vscode/
+
+refs/
+
+### Variáveis de ambiente (o .example é versionado) ###
+.env
+.env.*
+!.env.example
+
+### Neon (vínculo local com a conta) e pacotes do neon.ts ###
+.neon
+node_modules/
+
+### Ferramental local de agentes ###
+.claude/
+skills-lock.json
