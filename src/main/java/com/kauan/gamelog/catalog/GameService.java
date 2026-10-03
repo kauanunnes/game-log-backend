@@ -67,6 +67,11 @@ public class GameService {
     }
 
     @Transactional(readOnly = true)
+    public boolean exists(long id) {
+        return gameRepository.existsById(id);
+    }
+
+    @Transactional(readOnly = true)
     public GameDetailsDTO findById(long id) {
         return gameRepository
                 .findDetailedById(id)

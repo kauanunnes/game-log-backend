@@ -35,6 +35,16 @@ public class LookupService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public boolean platformExists(long id) {
+        return platformRepository.existsById(id);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean storeExists(long id) {
+        return storeRepository.existsById(id);
+    }
+
     /** Na ordem de cadastro, que deixa "Loja física" e "Outra" por último. */
     @Transactional(readOnly = true)
     public List<StoreDTO> stores() {

@@ -61,15 +61,12 @@ public class GameSearchRepository {
                 .params(params)
                 .param("limit", pageable.getPageSize())
                 .param("offset", pageable.getOffset())
-                .query((rs, row) -> {
-                    LocalDate released = rs.getObject("release_date", LocalDate.class);
-                    return new GameSummaryDTO(
-                            rs.getLong("id"),
-                            rs.getString("slug"),
-                            rs.getString("title"),
-                            IgdbImages.cover(rs.getString("cover_image_id")),
-                            released == null ? null : released.getYear());
-                })
+                .query((rs, row) -> GameSummaryDTO.of(
+                        rs.getLong("id"),
+                        rs.getString("slug"),
+                        rs.getString("title"),
+                        rs.getString("cover_image_id"),
+                        rs.getObject("release_date", LocalDate.class)))
                 .list();
 
         return new PageImpl<>(content, pageable, total);
