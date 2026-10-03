@@ -6,6 +6,7 @@ import com.kauan.gamelog.library.dto.LibraryCounts;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryEntryRequest;
 import com.kauan.gamelog.library.dto.LibraryFilter;
+import com.kauan.gamelog.library.dto.StatsDTO;
 import com.kauan.gamelog.shared.ConflictException;
 import com.kauan.gamelog.shared.FieldIssue;
 import com.kauan.gamelog.shared.JsonMergePatch;
@@ -26,6 +27,7 @@ import tools.jackson.databind.JsonNode;
 public class LibraryService {
     private final LibraryEntryRepository entries;
     private final LibraryQueries queries;
+    private final LibraryStats stats;
     private final GameService games;
     private final LookupService lookups;
     private final JsonMergePatch mergePatch;
@@ -34,12 +36,14 @@ public class LibraryService {
     LibraryService(
             LibraryEntryRepository entries,
             LibraryQueries queries,
+            LibraryStats stats,
             GameService games,
             LookupService lookups,
             JsonMergePatch mergePatch,
             ApplicationEventPublisher events) {
         this.entries = entries;
         this.queries = queries;
+        this.stats = stats;
         this.games = games;
         this.lookups = lookups;
         this.mergePatch = mergePatch;
@@ -58,6 +62,12 @@ public class LibraryService {
     @Transactional(readOnly = true)
     public Page<LibraryEntryDTO> reviews(long userId, Pageable pageable) {
         return queries.findReviews(userId, pageable);
+    }
+
+    /** Estatísticas completas; quem expõe numa rota pública decide se mostra os gastos. */
+    @Transactional(readOnly = true)
+    public StatsDTO stats(long userId, Integer year) {
+        return stats.of(userId, year);
     }
 
     @Transactional(readOnly = true)

@@ -3,6 +3,7 @@ package com.kauan.gamelog.profile;
 import com.kauan.gamelog.library.LibraryService;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryFilter;
+import com.kauan.gamelog.library.dto.StatsDTO;
 import com.kauan.gamelog.profile.dto.ProfileDTO;
 import com.kauan.gamelog.shared.ForbiddenException;
 import com.kauan.gamelog.shared.NotFoundException;
@@ -51,6 +52,13 @@ public class ProfileService {
     public Page<LibraryEntryDTO> reviews(String username, Pageable pageable) {
         PublicUser user = findVisible(username);
         return hideSpending(user, library.reviews(user.id(), pageable));
+    }
+
+    @Transactional(readOnly = true)
+    public StatsDTO stats(String username, Integer year) {
+        PublicUser user = findVisible(username);
+        StatsDTO stats = library.stats(user.id(), year);
+        return user.showSpending() ? stats : stats.withoutSpending();
     }
 
     private PublicUser find(String username) {

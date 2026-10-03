@@ -2,6 +2,8 @@ package com.kauan.gamelog.profile;
 
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryFilter;
+import com.kauan.gamelog.library.dto.StatsDTO;
+import com.kauan.gamelog.library.dto.StatsFilter;
 import com.kauan.gamelog.profile.dto.ProfileDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,12 @@ public class ProfileController {
     @GetMapping("/favorites")
     public PagedModel<LibraryEntryDTO> favorites(@PathVariable String username, Pageable pageable) {
         return new PagedModel<>(profileService.favorites(username, pageable));
+    }
+
+    /** Sem gastos, salvo se o dono permitir. */
+    @GetMapping("/stats")
+    public StatsDTO stats(@PathVariable String username, @Valid StatsFilter filter) {
+        return profileService.stats(username, filter.year());
     }
 
     @GetMapping("/reviews")
