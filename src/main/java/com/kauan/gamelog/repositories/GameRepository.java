@@ -1,7 +1,7 @@
-package com.kauan.games_list.repositories;
+package com.kauan.gamelog.repositories;
 
-import com.kauan.games_list.entities.Game;
-import com.kauan.games_list.projections.GameMinProjection;
+import com.kauan.gamelog.entities.Game;
+import com.kauan.gamelog.projections.GameMinProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

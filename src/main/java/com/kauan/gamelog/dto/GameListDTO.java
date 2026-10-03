@@ -1,6 +1,6 @@
-package com.kauan.games_list.dto;
+package com.kauan.gamelog.dto;
 
-import com.kauan.games_list.entities.GameList;
+import com.kauan.gamelog.entities.GameList;
 
 public class GameListDTO {
     private Long id;

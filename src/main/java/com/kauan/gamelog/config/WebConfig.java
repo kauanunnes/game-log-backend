@@ -1,4 +1,4 @@
-package com.kauan.games_list.config;
+package com.kauan.gamelog.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

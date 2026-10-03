@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.kauan</groupId>
-	<artifactId>games-list</artifactId>
+	<artifactId>game-log</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>games-list</name>
-	<description>Games list</description>
+	<name>game-log</name>
+	<description>Game Log API</description>
 	<url/>
 	<licenses>
 		<license/>

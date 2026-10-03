@@ -1,9 +1,9 @@
-package com.kauan.games_list.controllers;
+package com.kauan.gamelog.controllers;
 
-import com.kauan.games_list.dto.GameListDTO;
-import com.kauan.games_list.dto.GameMinDTO;
-import com.kauan.games_list.services.GameListService;
-import com.kauan.games_list.services.GameService;
+import com.kauan.gamelog.dto.GameListDTO;
+import com.kauan.gamelog.dto.GameMinDTO;
+import com.kauan.gamelog.services.GameListService;
+import com.kauan.gamelog.services.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;

@@ -1,12 +1,12 @@
-package com.kauan.games_list.services;
+package com.kauan.gamelog.services;
 
-import com.kauan.games_list.dto.GameDTO;
-import com.kauan.games_list.dto.GameListDTO;
-import com.kauan.games_list.dto.GameMinDTO;
-import com.kauan.games_list.entities.Game;
-import com.kauan.games_list.entities.GameList;
-import com.kauan.games_list.repositories.GameListRepository;
-import com.kauan.games_list.repositories.GameRepository;
+import com.kauan.gamelog.dto.GameDTO;
+import com.kauan.gamelog.dto.GameListDTO;
+import com.kauan.gamelog.dto.GameMinDTO;
+import com.kauan.gamelog.entities.Game;
+import com.kauan.gamelog.entities.GameList;
+import com.kauan.gamelog.repositories.GameListRepository;
+import com.kauan.gamelog.repositories.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

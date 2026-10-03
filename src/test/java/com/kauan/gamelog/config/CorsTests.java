@@ -1,4 +1,4 @@
-package com.kauan.games_list.config;
+package com.kauan.gamelog.config;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

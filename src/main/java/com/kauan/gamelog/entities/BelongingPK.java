@@ -1,4 +1,4 @@
-package com.kauan.games_list.entities;
+package com.kauan.gamelog.entities;
 
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;

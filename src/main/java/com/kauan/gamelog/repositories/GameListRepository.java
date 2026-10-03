@@ -1,6 +1,6 @@
-package com.kauan.games_list.repositories;
+package com.kauan.gamelog.repositories;
 
-import com.kauan.games_list.entities.GameList;
+import com.kauan.gamelog.entities.GameList;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

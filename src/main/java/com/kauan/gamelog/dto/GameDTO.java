@@ -1,38 +1,18 @@
-package com.kauan.games_list.entities;
+package com.kauan.gamelog.dto;
 
-import jakarta.persistence.*;
 
-import java.util.Objects;
-@Entity
-@Table(name="tb_game")
-public class Game {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+import com.kauan.gamelog.entities.Game;
+import org.springframework.beans.BeanUtils;
+
+public class GameDTO {
     private Long id;
 
-    @Column(name="game_year")
     private Integer year;
     private Double score;
-    private String title, genre, platforms, imgUrl;
+    private String title, genre, platforms, imgUrl, shortDescription, longDescription;
 
-    @Column(columnDefinition = "TEXT")
-    private String shortDescription;
-
-    @Column(columnDefinition = "TEXT")
-    private String longDescription;
-
-    public Game() { }
-
-    public Game(Long id, Integer year, Double score, String title, String genre, String platforms, String imgUrl, String shortDescription, String longDescription) {
-        this.id = id;
-        this.year = year;
-        this.score = score;
-        this.title = title;
-        this.genre = genre;
-        this.platforms = platforms;
-        this.imgUrl = imgUrl;
-        this.shortDescription = shortDescription;
-        this.longDescription = longDescription;
+    public GameDTO(Game entity) {
+        BeanUtils.copyProperties(entity, this);
     }
 
     public Long getId() {
@@ -105,18 +85,5 @@ public class Game {
 
     public void setLongDescription(String longDescription) {
         this.longDescription = longDescription;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Game game = (Game) o;
-        return Objects.equals(id, game.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 }

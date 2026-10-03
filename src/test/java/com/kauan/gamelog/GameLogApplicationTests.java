@@ -1,10 +1,10 @@
-package com.kauan.games_list;
+package com.kauan.gamelog;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class GamesListApplicationTests {
+class GameLogApplicationTests {
 
 	@Test
 	void contextLoads() {
