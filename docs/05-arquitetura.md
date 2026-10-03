@@ -168,8 +168,10 @@ PR aberto     → ./mvnw verify (formatação, testes com Testcontainers, cobert
 merge na main → build da imagem → publica no GHCR → deploy (Render ou Cloud Run)
 ```
 
-- A imagem pode sair do Buildpacks (`./mvnw spring-boot:build-image`, sem Dockerfile) ou de um Dockerfile multi-stage.
-- Dependabot para Maven e GitHub Actions; CodeQL (gratuito em repositório público).
+- A imagem sai do `Dockerfile` multi-stage: compila com o JDK 25, separa o jar nas camadas do Spring Boot (as dependências ficam em cache entre builds) e roda numa JRE 25, com usuário sem root. O `.dockerignore` é uma lista de permissão: só `pom.xml`, `mvnw`, `.mvn` e `src` entram no build.
+- O job `image` do CI roda depois do `verify`, só na `main`: publica `ghcr.io/kauanunnes/game-log-backend` com as tags `latest` e o SHA do commit e, se o segredo `RENDER_DEPLOY_HOOK_URL` existir, chama o deploy hook do Render.
+- Em produção, os logs saem em JSON (formato ECS) e o pool do Hikari fica em 5 conexões, por causa do limite do plano gratuito do Neon.
+- Dependabot para Maven, GitHub Actions e a imagem base do Docker; CodeQL (gratuito em repositório público).
 - No plano gratuito do Render, a aplicação hiberna quando fica sem uso, e a primeira requisição depois disso demora. O Cloud Run escala a zero e costuma acordar mais rápido. Se incomodar, a Fase 4 tem a opção de AOT cache ou imagem nativa.
 
 ## Observabilidade

@@ -117,7 +117,7 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 1.8 Deploy
 
-- [ ] Imagem Docker (Buildpacks ou Dockerfile multi-stage).
+- [x] Imagem Docker (Dockerfile multi-stage), publicada no GHCR pelo CI a cada push na `main` depois dos testes.
 - [ ] Banco no Neon e API no Render ou no Cloud Run, com deploy automático a partir da `main`.
 - [ ] Swagger público e o link da demo no "About" do repositório.
 

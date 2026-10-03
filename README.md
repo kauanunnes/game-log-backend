@@ -56,7 +56,22 @@ Roda os testes contra um PostgreSQL 18 em container (Testcontainers) e um IGDB s
 
 ## Produção
 
-Defina `SPRING_PROFILES_ACTIVE=prod` e as variáveis listadas em [`.env.example`](.env.example). Sem `JWT_PRIVATE_KEY`, a aplicação não sobe em produção.
+A imagem roda com o perfil `prod` e lê a configuração das variáveis listadas em [`.env.example`](.env.example). Sem `JWT_PRIVATE_KEY`, ela não sobe.
+
+```bash
+docker build -t game-log-api .
+docker run -p 8080:8080 --env-file .env.prod game-log-api
+```
+
+A cada push na `main`, o CI roda os testes e publica a imagem em `ghcr.io/kauanunnes/game-log-backend`.
+
+### Deploy no Render com o banco no Neon
+
+1. No Neon, copie a connection string da branch de produção. A URL do JDBC é a mesma sem o usuário e a senha, que vão em variáveis próprias: `jdbc:postgresql://<host>/<banco>?sslmode=require`.
+2. No Render, crie um Web Service a partir da imagem `ghcr.io/kauanunnes/game-log-backend:latest`, com health check em `/actuator/health`.
+3. Defina `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, `JWT_PRIVATE_KEY`, `IGDB_CLIENT_ID`, `IGDB_CLIENT_SECRET` e `CORS_ORIGINS`.
+4. Copie o deploy hook do serviço para o segredo `RENDER_DEPLOY_HOOK_URL` do repositório. Daí em diante, cada push na `main` que passar nos testes vira um deploy.
+5. Para encher o catálogo na primeira vez, suba uma vez com `GAME_LOG_IGDB_BOOTSTRAP_LIMIT=2000` e depois remova a variável.
 
 ## Documentação
 
