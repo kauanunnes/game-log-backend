@@ -145,9 +145,9 @@ Os testes rodam contra a mesma imagem de PostgreSQL usada em desenvolvimento, se
 
 | Perfil | Banco | Uso |
 |---|---|---|
-| `local` | PostgreSQL do `compose.yaml` (o Spring Boot sobe o container junto com a aplicação) | desenvolvimento |
-| `test` | Testcontainers com `@ServiceConnection` | testes automatizados |
-| `prod` | Neon | produção |
+| `local` (padrão) | PostgreSQL do `compose.yaml` na porta 5433 (o Spring Boot sobe o container junto com a aplicação) + seed de exemplo em `db/seed` | desenvolvimento |
+| testes (`./mvnw verify`) | H2 em memória até a 0.4 (o Compose não sobe nos testes); depois, Testcontainers com `@ServiceConnection` | testes automatizados |
+| `prod` | Neon, via `SPRING_DATASOURCE_*` (exige `SPRING_PROFILES_ACTIVE=prod`) | produção |
 
 | Variável | Exemplo | Uso |
 |---|---|---|

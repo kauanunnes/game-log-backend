@@ -32,9 +32,9 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 0.3 Banco e configuração
 
-- [ ] `compose.yaml` com PostgreSQL na imagem `pgvector/pgvector:pg18` (mesma versão do Neon), que já serve para a Fase 3, e o suporte a Docker Compose do Spring Boot (o banco sobe junto com a aplicação).
-- [ ] Flyway com a migration inicial; remover o `import.sql` e o `ddl-auto`.
-- [ ] Perfis `local` e `prod` lendo variáveis de ambiente, `.env.example` versionado e credenciais do banco local fora do `application-dev.properties`.
+- [x] `compose.yaml` com PostgreSQL na imagem `pgvector/pgvector:pg18` (mesma versão do Neon), que já serve para a Fase 3, e o suporte a Docker Compose do Spring Boot (o banco sobe junto com a aplicação).
+- [x] Flyway com a migration inicial; o `import.sql` virou um seed (`db/seed`) que só roda no perfil `local`, e o Hibernate passou a só validar o schema (`ddl-auto=validate`).
+- [x] Perfis `local` e `prod` lendo variáveis de ambiente, `.env.example` versionado e credenciais do banco local fora do `application-dev.properties`.
 
 **Pronto quando:** clonar o repositório e rodar `./mvnw spring-boot:run` sobe banco e aplicação sem editar nenhum arquivo.
 
