@@ -11,6 +11,7 @@
 | Acentos | Rosa `#FF6EC7` / `#C2185B` nas janelas de destaque, ciano `#00FFFF` como marca-texto, amarelo `#FFD800` nas estrelas, gradiente pastel rosa → lilás → ciano |
 | Estados | Erro `#C00000`, sucesso `#008000`, fita amarela e preta para "em construção" |
 | Tema | Claro, como o Windows 95; o tema escuro fica para depois |
+| Layout | Duas janelas: a da conta à esquerda, parada enquanto a principal rola; no celular, ela vai para depois do conteúdo |
 | Tipografia | Press Start 2P (logo e destaques), Pixelify Sans (interface e títulos), IBM Plex Mono (textos longos e números) |
 | Componentes | CSS próprio com tokens, sem biblioteca: botão, campo e fieldset nativos ganham o visual do Win95 |
 | Ícones | Pixel art em SVG feita no projeto (ex.: a estrela da nota) |
@@ -72,6 +73,7 @@ src/
 | `TabPanel` | Abas no estilo Win95, ligadas às rotas filhas, com o painel embaixo |
 | `StarRating` | Mostra e edita a nota de 0 a 5 em passos de 0,25, com preenchimento parcial da estrela. Funciona no teclado (setas mudam 0,25; Home, End e Delete) |
 | `GameCard` | Capa (ou padrão pontilhado sem capa), título, ano, nota, status e favorito |
+| `UserWindow` | Janela da conta: convite para entrar (que volta para a página atual) ou nome, contadores por status, "Jogando agora" e atalhos para perfil, configurações e sair |
 | `GameCardSkeleton` | Card pontilhado que pisca enquanto os jogos carregam |
 | `ErrorMessage` | Diálogo de erro do Win95 com "Tentar de novo" |
 | `PageNav` | Anterior e próxima, pela `?page=` da rota atual |
