@@ -16,7 +16,7 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 - [x] Commitar ou descartar as mudanças pendentes em `application.properties`, `application-dev.properties` e `WebConfig`.
 - [x] Enviar os 6 commits que estão só na sua máquina (`git push`). Antes do push, atenção: o `application-dev.properties` desses commits tem usuário e senha do PostgreSQL local. Aponta só para localhost, mas, se essa senha for usada em outro lugar, troque-a.
-- [ ] Corrigir o pacote do `WebConfig`: ele está em `config`, fora de `com.kauan.games_list`. O Spring só procura componentes dentro do pacote da aplicação, então a classe nunca é carregada e o CORS não é aplicado.
+- [x] Corrigir o pacote do `WebConfig`: ele está em `config`, fora de `com.kauan.games_list`. O Spring só procura componentes dentro do pacote da aplicação, então a classe nunca é carregada e o CORS não é aplicado.
 
 **Pronto quando:** `git status` está limpo e o GitHub está igual ao local.
 
