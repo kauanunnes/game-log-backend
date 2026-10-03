@@ -3,12 +3,11 @@ package com.kauan.gamelog.controllers;
 import com.kauan.gamelog.dto.GameDTO;
 import com.kauan.gamelog.dto.GameMinDTO;
 import com.kauan.gamelog.services.GameService;
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
 
 @RestController
 @RequestMapping(value = "/games")

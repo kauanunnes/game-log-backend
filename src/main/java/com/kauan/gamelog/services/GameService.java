@@ -6,10 +6,9 @@ import com.kauan.gamelog.entities.Game;
 import com.kauan.gamelog.errors.NotFoundException;
 import com.kauan.gamelog.projections.GameMinProjection;
 import com.kauan.gamelog.repositories.GameRepository;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class GameService {
@@ -27,9 +26,8 @@ public class GameService {
 
     @Transactional(readOnly = true)
     public GameDTO findById(Long id) {
-        Game result = gameRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Jogo " + id + " não encontrado."));
+        Game result =
+                gameRepository.findById(id).orElseThrow(() -> new NotFoundException("Jogo " + id + " não encontrado."));
         return new GameDTO(result);
     }
 

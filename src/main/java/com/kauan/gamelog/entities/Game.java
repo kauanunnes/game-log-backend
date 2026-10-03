@@ -1,17 +1,18 @@
 package com.kauan.gamelog.entities;
 
 import jakarta.persistence.*;
-
 import java.util.Objects;
+
 @Entity
-@Table(name="tb_game")
+@Table(name = "tb_game")
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name="game_year")
+    @Column(name = "game_year")
     private Integer year;
+
     private Double score;
     private String title, genre, platforms, imgUrl;
 
@@ -21,9 +22,18 @@ public class Game {
     @Column(columnDefinition = "TEXT")
     private String longDescription;
 
-    public Game() { }
+    public Game() {}
 
-    public Game(Long id, Integer year, Double score, String title, String genre, String platforms, String imgUrl, String shortDescription, String longDescription) {
+    public Game(
+            Long id,
+            Integer year,
+            Double score,
+            String title,
+            String genre,
+            String platforms,
+            String imgUrl,
+            String shortDescription,
+            String longDescription) {
         this.id = id;
         this.year = year;
         this.score = score;

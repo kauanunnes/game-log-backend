@@ -2,10 +2,9 @@ package com.kauan.gamelog.repositories;
 
 import com.kauan.gamelog.entities.Game;
 import com.kauan.gamelog.projections.GameMinProjection;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.List;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
     @Query(nativeQuery = true, value = """

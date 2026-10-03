@@ -1,6 +1,5 @@
 package com.kauan.gamelog.dto;
 
-
 import com.kauan.gamelog.entities.Game;
 import org.springframework.beans.BeanUtils;
 

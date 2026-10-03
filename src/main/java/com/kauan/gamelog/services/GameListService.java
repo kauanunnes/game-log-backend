@@ -4,10 +4,9 @@ import com.kauan.gamelog.dto.GameListDTO;
 import com.kauan.gamelog.entities.GameList;
 import com.kauan.gamelog.errors.NotFoundException;
 import com.kauan.gamelog.repositories.GameListRepository;
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 public class GameListService {

@@ -1,18 +1,18 @@
 package com.kauan.gamelog.entities;
 
 import jakarta.persistence.*;
-
 import java.util.Objects;
+
 @Entity
-@Table(name="tb_game_list")
+@Table(name = "tb_game_list")
 public class GameList {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String name;
 
-    public GameList() {
-    }
+    public GameList() {}
 
     public GameList(Long id, String name) {
         this.id = id;
