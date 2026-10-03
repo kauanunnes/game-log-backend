@@ -12,4 +12,14 @@ public record LibraryEntryDTO(
         PlaythroughDTO playthrough,
         AcquisitionDTO acquisition,
         Instant createdAt,
-        Instant updatedAt) {}
+        Instant updatedAt) {
+
+    /** Sem loja e valor pago, para as rotas públicas (RN10). */
+    public LibraryEntryDTO withoutSpending() {
+        if (acquisition == null) {
+            return this;
+        }
+        var hidden = new AcquisitionDTO(acquisition.method(), null, null, acquisition.acquiredOn());
+        return new LibraryEntryDTO(game, status, favorite, review, playthrough, hidden, createdAt, updatedAt);
+    }
+}

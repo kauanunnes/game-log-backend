@@ -2,6 +2,7 @@ package com.kauan.gamelog.library;
 
 import com.kauan.gamelog.catalog.GameService;
 import com.kauan.gamelog.catalog.LookupService;
+import com.kauan.gamelog.library.dto.LibraryCounts;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryEntryRequest;
 import com.kauan.gamelog.library.dto.LibraryFilter;
@@ -51,6 +52,17 @@ public class LibraryService {
     @Transactional(readOnly = true)
     public Page<LibraryEntryDTO> list(long userId, LibraryFilter filter, Pageable pageable) {
         return queries.find(userId, filter, pageable);
+    }
+
+    /** Entradas com texto de avaliação, das editadas por último. */
+    @Transactional(readOnly = true)
+    public Page<LibraryEntryDTO> reviews(long userId, Pageable pageable) {
+        return queries.findReviews(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public LibraryCounts counts(long userId) {
+        return queries.counts(userId);
     }
 
     @Transactional(readOnly = true)

@@ -2,6 +2,7 @@ package com.kauan.gamelog.library;
 
 import com.kauan.gamelog.catalog.dto.GameSummaryDTO;
 import com.kauan.gamelog.library.dto.AcquisitionDTO;
+import com.kauan.gamelog.library.dto.LibraryCounts;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryFilter;
 import com.kauan.gamelog.library.dto.MoneyDTO;
@@ -92,14 +93,49 @@ class LibraryQueries {
             conditions.add("strpos(g.title_normalized, :q) > 0");
             params.put("q", TextNormalizer.normalize(filter.q()));
         }
-        String where = " WHERE " + String.join(" AND ", conditions);
+        return page(conditions, params, orderBy(pageable.getSort()), pageable);
+    }
 
+    Page<LibraryEntryDTO> findReviews(long userId, Pageable pageable) {
+        return page(
+                List.of("e.user_id = :userId", "e.review_text IS NOT NULL"),
+                Map.of("userId", userId),
+                "e.reviewed_at DESC, e.id DESC",
+                pageable);
+    }
+
+    LibraryCounts counts(long userId) {
+        return jdbc.sql("""
+                        SELECT count(*) FILTER (WHERE status = 'PLAYED') AS played,
+                               count(*) FILTER (WHERE status = 'PLAYING') AS playing,
+                               count(*) FILTER (WHERE status = 'BACKLOG') AS backlog,
+                               count(*) FILTER (WHERE status = 'WISHLIST') AS wishlist,
+                               count(*) FILTER (WHERE status = 'DROPPED') AS dropped,
+                               count(*) FILTER (WHERE favorite) AS favorites,
+                               count(*) FILTER (WHERE review_text IS NOT NULL) AS reviews
+                        FROM library_entries WHERE user_id = :userId
+                        """)
+                .param("userId", userId)
+                .query((rs, row) -> new LibraryCounts(
+                        rs.getLong("played"),
+                        rs.getLong("playing"),
+                        rs.getLong("backlog"),
+                        rs.getLong("wishlist"),
+                        rs.getLong("dropped"),
+                        rs.getLong("favorites"),
+                        rs.getLong("reviews")))
+                .single();
+    }
+
+    private Page<LibraryEntryDTO> page(
+            List<String> conditions, Map<String, Object> params, String orderBy, Pageable pageable) {
+        String where = " WHERE " + String.join(" AND ", conditions);
         long total = jdbc.sql("SELECT count(*) FROM library_entries e JOIN games g ON g.id = e.game_id" + where)
                 .params(params)
                 .query(Long.class)
                 .single();
         List<LibraryEntryDTO> content = jdbc.sql(
-                        SELECT + where + " ORDER BY " + orderBy(pageable.getSort()) + " LIMIT :limit OFFSET :offset")
+                        SELECT + where + " ORDER BY " + orderBy + " LIMIT :limit OFFSET :offset")
                 .params(params)
                 .param("limit", pageable.getPageSize())
                 .param("offset", pageable.getOffset())

@@ -1,0 +1,45 @@
+package com.kauan.gamelog.profile;
+
+import com.kauan.gamelog.library.dto.LibraryEntryDTO;
+import com.kauan.gamelog.library.dto.LibraryFilter;
+import com.kauan.gamelog.profile.dto.ProfileDTO;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedModel;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+/** Perfis públicos (RF40, RF41): não exigem login. */
+@RestController
+@RequestMapping("/users/{username}")
+public class ProfileController {
+    private final ProfileService profileService;
+
+    public ProfileController(ProfileService profileService) {
+        this.profileService = profileService;
+    }
+
+    @GetMapping
+    public ProfileDTO profile(@PathVariable String username) {
+        return profileService.profile(username);
+    }
+
+    /** Mesmos filtros de {@code /me/library}; as abas Jogados, Jogando etc. usam {@code ?status=}. */
+    @GetMapping("/library")
+    public PagedModel<LibraryEntryDTO> library(
+            @PathVariable String username, @Valid LibraryFilter filter, Pageable pageable) {
+        return new PagedModel<>(profileService.library(username, filter, pageable));
+    }
+
+    @GetMapping("/favorites")
+    public PagedModel<LibraryEntryDTO> favorites(@PathVariable String username, Pageable pageable) {
+        return new PagedModel<>(profileService.favorites(username, pageable));
+    }
+
+    @GetMapping("/reviews")
+    public PagedModel<LibraryEntryDTO> reviews(@PathVariable String username, Pageable pageable) {
+        return new PagedModel<>(profileService.reviews(username, pageable));
+    }
+}

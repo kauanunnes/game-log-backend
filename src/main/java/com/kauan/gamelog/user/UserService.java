@@ -68,6 +68,11 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public Optional<PublicUser> findPublic(String username) {
+        return users.findByUsername(normalize(username)).map(PublicUser::of);
+    }
+
+    @Transactional(readOnly = true)
     public MeDTO getMe(long id) {
         return MeDTO.from(find(id));
     }
