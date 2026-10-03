@@ -94,7 +94,9 @@ A entrada é identificada por **usuário + jogo**. Por isso o `PUT` cria ou subs
 | PUT | `/me/library/{gameId}` | usuário | Cria (201) ou substitui (200) a entrada inteira | 1 |
 | PATCH | `/me/library/{gameId}` | usuário | Altera só os campos enviados (ex.: status ou favorito); `null` limpa o campo (JSON Merge Patch, RFC 7396) | 1 |
 | DELETE | `/me/library/{gameId}` | usuário | Remove a entrada; 204 | 1 |
-| GET | `/me/stats` | usuário | Estatísticas completas, inclusive gastos; `?year=` opcional | 1 |
+| GET | `/me/stats` | usuário | Estatísticas completas, inclusive gastos; com `?year=`, contam os jogos terminados no ano e as compras feitas no ano | 1 |
+
+As estatísticas trazem `total`, `byStatus`, `finishedByYear`, os 10 primeiros gêneros (`byGenre`, sem a lista de desejos) e plataformas em que a pessoa jogou (`byPlatform`), `ratingDistribution` (uma faixa a cada meia estrela), `averageRating`, `hoursPlayed` e `spending` por moeda, sem conversão, com totais por loja e por ano (RN05).
 
 Corpo do `PUT /me/library/{gameId}`:
 
@@ -144,7 +146,7 @@ Respondem igual para qualquer pessoa, inclusive o dono, que vê os próprios dad
 | GET | `/users/{username}/library` | público | Mesmos filtros de `/me/library`; 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/favorites` | público | Favoritos | 1 |
 | GET | `/users/{username}/reviews` | público | Entradas com texto de avaliação, das editadas por último | 1 |
-| GET | `/users/{username}/stats` | público | Estatísticas, sem gastos (salvo se o dono permitir) | 1 |
+| GET | `/users/{username}/stats` | público | Estatísticas, sem gastos (salvo se o dono permitir); 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/followers` e `/following` | público | Seguidores e seguidos | 2 |
 | PUT / DELETE | `/users/{username}/follow` | usuário | Seguir e deixar de seguir | 2 |
 | GET | `/users/{username}/lists` | público | Listas personalizadas | 2 |

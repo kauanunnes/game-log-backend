@@ -104,7 +104,7 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 1.6 Estatísticas · RF43
 
-- [ ] `GET /me/stats` e `GET /users/{username}/stats`, com consultas agregadas.
+- [x] `GET /me/stats` e `GET /users/{username}/stats`, com consultas agregadas.
 
 **Pronto quando:** os números batem com um cenário de teste conhecido.
 
