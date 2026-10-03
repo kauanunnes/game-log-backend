@@ -53,6 +53,11 @@ public class IgdbClient {
                 .build());
     }
 
+    /** Pede um token à Twitch; lança exceção se ela recusar as credenciais. */
+    void checkCredentials() {
+        tokens.token();
+    }
+
     public List<IgdbGame> search(String text, int limit) {
         return query(FIELDS + "search \"" + escape(text) + "\"; where " + SUPPORTED_TYPES + "; limit " + limit + ";");
     }

@@ -3,6 +3,7 @@ package com.kauan.gamelog.catalog.igdb;
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.equalTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.jsonResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.okJson;
 import static com.github.tomakehurst.wiremock.client.WireMock.post;
 import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
@@ -64,6 +65,14 @@ class IgdbClientTests {
                         .withHeader("Authorization", equalTo("Bearer token-1"))
                         .withRequestBody(
                                 containing("search \"hades\"; where game_type = (0,2,4,8,9,10,11); limit 5;")));
+    }
+
+    @Test
+    void reportsCredentialsRejectedByTwitch() {
+        igdb.stubFor(post("/oauth2/token")
+                .willReturn(jsonResponse("{\"status\": 400, \"message\": \"invalid client\"}", 400)));
+
+        assertThatThrownBy(client::checkCredentials).hasMessageContaining("invalid client");
     }
 
     @Test

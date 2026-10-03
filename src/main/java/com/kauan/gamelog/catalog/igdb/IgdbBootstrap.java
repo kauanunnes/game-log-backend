@@ -8,7 +8,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
 /**
- * Importação inicial dos jogos mais populares do IGDB. Só roda quando pedida:
+ * Na subida, avisa no log se o IGDB está ligado e, quando pedido, importa os jogos mais populares:
  * {@code --game-log.igdb.bootstrap-limit=2000}.
  */
 @Component
@@ -28,14 +28,25 @@ class IgdbBootstrap implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        int limit = properties.bootstrapLimit();
-        if (limit <= 0) {
-            return;
-        }
         if (!properties.enabled()) {
-            log.warn("IGDB sem credenciais: a importação inicial não vai rodar");
+            log.warn("IGDB desligado: sem IGDB_CLIENT_ID e IGDB_CLIENT_SECRET, a busca usa só o banco");
             return;
         }
+        try {
+            client.checkCredentials();
+        } catch (RuntimeException e) {
+            log.error(
+                    "IGDB fora: a Twitch não liberou o token ({}). Confira IGDB_CLIENT_ID e IGDB_CLIENT_SECRET",
+                    e.getMessage());
+            return;
+        }
+        log.info("IGDB ligado");
+        if (properties.bootstrapLimit() > 0) {
+            importPopular(properties.bootstrapLimit());
+        }
+    }
+
+    private void importPopular(int limit) {
         int imported = 0;
         try {
             for (int offset = 0; offset < limit; offset += PAGE_SIZE) {

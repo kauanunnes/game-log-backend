@@ -32,7 +32,7 @@ IGDB_CLIENT_ID=...
 IGDB_CLIENT_SECRET=...
 ```
 
-Daí em diante, uma busca com poucos resultados também consulta o IGDB e guarda o que encontrar. Para trazer de uma vez os jogos mais populares:
+Ao subir, a aplicação confere as credenciais e mostra no log `IGDB ligado` ou o motivo de estar desligado. Daí em diante, uma busca com poucos resultados também consulta o IGDB e guarda o que encontrar. Para trazer de uma vez os jogos mais populares:
 
 ```bash
 ./mvnw spring-boot:run -Dspring-boot.run.arguments=--game-log.igdb.bootstrap-limit=2000
