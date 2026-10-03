@@ -52,7 +52,7 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 0.5 Estrutura por módulos
 
-- [ ] Reorganizar o código em `catalog/`, `library/`, etc. (ver [arquitetura](05-arquitetura.md#organização-do-código)). O código atual de `Game` vai para `catalog/`; o de `GameList`/`Belonging` fica guardado para a tarefa 2.5.
+- [x] Reorganizar o código por funcionalidade (ver [arquitetura](05-arquitetura.md#organização-do-código)): `catalog/` (jogos), `lists/` (listas do curso, base da tarefa 2.5) e `shared/` (CORS, prefixo da API e erros). A dependência entre módulos vai num sentido só: `lists` → `catalog`.
 
 **Pronto quando:** os pacotes estão separados por funcionalidade.
 
