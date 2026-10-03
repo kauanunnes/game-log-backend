@@ -136,14 +136,14 @@ Erros de regra voltam com 422 e um `code`:
 
 ### Perfis públicos
 
-Respondem igual para qualquer pessoa: nunca incluem loja e valor pago, a menos que o dono ative "mostrar gastos" (RN10).
+Respondem igual para qualquer pessoa, inclusive o dono, que vê os próprios dados privados em `/me`. Nunca incluem loja e valor pago, a menos que o dono ative "mostrar gastos" (RN10); o método e a data da aquisição continuam.
 
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
-| GET | `/users/{username}` | público | Cabeçalho (nome, bio, gênero se informado) e contadores; `"private": true` se o perfil for privado | 1 |
+| GET | `/users/{username}` | público | Cabeçalho (nome, bio, gênero se informado, `memberSince`) e `counts` de cada aba; num perfil privado, só `username`, `displayName` e `"private": true` | 1 |
 | GET | `/users/{username}/library` | público | Mesmos filtros de `/me/library`; 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/favorites` | público | Favoritos | 1 |
-| GET | `/users/{username}/reviews` | público | Entradas com texto de avaliação | 1 |
+| GET | `/users/{username}/reviews` | público | Entradas com texto de avaliação, das editadas por último | 1 |
 | GET | `/users/{username}/stats` | público | Estatísticas, sem gastos (salvo se o dono permitir) | 1 |
 | GET | `/users/{username}/followers` e `/following` | público | Seguidores e seguidos | 2 |
 | PUT / DELETE | `/users/{username}/follow` | usuário | Seguir e deixar de seguir | 2 |

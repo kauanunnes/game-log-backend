@@ -97,8 +97,8 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 1.5 Perfil público · RF40–RF42
 
-- [ ] `GET /users/{username}` e as abas `library`, `favorites` e `reviews`.
-- [ ] Perfil privado e omissão dos dados de aquisição (RN10).
+- [x] `GET /users/{username}` e as abas `library`, `favorites` e `reviews`.
+- [x] Perfil privado e omissão dos dados de aquisição (RN10).
 
 **Pronto quando:** um teste garante que o valor pago nunca aparece numa rota pública quando "mostrar gastos" está desligado.
 
