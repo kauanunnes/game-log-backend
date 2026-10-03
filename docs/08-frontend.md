@@ -1,6 +1,6 @@
 # 08 · Front-end (Vue 3)
 
-> O esqueleto está no repositório **`game-log-frontend`** (pasta irmã deste projeto). Ele já tem o visual, as rotas, a sessão e o cliente da API. As telas mostram "Em construção" até a API correspondente existir.
+> O código está no repositório **`game-log-frontend`** (pasta irmã deste projeto). Explorar e Página do jogo já usam a API; as outras telas mostram "Em construção" até a vez delas.
 
 ## Identidade visual
 
@@ -26,12 +26,13 @@ As cores, sombras e fontes ficam em `src/styles/tokens.css`. Em desenvolvimento,
 | Pacotes | pnpm |
 | Rotas | Vue Router |
 | Estado da sessão | Pinia |
+| Dados da API | TanStack Query (cache, carregamento e erro; não repete erro 4xx) |
 | Testes | Vitest + Vue Test Utils |
 | Qualidade | ESLint + Oxlint + Prettier |
 | Fontes | Fontsource (servidas pelo próprio app) |
 | Deploy | Vercel, com rewrite de `/api/*` para a API |
 
-Entram quando forem usados: TanStack Query (primeira tela que buscar dados), VeeValidate + Zod (formulário "Registrar jogo"), Playwright (testes E2E) e `openapi-typescript` (tipos gerados do Swagger, quando a API existir).
+Entram quando forem usados: VeeValidate + Zod (formulário "Registrar jogo"), Playwright (testes E2E) e `openapi-typescript` (tipos gerados do Swagger).
 
 ## Estrutura de pastas
 
@@ -71,6 +72,11 @@ src/
 | `TabPanel` | Abas no estilo Win95, ligadas às rotas filhas, com o painel embaixo |
 | `StarRating` | Mostra e edita a nota de 0 a 5 em passos de 0,25, com preenchimento parcial da estrela. Funciona no teclado (setas mudam 0,25; Home, End e Delete) |
 | `GameCard` | Capa (ou padrão pontilhado sem capa), título, ano, nota, status e favorito |
+| `GameCardSkeleton` | Card pontilhado que pisca enquanto os jogos carregam |
+| `ErrorMessage` | Diálogo de erro do Win95 com "Tentar de novo" |
+| `PageNav` | Anterior e próxima, pela `?page=` da rota atual |
+| `RatingHistogram` | Distribuição das notas, uma barra a cada meia estrela |
+| `ReviewCard` | Avaliação pública com autor, nota e "recomenda"; o spoiler fica escondido até o clique |
 | `UnderConstruction` | Aviso de "em construção" para telas que ainda não existem |
 
 ## Sessão e chamadas à API
@@ -83,4 +89,6 @@ src/
 
 ## Próximos passos
 
-As telas reais começam quando a API da biblioteca estiver pronta (tarefa 1.4 do [roadmap](07-roadmap.md)).
+- **Explorar** (`/games`): busca, filtros e ordenação ficam na URL; a busca só dispara no Enter, porque cada busca com poucos resultados consulta o IGDB.
+- **Página do jogo** (`/games/:slug`): dados do IGDB, números da comunidade e avaliações públicas.
+- A seguir: entrar e criar conta, registrar jogo na biblioteca, perfil com abas e estatísticas, e a página inicial com `sort=trending` e `GET /reviews` (a API de todas já existe).
