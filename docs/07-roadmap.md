@@ -88,10 +88,10 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 1.4 Biblioteca · RF30–RF37
 
-- [ ] Tabela `library_entries` com as constraints; `Review`, `Playthrough` e `Acquisition` como `@Embeddable`.
-- [ ] Regras da RN02 num lugar só, com teste parametrizado por status.
-- [ ] `GET`, `PUT`, `PATCH` e `DELETE /me/library/{gameId}`, e `GET /me/library` com filtros.
-- [ ] Publicar o evento `LibraryEntryChanged`, ainda sem ouvintes (prepara as Fases 2 e 3).
+- [x] Tabela `library_entries` com as constraints; `Review`, `Playthrough` e `Acquisition` como `@Embeddable`.
+- [x] Regras da RN02 num lugar só, com teste parametrizado por status.
+- [x] `GET`, `PUT`, `PATCH` e `DELETE /me/library/{gameId}`, e `GET /me/library` com filtros.
+- [x] Publicar o evento `LibraryEntryChanged`, ainda sem ouvintes (prepara as Fases 2 e 3).
 
 **Pronto quando:** todas as células da tabela da RN02 têm teste.
 

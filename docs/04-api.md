@@ -89,7 +89,7 @@ A entrada é identificada por **usuário + jogo**. Por isso o `PUT` cria ou subs
 
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
-| GET | `/me/library` | usuário | Lista com filtros `status`, `favorite`, `genreId`, `platformId`, `minRating`, `recommends`, `q`; ordena por `createdAt`, `updatedAt`, `rating`, `title`, `finishedOn` | 1 |
+| GET | `/me/library` | usuário | Lista com filtros `status`, `favorite`, `genreId`, `platformId` (onde a pessoa jogou), `minRating`, `recommends`, `q`; ordena por `createdAt`, `updatedAt` (padrão, mais recentes primeiro), `rating`, `title`, `finishedOn` | 1 |
 | GET | `/me/library/{gameId}` | usuário | Minha entrada para o jogo; 404 se não existir | 1 |
 | PUT | `/me/library/{gameId}` | usuário | Cria (201) ou substitui (200) a entrada inteira | 1 |
 | PATCH | `/me/library/{gameId}` | usuário | Altera só os campos enviados (ex.: status ou favorito); `null` limpa o campo (JSON Merge Patch, RFC 7396) | 1 |
@@ -124,7 +124,15 @@ Corpo do `PUT /me/library/{gameId}`:
 }
 ```
 
-Na resposta, a entrada volta com o resumo do jogo (`id`, `slug`, `title`, `coverUrl`, `releaseYear`) e com `createdAt` e `updatedAt`.
+Na resposta, a entrada volta com o resumo do jogo (`id`, `slug`, `title`, `coverUrl`, `releaseYear`) e com `createdAt` e `updatedAt`. Partes vazias (como `"review": {}`) valem como ausentes.
+
+Erros de regra voltam com 422 e um `code`:
+
+| `code` | Quando |
+|---|---|
+| `INVALID_FIELDS_FOR_STATUS` | algum campo não cabe no status (RN02) |
+| `INVALID_FIELDS` | nota fora dos passos de 0,25, término antes do início, valor pago sem compra ou moeda desconhecida (RN03, RN05, RN06) |
+| `UNKNOWN_REFERENCE` | plataforma ou loja que não existe no catálogo |
 
 ### Perfis públicos
 

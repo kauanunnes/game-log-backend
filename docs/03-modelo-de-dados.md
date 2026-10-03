@@ -130,7 +130,7 @@ Uma linha por usuário + jogo. No JPA, `LibraryEntry` agrupa três `@Embeddable`
 | `rating` | numeric(3,2) | 0 a 5, em passos de 0,25 |
 | `recommends` | boolean | `null` = não respondeu |
 | `review_text` | varchar(2000) | texto puro |
-| `has_spoilers` | boolean | padrão `false` |
+| `has_spoilers` | boolean | `false` por padrão numa avaliação; `null` quando não há avaliação |
 | `reviewed_at` | timestamptz | última edição da avaliação; ordena as "recentes" |
 | **Playthrough** | | |
 | `played_platform_id` | bigint | FK `platforms` |
