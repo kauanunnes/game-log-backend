@@ -1,11 +1,9 @@
-package com.kauan.gamelog.services;
+package com.kauan.gamelog.catalog;
 
-import com.kauan.gamelog.dto.GameDTO;
-import com.kauan.gamelog.dto.GameMinDTO;
-import com.kauan.gamelog.entities.Game;
-import com.kauan.gamelog.errors.NotFoundException;
-import com.kauan.gamelog.projections.GameMinProjection;
-import com.kauan.gamelog.repositories.GameRepository;
+import com.kauan.gamelog.catalog.dto.GameDTO;
+import com.kauan.gamelog.catalog.dto.GameMinDTO;
+import com.kauan.gamelog.lists.GameMinProjection;
+import com.kauan.gamelog.shared.NotFoundException;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

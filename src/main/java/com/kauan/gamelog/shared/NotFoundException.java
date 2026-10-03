@@ -1,4 +1,4 @@
-package com.kauan.gamelog.errors;
+package com.kauan.gamelog.shared;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.ErrorResponseException;

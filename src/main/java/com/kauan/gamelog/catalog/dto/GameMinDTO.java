@@ -1,7 +1,7 @@
-package com.kauan.gamelog.dto;
+package com.kauan.gamelog.catalog.dto;
 
-import com.kauan.gamelog.entities.Game;
-import com.kauan.gamelog.projections.GameMinProjection;
+import com.kauan.gamelog.catalog.Game;
+import com.kauan.gamelog.lists.GameMinProjection;
 
 public class GameMinDTO {
     private Long id;

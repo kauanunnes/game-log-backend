@@ -1,4 +1,4 @@
-package com.kauan.gamelog.controllers;
+package com.kauan.gamelog.catalog;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;

@@ -1,5 +1,6 @@
-package com.kauan.gamelog.entities;
+package com.kauan.gamelog.lists;
 
+import com.kauan.gamelog.catalog.Game;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

@@ -1,4 +1,4 @@
-package com.kauan.gamelog.config;
+package com.kauan.gamelog.shared;
 
 import com.kauan.gamelog.GameLogApplication;
 import org.springframework.beans.factory.annotation.Value;

@@ -1,4 +1,4 @@
-package com.kauan.gamelog.config;
+package com.kauan.gamelog.shared;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;

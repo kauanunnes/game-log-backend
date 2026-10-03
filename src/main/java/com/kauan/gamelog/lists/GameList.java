@@ -1,4 +1,4 @@
-package com.kauan.gamelog.entities;
+package com.kauan.gamelog.lists;
 
 import jakarta.persistence.*;
 import java.util.Objects;

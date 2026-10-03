@@ -1,4 +1,4 @@
-package com.kauan.gamelog.projections;
+package com.kauan.gamelog.lists;
 
 public interface GameMinProjection {
     Long getId();

@@ -1,8 +1,7 @@
-package com.kauan.gamelog.controllers;
+package com.kauan.gamelog.catalog;
 
-import com.kauan.gamelog.dto.GameDTO;
-import com.kauan.gamelog.dto.GameMinDTO;
-import com.kauan.gamelog.services.GameService;
+import com.kauan.gamelog.catalog.dto.GameDTO;
+import com.kauan.gamelog.catalog.dto.GameMinDTO;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
