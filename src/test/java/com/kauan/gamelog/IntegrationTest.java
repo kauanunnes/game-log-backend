@@ -8,10 +8,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.context.annotation.Import;
 
-/** Contexto completo, MockMvc e PostgreSQL 18 num container compartilhado entre as classes de teste. */
+/**
+ * Contexto completo, MockMvc e PostgreSQL 18 num container compartilhado entre as classes de teste. O IGDB
+ * fica desligado mesmo que exista um {@code .env} com credenciais.
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest
+@SpringBootTest(properties = {"game-log.igdb.client-id=", "game-log.igdb.client-secret="})
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 public @interface IntegrationTest {}

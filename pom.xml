@@ -19,6 +19,7 @@
 		<spotless.version>3.10.3</spotless.version>
 		<palantir-java-format.version>2.101.0</palantir-java-format.version>
 		<jacoco.version>0.8.15</jacoco.version>
+		<wiremock.version>3.13.2</wiremock.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -75,6 +76,12 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>testcontainers-postgresql</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.wiremock</groupId>
+			<artifactId>wiremock-standalone</artifactId>
+			<version>${wiremock.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
