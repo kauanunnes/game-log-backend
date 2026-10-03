@@ -211,7 +211,7 @@ Se usarmos o `PgVectorStore` do Spring AI, ele cria a própria tabela (`vector_s
 
 ## Do código do curso para o novo modelo
 
-O projeto hoje é a base do curso DSList. O que muda:
+O projeto começou a partir do curso DSList. O que mudou:
 
 | No curso | No Game Log |
 |---|---|
