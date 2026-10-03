@@ -38,6 +38,14 @@ Ao subir, a aplicação confere as credenciais e mostra no log `IGDB ligado` ou 
 ./mvnw spring-boot:run -Dspring-boot.run.arguments=--game-log.igdb.bootstrap-limit=2000
 ```
 
+### Contas
+
+O cadastro e o login devolvem um access token (15 minutos) e deixam o refresh token num cookie `HttpOnly`. No Swagger, use o botão **Authorize** com o access token. Não existe rota que crie administrador: o papel é dado direto no banco, e o token só sai com ele depois de entrar de novo.
+
+```sql
+UPDATE users SET role = 'ADMIN' WHERE username = 'seu_username';
+```
+
 ## Testes e qualidade
 
 ```bash
@@ -48,7 +56,7 @@ Roda os testes contra um PostgreSQL 18 em container (Testcontainers) e um IGDB s
 
 ## Produção
 
-Defina `SPRING_PROFILES_ACTIVE=prod` e as variáveis listadas em [`.env.example`](.env.example).
+Defina `SPRING_PROFILES_ACTIVE=prod` e as variáveis listadas em [`.env.example`](.env.example). Sem `JWT_PRIVATE_KEY`, a aplicação não sobe em produção.
 
 ## Documentação
 

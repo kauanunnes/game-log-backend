@@ -100,7 +100,7 @@ sequenceDiagram
 ```
 
 - **Senhas:** BCrypt com custo 12.
-- **Access token:** JWT assinado (RS256) com validade de 15 minutos, contendo `sub` (id do usuário), `username` e papéis. No front, fica só em memória.
+- **Access token:** JWT assinado (RS256) com validade de 15 minutos, contendo `sub` (id do usuário), `username` e papéis (`roles`). No front, fica só em memória. A própria API assina e valida (Spring Security Resource Server), sem servidor de autorização separado.
 - **Refresh token:** valor aleatório, salvo no banco só como hash SHA-256, com validade de 30 dias e trocado a cada uso. Se um refresh já usado aparecer de novo, a sessão inteira (a "família") é revogada, porque isso indica roubo do token.
 - **Cookie:** `HttpOnly; Secure; SameSite=Lax; Path=/api/v1/auth`. Para o cookie funcionar, front e API precisam estar no mesmo site: use o rewrite do Vercel (`/api/*` → API) ou subdomínios de um mesmo domínio. O Safari bloqueia cookies de terceiros.
 - **Autorização:** a escrita acontece sempre em `/me/...`, então não existe id de outro usuário para trocar na URL (sem IDOR). As rotas de admin exigem `hasRole('ADMIN')`.
@@ -154,7 +154,7 @@ Os testes rodam contra a mesma imagem de PostgreSQL usada em desenvolvimento, se
 | `SPRING_PROFILES_ACTIVE` | `local` / `prod` | perfil |
 | `SPRING_DATASOURCE_URL` | `jdbc:postgresql://localhost:5432/gamelog` | banco |
 | `SPRING_DATASOURCE_USERNAME` / `SPRING_DATASOURCE_PASSWORD` | | banco |
-| `JWT_PRIVATE_KEY` / `JWT_PUBLIC_KEY` | PEM | assinatura dos tokens |
+| `JWT_PRIVATE_KEY` | PEM (PKCS#8) | assinatura dos tokens; a chave pública é derivada dela. Obrigatória em `prod`; sem ela, o perfil local gera uma chave a cada subida |
 | `CORS_ORIGINS` | `http://localhost:5173` | origens liberadas, separadas por vírgula |
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | | app da Twitch |
 | `ANTHROPIC_API_KEY`, chave do provedor de embeddings | | Fase 3 |

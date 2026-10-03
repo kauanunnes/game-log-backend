@@ -65,7 +65,7 @@ Formato estável do Spring Data (`PagedModel`):
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
 | POST | `/auth/register` | público | Cria a conta; 201 com access token e cookie de refresh | 1 |
-| POST | `/auth/login` | público | Login com username ou e-mail; limite de tentativas | 1 |
+| POST | `/auth/login` | público | Login com username ou e-mail; 5 erros seguidos do mesmo IP para o mesmo login bloqueiam por 15 minutos (429) | 1 |
 | POST | `/auth/refresh` | cookie | Troca o refresh token (rotação) e devolve um novo access token | 1 |
 | POST | `/auth/logout` | cookie | Revoga a sessão; 204 | 1 |
 | POST | `/auth/password/forgot` | público | Envia o link de redefinição por e-mail | 2 |
@@ -77,10 +77,10 @@ Formato estável do Spring Data (`PagedModel`):
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
 | GET | `/me` | usuário | Perfil e configurações | 1 |
-| PATCH | `/me` | usuário | Nome, bio, gênero (`FEMALE`, `MALE`, `NON_BINARY`, `OTHER` ou `null`), username | 1 |
+| PATCH | `/me` | usuário | Nome, bio, gênero (`FEMALE`, `MALE`, `NON_BINARY`, `OTHER` ou `null`), username. JSON Merge Patch: só o que vier muda, e `null` limpa | 1 |
 | PATCH | `/me/settings` | usuário | Perfil privado, mostrar gastos, moeda padrão | 1 |
-| PUT | `/me/password` | usuário | Troca a senha; exige a senha atual | 1 |
-| DELETE | `/me` | usuário | Exclui a conta; exige a senha; 204 | 1 |
+| PUT | `/me/password` | usuário | Troca a senha; exige a senha atual e encerra todas as sessões (é preciso entrar de novo) | 1 |
+| DELETE | `/me` | usuário | Exclui a conta; exige a senha no corpo (`{ "password": "..." }`); 204 | 1 |
 | GET | `/me/export` | usuário | Exporta todos os dados | 2 |
 
 ### Minha biblioteca
