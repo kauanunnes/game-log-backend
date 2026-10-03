@@ -1,0 +1,6 @@
+# Lista de permissão: só o necessário para compilar entra na imagem (nada de .env, target ou .git).
+*
+!.mvn/
+!mvnw
+!pom.xml
+!src/
