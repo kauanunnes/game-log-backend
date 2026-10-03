@@ -1,0 +1,18 @@
+name: game-log
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg18
+    environment:
+      POSTGRES_DB: gamelog
+      POSTGRES_USER: gamelog
+      POSTGRES_PASSWORD: gamelog
+    ports:
+      - '5433:5432'
+    labels:
+      org.springframework.boot.service-connection: postgres
+    volumes:
+      - gamelog-data:/var/lib/postgresql
+
+volumes:
+  gamelog-data:
