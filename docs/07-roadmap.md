@@ -68,20 +68,21 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 1.2 Integração com o IGDB · RF25, RF26
 
-- [ ] App na Twitch; token com cache e renovação.
-- [ ] Cliente HTTP com limite de 4 req/s, retry e timeout, testado com WireMock.
-- [ ] Importação por id do IGDB (upsert de gêneros, plataformas e metadados).
-- [ ] Busca com fallback: se o resultado local for fraco, consulta o IGDB, importa e devolve.
-- [ ] Job de importação inicial dos jogos mais populares (começando com ~2 mil).
+- [x] App na Twitch; token com cache e renovação.
+- [x] Cliente HTTP com limite de 4 req/s, retry e timeout, testado com WireMock.
+- [x] Importação por id do IGDB (upsert de gêneros, plataformas e metadados). As rotas de admin que a usam entram na 1.3, junto com os papéis.
+- [x] Busca com fallback: se o resultado local for fraco, consulta o IGDB, importa e devolve.
+- [x] Job de importação inicial dos jogos mais populares (começando com ~2 mil).
 
 **Pronto quando:** a primeira busca por um jogo fora do banco traz o resultado do IGDB, e a segunda já sai do banco.
 
-### 1.3 Contas e autenticação · RF01–RF08
+### 1.3 Contas e autenticação · RF01–RF08, RF26
 
 - [ ] Tabelas `users` e `refresh_tokens`; cadastro validado (RN08, RN09).
 - [ ] Login, refresh com rotação e logout; Spring Security com JWT.
 - [ ] `GET` e `PATCH /me` (nome, bio e gênero opcional, RN14), `PATCH /me/settings`, `PUT /me/password`, `DELETE /me`.
 - [ ] Limite de tentativas no login; CORS configurado por variável de ambiente.
+- [ ] `POST /admin/games/import` e `POST /admin/games/{id}/sync`, só para admin (RF26).
 
 **Pronto quando:** há testes para 401 (sem token), 403 (sem permissão) e para o caso de um refresh reutilizado, que deve revogar a sessão.
 

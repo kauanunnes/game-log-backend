@@ -25,7 +25,7 @@ flowchart LR
 | Migrations | Flyway | Schema versionado e revisável em PR |
 | Segurança | Spring Security 7 + OAuth2 Resource Server (JWT) | Validação de JWT pronta, sem biblioteca extra |
 | Validação | Jakarta Bean Validation | Anotações nos DTOs de entrada |
-| HTTP externo | `RestClient` ou HTTP Interface (`@HttpExchange`) | Cliente declarativo para o IGDB |
+| HTTP externo | `RestClient` | Cliente do IGDB, com limite de taxa e retry |
 | Cache | Spring Cache + Caffeine | Listas auxiliares e respostas do IGDB. Redis só se houver mais de uma instância |
 | Documentação | springdoc-openapi | Swagger UI gerado do código |
 | Testes | JUnit, AssertJ, Mockito, Testcontainers, WireMock | Banco real nos testes e IGDB simulado |
@@ -113,13 +113,13 @@ sequenceDiagram
 
 - **Credenciais:** crie um app no console de desenvolvedor da Twitch (Client ID + Client Secret) e obtenha o token por *client credentials* em `POST https://id.twitch.tv/oauth2/token`. O token vale por semanas: guarde em memória e renove quando expirar ou quando a API responder 401.
 - **Chamadas:** `POST https://api.igdb.com/v4/games`, com os headers `Client-ID` e `Authorization: Bearer`. O corpo vai na linguagem Apicalypse (campos, filtros, limite).
-- **Limite:** 4 requisições por segundo por credencial. Use um limitador no cliente, cache das buscas por 24 h e retry com espera para erros temporários (o Spring Framework 7 já traz `@Retryable`).
+- **Limite:** 4 requisições por segundo por credencial. O cliente espaça as chamadas, lembra por 24 h as buscas já feitas e repete com espera (`RetryTemplate` do Spring Framework 7) os erros temporários: 401, 429 e 5xx. Timeout e erro de rede não repetem, para a busca não travar.
 - **O que importar:** jogos principais, remakes, remasters e expansões; ficam de fora DLCs pequenas e bundles.
 - **Campos:** nome, slug, resumo, lançamento, capa, gêneros, plataformas, temas, palavras-chave, modos, perspectiva, desenvolvedora, publicadora, franquia, nota, número de avaliações e `similar_games`.
 - **Capas:** guarde só o `image_id` e monte a URL no tamanho desejado: `https://images.igdb.com/igdb/image/upload/t_cover_big/{image_id}.jpg`.
-- **Isolamento:** o resto do sistema conversa com uma interface (`GameCatalogProvider`), e o IGDB é uma implementação dela. Trocar pelo RAWG não mexe no domínio.
+- **Isolamento:** tudo do IGDB fica em `catalog/igdb`. O resto do sistema lê o catálogo local e só chama `IgdbCatalogSync`, então trocar pelo RAWG fica restrito a esse pacote.
 - **Estratégia:**
-  1. um job inicial importa os jogos mais populares;
+  1. um job inicial importa os jogos mais populares (`--game-log.igdb.bootstrap-limit=2000`);
   2. a busca usa o IGDB como fallback quando o resultado local é fraco;
   3. uma ressincronização periódica (ex.: semanal) atualiza os jogos com `synced_at` antigo.
 - **Termos:** o uso segue o Twitch Developer Services Agreement; dê crédito ao IGDB no rodapé do front.
