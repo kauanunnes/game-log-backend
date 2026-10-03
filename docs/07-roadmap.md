@@ -40,12 +40,13 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 0.4 Base de qualidade
 
-- [ ] Tratamento global de erros com Problem Details. Hoje, `findById(id).get()` em `GameService` e `GameListService` responde 500 quando deveria responder 404.
-- [ ] springdoc-openapi (Swagger UI) e Actuator (`/actuator/health`).
-- [ ] Testcontainers com `@ServiceConnection` e o primeiro teste de integração; remover o H2 (os testes passam a usar PostgreSQL).
-- [ ] Spotless (formatação) e JaCoCo (cobertura).
-- [ ] GitHub Actions rodando `./mvnw verify` em cada PR, mais o Dependabot.
-- [ ] README do projeto (o que é, como rodar, link para `docs/`) e LICENSE.
+- [x] Prefixo `/api/v1` nos controllers da aplicação; Swagger e Actuator ficam na raiz.
+- [x] Tratamento global de erros com Problem Details: id inexistente responde 404 (antes, `findById(id).get()` respondia 500).
+- [x] springdoc-openapi (Swagger UI) e Actuator (`/actuator/health`).
+- [x] Testcontainers com `@ServiceConnection` e o primeiro teste de integração; remover o H2 (os testes passam a usar PostgreSQL).
+- [x] Spotless (formatação) e JaCoCo (cobertura).
+- [x] GitHub Actions rodando `./mvnw verify` em cada PR, mais o Dependabot.
+- [x] README do projeto (o que é, como rodar, link para `docs/`) e LICENSE.
 
 **Pronto quando:** um PR de teste fica verde no CI e o Swagger abre localmente.
 
