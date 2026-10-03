@@ -26,7 +26,7 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 - [x] Atualizar ou remover o `system.properties` (usado por buildpacks do Heroku/Railway).
 - [x] Remover do `pom.xml` o `maven-resources-plugin 3.1.0` fixo (resquício do curso). O H2 ficou para a 0.4: até o Testcontainers entrar, é ele que dá banco aos testes.
 - [x] Trocar o `@Autowired` em campo por injeção via construtor.
-- [x] Renomear o back-end para game-log: `artifactId` e `name` no `pom.xml`, `spring.application.name`, pacote `com.kauan.gamelog` (classe `GameLogApplication`). No GitHub o repositório está como `gamelog-backend`; renomear para `game-log-backend` é com você.
+- [x] Renomear o back-end para game-log: `artifactId` e `name` no `pom.xml`, `spring.application.name`, pacote `com.kauan.gamelog` (classe `GameLogApplication`). O repositório no GitHub também já se chama `game-log-backend`.
 
 **Pronto quando:** `./mvnw verify` passa no Boot 4.
 

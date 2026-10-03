@@ -1,6 +1,6 @@
 # Game Log · API
 
-[![CI](https://github.com/kauanunnes/gamelog-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/kauanunnes/gamelog-backend/actions/workflows/ci.yml)
+[![CI](https://github.com/kauanunnes/game-log-backend/actions/workflows/ci.yml/badge.svg)](https://github.com/kauanunnes/game-log-backend/actions/workflows/ci.yml)
 
 API do Game Log, um diário de jogos com perfil público: cada pessoa registra o que jogou, a nota, se recomenda e quanto pagou, e organiza o que quer jogar. O front-end fica no repositório `game-log-frontend`.
 
