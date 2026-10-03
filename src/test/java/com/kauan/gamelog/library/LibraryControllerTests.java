@@ -60,10 +60,10 @@ class LibraryControllerTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value("PLAYING"));
 
-        assertThat(jdbc.sql("SELECT count(*) FROM library_entries WHERE game_id = :gameId")
-                        .param("gameId", celeste)
-                        .query(Long.class)
-                        .single())
+        // O banco é dividido entre as classes de teste: conta só as entradas desta conta.
+        assertThat(jdbc.sql("""
+                                SELECT count(*) FROM library_entries e JOIN users u ON u.id = e.user_id
+                                WHERE u.username = 'lib_ana' AND e.game_id = :gameId""").param("gameId", celeste).query(Long.class).single())
                 .isEqualTo(1);
         assertThat(events.stream(LibraryEntryChanged.class)).hasSize(2);
     }
@@ -217,13 +217,16 @@ class LibraryControllerTests {
         Account account = Account.register(mockMvc, "lib_iris");
         add(account, "stardew-valley", """
                 {"status": "PLAYING"}""");
+        long userId = jdbc.sql("SELECT id FROM users WHERE username = 'lib_iris'")
+                .query(Long.class)
+                .single();
 
         send(delete("/api/v1/me"), account, """
                         {"password": "%s"}
                         """.formatted(Account.PASSWORD)).andExpect(status().isNoContent());
 
-        assertThat(jdbc.sql("SELECT count(*) FROM library_entries e JOIN games g ON g.id = e.game_id"
-                                + " WHERE g.slug = 'stardew-valley'")
+        assertThat(jdbc.sql("SELECT count(*) FROM library_entries WHERE user_id = :userId")
+                        .param("userId", userId)
                         .query(Long.class)
                         .single())
                 .isZero();
