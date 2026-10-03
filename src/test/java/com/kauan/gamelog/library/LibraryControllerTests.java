@@ -208,6 +208,13 @@ class LibraryControllerTests {
         list(account, "?recommends=true&minRating=4.75")
                 .andExpect(jsonPath("$.content[*].game.title", contains("Hollow Knight")));
         list(account, "?q=celes").andExpect(jsonPath("$.content[*].game.title", contains("Celeste")));
+        list(account, "?reviewed=true")
+                .andExpect(jsonPath("$.page.totalElements").value(0));
+        send(get("/api/v1/me/library/counts"), account, null)
+                .andExpect(jsonPath("$.played").value(2))
+                .andExpect(jsonPath("$.dropped").value(1))
+                .andExpect(jsonPath("$.wishlist").value(1))
+                .andExpect(jsonPath("$.favorites").value(1));
         list(account, "?status=PLAYED&completed=true")
                 .andExpect(jsonPath("$.content[*].game.title", contains("Hollow Knight")));
         list(account, "?status=PLAYED&completed=false")

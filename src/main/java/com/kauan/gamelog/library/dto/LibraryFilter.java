@@ -12,6 +12,7 @@ import java.util.List;
  *
  * @param platformId plataforma em que a pessoa jogou
  * @param completed "zerou"; {@code false} também traz quem não respondeu
+ * @param reviewed só as entradas com texto de avaliação
  * @param q parte do título do jogo
  */
 public record LibraryFilter(
@@ -25,6 +26,7 @@ public record LibraryFilter(
 
         Boolean recommends,
         Boolean completed,
+        Boolean reviewed,
 
         @Size(max = 100, message = "use no máximo 100 caracteres")
         String q) {}

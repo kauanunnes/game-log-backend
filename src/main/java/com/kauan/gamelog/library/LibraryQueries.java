@@ -93,6 +93,9 @@ class LibraryQueries {
             conditions.add("coalesce(e.completed, false) = :completed");
             params.put("completed", filter.completed());
         }
+        if (filter.reviewed() != null) {
+            conditions.add(filter.reviewed() ? "e.review_text IS NOT NULL" : "e.review_text IS NULL");
+        }
         if (filter.q() != null && !filter.q().isBlank()) {
             conditions.add("strpos(g.title_normalized, :q) > 0");
             params.put("q", TextNormalizer.normalize(filter.q()));
