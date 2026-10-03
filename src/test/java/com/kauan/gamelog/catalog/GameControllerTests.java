@@ -80,7 +80,9 @@ class GameControllerTests {
                 .andExpect(jsonPath("$.releaseDate").value("2017-02-24"))
                 .andExpect(jsonPath("$.kind").value("MAIN"))
                 .andExpect(jsonPath("$.genres[*].name", contains("Adventure", "Indie", "Platform")))
-                .andExpect(jsonPath("$.platforms.length()").value(4));
+                .andExpect(jsonPath("$.platforms.length()").value(4))
+                .andExpect(jsonPath("$.developers").isEmpty())
+                .andExpect(jsonPath("$.igdbRating").value(90));
     }
 
     @Test

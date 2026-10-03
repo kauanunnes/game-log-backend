@@ -124,12 +124,13 @@ class IgdbImportTests {
         mockMvc.perform(get("/api/v1/games/outer-wilds"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.genres[*].name", contains("Adventure", "Indie")))
-                .andExpect(jsonPath("$.platforms[0].abbreviation").value("PC"));
+                .andExpect(jsonPath("$.platforms[0].abbreviation").value("PC"))
+                .andExpect(jsonPath("$.developers", contains("Mobius Digital")))
+                .andExpect(jsonPath("$.publishers", contains("Annapurna Interactive")))
+                .andExpect(jsonPath("$.themes", contains("Science fiction")))
+                .andExpect(jsonPath("$.igdbRating").value(89))
+                .andExpect(jsonPath("$.igdbRatingCount").value(900));
 
-        assertThat(jdbc.sql("SELECT metadata ->> 'developers' FROM games WHERE slug = 'outer-wilds'")
-                        .query(String.class)
-                        .single())
-                .isEqualTo("[\"Mobius Digital\"]");
         assertThat(jdbc.sql("SELECT count(*) FROM genres WHERE slug = 'adventure'")
                         .query(Long.class)
                         .single())

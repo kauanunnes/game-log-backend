@@ -148,7 +148,7 @@ A busca devolve só jogos já salvos no banco, com id próprio. Quando o resulta
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
 | GET | `/games` | público | `q`, `genreId`, `platformId`, `year` e `sort`: `relevance` (padrão quando há `q`), `popular` (padrão sem `q`; por enquanto usa o número de avaliações no IGDB e, quando a biblioteca existir, a presença nas bibliotecas), `rating`, `release`, `title`; `trending` (mais adicionados em 7 dias) entra com a 1.7 | 1 |
-| GET | `/games/{slug}` | público | Detalhes + números da comunidade (RF23) | 1 |
+| GET | `/games/{slug}` | público | Detalhes, com desenvolvedoras, publicadoras, franquias, temas, modos, perspectivas e nota do IGDB (0 a 100), + números da comunidade (RF23) | 1 |
 | GET | `/games/{slug}/reviews` | público | Avaliações públicas; `sort=recent` (Fase 2: `popular`) | 1 |
 | GET | `/games/{slug}/similar` | público | Jogos parecidos | 3 |
 | GET | `/reviews` | público | Avaliações recentes do site todo (página inicial) | 1 |

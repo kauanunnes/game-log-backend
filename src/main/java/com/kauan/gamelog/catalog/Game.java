@@ -10,9 +10,12 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 @Entity
 @Table(name = "games")
@@ -29,6 +32,12 @@ public class Game {
 
     @Enumerated(EnumType.STRING)
     private GameKind kind;
+
+    @JdbcTypeCode(SqlTypes.JSON)
+    private GameMetadata metadata;
+
+    private BigDecimal igdbRating;
+    private Integer igdbRatingCount;
 
     @ManyToMany
     @JoinTable(
@@ -72,6 +81,18 @@ public class Game {
 
     public GameKind getKind() {
         return kind;
+    }
+
+    public GameMetadata getMetadata() {
+        return metadata;
+    }
+
+    public BigDecimal getIgdbRating() {
+        return igdbRating;
+    }
+
+    public Integer getIgdbRatingCount() {
+        return igdbRatingCount;
     }
 
     public Set<Genre> getGenres() {

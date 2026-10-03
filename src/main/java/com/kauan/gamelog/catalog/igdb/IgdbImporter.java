@@ -1,11 +1,11 @@
 package com.kauan.gamelog.catalog.igdb;
 
 import com.kauan.gamelog.catalog.GameKind;
+import com.kauan.gamelog.catalog.GameMetadata;
 import com.kauan.gamelog.shared.TextNormalizer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -165,16 +165,15 @@ public class IgdbImporter {
     }
 
     private static String metadata(IgdbGame game) {
-        Map<String, Object> metadata = new LinkedHashMap<>();
-        metadata.put("themes", names(game.themes()));
-        metadata.put("keywords", names(game.keywords()));
-        metadata.put("modes", names(game.gameModes()));
-        metadata.put("perspectives", names(game.playerPerspectives()));
-        metadata.put("developers", companies(game, IgdbGame.InvolvedCompany::developer));
-        metadata.put("publishers", companies(game, IgdbGame.InvolvedCompany::publisher));
-        metadata.put("franchises", names(game.franchises()));
-        metadata.put("similarGames", orEmpty(game.similarGames()));
-        return JSON.writeValueAsString(metadata);
+        return JSON.writeValueAsString(new GameMetadata(
+                names(game.themes()),
+                names(game.keywords()),
+                names(game.gameModes()),
+                names(game.playerPerspectives()),
+                companies(game, IgdbGame.InvolvedCompany::developer),
+                companies(game, IgdbGame.InvolvedCompany::publisher),
+                names(game.franchises()),
+                orEmpty(game.similarGames())));
     }
 
     private static List<String> names(List<IgdbGame.Named> items) {
