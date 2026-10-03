@@ -3,6 +3,7 @@ package com.kauan.gamelog.services;
 import com.kauan.gamelog.dto.GameDTO;
 import com.kauan.gamelog.dto.GameMinDTO;
 import com.kauan.gamelog.entities.Game;
+import com.kauan.gamelog.errors.NotFoundException;
 import com.kauan.gamelog.projections.GameMinProjection;
 import com.kauan.gamelog.repositories.GameRepository;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,9 @@ public class GameService {
 
     @Transactional(readOnly = true)
     public GameDTO findById(Long id) {
-        Game result = gameRepository.findById(id).get();
+        Game result = gameRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Jogo " + id + " não encontrado."));
         return new GameDTO(result);
     }
 

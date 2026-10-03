@@ -34,7 +34,7 @@ class CorsTests {
     }
 
     private ResultActions preflight(String origin) throws Exception {
-        return mockMvc.perform(options("/games")
+        return mockMvc.perform(options("/api/v1/games")
                 .header(HttpHeaders.ORIGIN, origin)
                 .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "GET"));
     }
