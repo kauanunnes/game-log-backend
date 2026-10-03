@@ -1,132 +1,84 @@
 package com.kauan.gamelog.catalog;
 
-import jakarta.persistence.*;
-import java.util.Objects;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "tb_game")
+@Table(name = "games")
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "game_year")
-    private Integer year;
+    private String slug;
+    private String title;
+    private String summary;
+    private LocalDate releaseDate;
+    private String coverImageId;
 
-    private Double score;
-    private String title, genre, platforms, imgUrl;
+    @Enumerated(EnumType.STRING)
+    private GameKind kind;
 
-    @Column(columnDefinition = "TEXT")
-    private String shortDescription;
+    @ManyToMany
+    @JoinTable(
+            name = "game_genres",
+            joinColumns = @JoinColumn(name = "game_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    private Set<Genre> genres = new HashSet<>();
 
-    @Column(columnDefinition = "TEXT")
-    private String longDescription;
+    @ManyToMany
+    @JoinTable(
+            name = "game_platforms",
+            joinColumns = @JoinColumn(name = "game_id"),
+            inverseJoinColumns = @JoinColumn(name = "platform_id"))
+    private Set<Platform> platforms = new HashSet<>();
 
-    public Game() {}
-
-    public Game(
-            Long id,
-            Integer year,
-            Double score,
-            String title,
-            String genre,
-            String platforms,
-            String imgUrl,
-            String shortDescription,
-            String longDescription) {
-        this.id = id;
-        this.year = year;
-        this.score = score;
-        this.title = title;
-        this.genre = genre;
-        this.platforms = platforms;
-        this.imgUrl = imgUrl;
-        this.shortDescription = shortDescription;
-        this.longDescription = longDescription;
-    }
+    protected Game() {}
 
     public Long getId() {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Integer getYear() {
-        return year;
-    }
-
-    public void setYear(Integer year) {
-        this.year = year;
-    }
-
-    public Double getScore() {
-        return score;
-    }
-
-    public void setScore(Double score) {
-        this.score = score;
+    public String getSlug() {
+        return slug;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setTitle(String title) {
-        this.title = title;
+    public String getSummary() {
+        return summary;
     }
 
-    public String getGenre() {
-        return genre;
+    public LocalDate getReleaseDate() {
+        return releaseDate;
     }
 
-    public void setGenre(String genre) {
-        this.genre = genre;
+    public String getCoverImageId() {
+        return coverImageId;
     }
 
-    public String getPlatforms() {
+    public GameKind getKind() {
+        return kind;
+    }
+
+    public Set<Genre> getGenres() {
+        return genres;
+    }
+
+    public Set<Platform> getPlatforms() {
         return platforms;
-    }
-
-    public void setPlatforms(String platforms) {
-        this.platforms = platforms;
-    }
-
-    public String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
-    public String getShortDescription() {
-        return shortDescription;
-    }
-
-    public void setShortDescription(String shortDescription) {
-        this.shortDescription = shortDescription;
-    }
-
-    public String getLongDescription() {
-        return longDescription;
-    }
-
-    public void setLongDescription(String longDescription) {
-        this.longDescription = longDescription;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Game game = (Game) o;
-        return Objects.equals(id, game.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
     }
 }
