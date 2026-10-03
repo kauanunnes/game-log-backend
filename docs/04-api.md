@@ -157,11 +157,11 @@ A busca devolve só jogos já salvos no banco, com id próprio. Quando o resulta
 
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
-| GET | `/games` | público | `q`, `genreId`, `platformId`, `year` e `sort`: `relevance` (padrão quando há `q`), `popular` (padrão sem `q`; por enquanto usa o número de avaliações no IGDB e, quando a biblioteca existir, a presença nas bibliotecas), `rating`, `release`, `title`; `trending` (mais adicionados em 7 dias) entra com a 1.7 | 1 |
+| GET | `/games` | público | `q`, `genreId`, `platformId`, `year` e `sort`: `relevance` (padrão quando há `q`), `popular` (padrão sem `q`; por enquanto usa o número de avaliações no IGDB e, quando a biblioteca existir, a presença nas bibliotecas), `rating`, `release`, `title`; `trending` (mais adicionados a bibliotecas públicas em 7 dias) | 1 |
 | GET | `/games/{slug}` | público | Detalhes, com desenvolvedoras, publicadoras, franquias, temas, modos, perspectivas e nota do IGDB (0 a 100), + números da comunidade (RF23) | 1 |
-| GET | `/games/{slug}/reviews` | público | Avaliações públicas; `sort=recent` (Fase 2: `popular`) | 1 |
+| GET | `/games/{slug}/reviews` | público | Avaliações públicas (perfis públicos, com texto), das mais recentes para as mais antigas (Fase 2: também as mais curtidas) | 1 |
 | GET | `/games/{slug}/similar` | público | Jogos parecidos | 3 |
-| GET | `/reviews` | público | Avaliações recentes do site todo (página inicial) | 1 |
+| GET | `/reviews` | público | Avaliações recentes do site todo (página inicial), com o autor e o resumo do jogo | 1 |
 | GET | `/genres`, `/platforms`, `/stores` | público | Listas para filtros e formulários (em cache) | 1 |
 
 Números da comunidade em `GET /games/{slug}`:
@@ -182,7 +182,7 @@ Números da comunidade em `GET /games/{slug}`:
 }
 ```
 
-A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemplo mostra só algumas). Uma nota 4,75 conta na faixa 4,5.
+A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemplo mostra só algumas). Uma nota 4,75 conta na faixa 4,5. `playersCount` conta Jogando, Jogado e Abandonado; `wantToPlayCount`, Quero jogar e Lista de desejos. Sem respostas, `averageRating` e `recommendPercent` vêm `null`.
 
 ### Social (Fase 2)
 

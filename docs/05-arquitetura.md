@@ -70,7 +70,7 @@ Regras:
 
 - O controller só traduz HTTP ↔ DTO e chama o service.
 - A entidade nunca sai do service: a resposta é sempre um record.
-- Um módulo não usa o repositório de outro. Ele chama o service público do outro módulo ou reage a um evento.
+- Um módulo não usa o repositório de outro. Ele chama o service público do outro módulo ou reage a um evento. Quando o módulo de baixo precisa de algo do de cima, ele declara uma interface e o de cima a implementa: os números da comunidade aparecem no catálogo pela interface `GameCommunity`, implementada pela biblioteca.
 - Formato de entrada é validado nos DTOs (Bean Validation); regra de negócio fica no domínio.
 - Injeção sempre pelo construtor.
 - (Opcional) Um teste com Spring Modulith verifica que os módulos não acessam o interior uns dos outros.

@@ -110,8 +110,8 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 1.7 Jogo na comunidade · RF23, RF24
 
-- [ ] Nota média, distribuição, % que recomenda e contagens, só com perfis públicos (RN11).
-- [ ] `GET /games/{slug}/reviews` e `GET /reviews`.
+- [x] Nota média, distribuição, % que recomenda e contagens, só com perfis públicos (RN11).
+- [x] `GET /games/{slug}/reviews` e `GET /reviews`.
 
 **Pronto quando:** a página do jogo mostra os números da comunidade e as avaliações públicas.
 
