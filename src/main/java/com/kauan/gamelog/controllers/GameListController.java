@@ -4,7 +4,6 @@ import com.kauan.gamelog.dto.GameListDTO;
 import com.kauan.gamelog.dto.GameMinDTO;
 import com.kauan.gamelog.services.GameListService;
 import com.kauan.gamelog.services.GameService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,11 +14,13 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/lists")
 public class GameListController {
-    @Autowired
-    private GameListService gameListService;
+    private final GameListService gameListService;
+    private final GameService gameService;
 
-    @Autowired
-    private GameService gameService;
+    public GameListController(GameListService gameListService, GameService gameService) {
+        this.gameListService = gameListService;
+        this.gameService = gameService;
+    }
 
     @GetMapping(value = "/{id}")
     public GameListDTO findById(@PathVariable Long id) {

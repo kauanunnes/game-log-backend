@@ -5,17 +5,19 @@ import com.kauan.gamelog.dto.GameMinDTO;
 import com.kauan.gamelog.entities.Game;
 import com.kauan.gamelog.projections.GameMinProjection;
 import com.kauan.gamelog.repositories.GameRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class GameService {
-    @Autowired
-    private GameRepository gameRepository;
+    private final GameRepository gameRepository;
+
+    public GameService(GameRepository gameRepository) {
+        this.gameRepository = gameRepository;
+    }
+
     @Transactional(readOnly = true)
     public List<GameMinDTO> findAll() {
         List<Game> result = gameRepository.findAll();
@@ -24,7 +26,7 @@ public class GameService {
 
     @Transactional(readOnly = true)
     public GameDTO findById(Long id) {
-        Game result =  gameRepository.findById(id).get();
+        Game result = gameRepository.findById(id).get();
         return new GameDTO(result);
     }
 
