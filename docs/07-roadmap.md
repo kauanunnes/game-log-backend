@@ -1,0 +1,163 @@
+# 07 · Roadmap
+
+Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concluindo.
+
+## Definição de pronto (vale para toda tarefa)
+
+- Testes do caminho feliz e dos erros principais.
+- Migration do Flyway, se a tarefa mexeu no banco.
+- Endpoint documentado no Swagger, com exemplo.
+- CI verde.
+- Docs atualizados, se o comportamento mudou.
+
+## Fase 0 · Fundação
+
+### 0.1 Sincronizar o que está local
+
+- [x] Commitar ou descartar as mudanças pendentes em `application.properties`, `application-dev.properties` e `WebConfig`.
+- [x] Enviar os 6 commits que estão só na sua máquina (`git push`). Antes do push, atenção: o `application-dev.properties` desses commits tem usuário e senha do PostgreSQL local. Aponta só para localhost, mas, se essa senha for usada em outro lugar, troque-a.
+- [ ] Corrigir o pacote do `WebConfig`: ele está em `config`, fora de `com.kauan.games_list`. O Spring só procura componentes dentro do pacote da aplicação, então a classe nunca é carregada e o CORS não é aplicado.
+
+**Pronto quando:** `git status` está limpo e o GitHub está igual ao local.
+
+### 0.2 Atualizar a base
+
+- [ ] Spring Boot 3.5.5 → 4.1.x e Java 21 → 25 ([D1, D2](README.md#decisões)). O Boot 4 traz Spring Framework 7, Spring Security 7, Hibernate 7 e Jackson 3; com ~15 classes, a migração é barata agora.
+- [ ] Atualizar ou remover o `system.properties` (usado por buildpacks do Heroku/Railway).
+- [ ] Remover do `pom.xml` o `maven-resources-plugin 3.1.0` fixo (resquício do curso) e a dependência do H2.
+- [ ] Trocar o `@Autowired` em campo por injeção via construtor.
+- [ ] Renomear o back-end para game-log: `artifactId` e `name` no `pom.xml`, `spring.application.name`, pacote `com.kauan.gamelog` (classe `GameLogApplication`). Renomear o repositório no GitHub para `game-log-backend` é com você; o GitHub redireciona o endereço antigo.
+
+**Pronto quando:** `./mvnw verify` passa no Boot 4.
+
+### 0.3 Banco e configuração
+
+- [ ] `compose.yaml` com PostgreSQL na imagem `pgvector/pgvector:pg18` (mesma versão do Neon), que já serve para a Fase 3, e o suporte a Docker Compose do Spring Boot (o banco sobe junto com a aplicação).
+- [ ] Flyway com a migration inicial; remover o `import.sql` e o `ddl-auto`.
+- [ ] Perfis `local` e `prod` lendo variáveis de ambiente, `.env.example` versionado e credenciais do banco local fora do `application-dev.properties`.
+
+**Pronto quando:** clonar o repositório e rodar `./mvnw spring-boot:run` sobe banco e aplicação sem editar nenhum arquivo.
+
+### 0.4 Base de qualidade
+
+- [ ] Tratamento global de erros com Problem Details. Hoje, `findById(id).get()` em `GameService` e `GameListService` responde 500 quando deveria responder 404.
+- [ ] springdoc-openapi (Swagger UI) e Actuator (`/actuator/health`).
+- [ ] Testcontainers com `@ServiceConnection` e o primeiro teste de integração.
+- [ ] Spotless (formatação) e JaCoCo (cobertura).
+- [ ] GitHub Actions rodando `./mvnw verify` em cada PR, mais o Dependabot.
+- [ ] README do projeto (o que é, como rodar, link para `docs/`) e LICENSE.
+
+**Pronto quando:** um PR de teste fica verde no CI e o Swagger abre localmente.
+
+### 0.5 Estrutura por módulos
+
+- [ ] Reorganizar o código em `catalog/`, `library/`, etc. (ver [arquitetura](05-arquitetura.md#organização-do-código)). O código atual de `Game` vai para `catalog/`; o de `GameList`/`Belonging` fica guardado para a tarefa 2.5.
+
+**Pronto quando:** os pacotes estão separados por funcionalidade.
+
+## Fase 1 · MVP
+
+### 1.1 Catálogo local · RF20–RF22
+
+- [ ] Migrations de `games`, `genres`, `platforms`, `stores` e das tabelas de junção.
+- [ ] `GET /games` com busca por trigramas, filtros e paginação; `GET /games/{slug}`; `GET /genres`, `/platforms` e `/stores`.
+- [ ] Seed de desenvolvimento com alguns jogos reais.
+
+**Pronto quando:** buscar "witcher" encontra "The Witcher 3: Wild Hunt".
+
+### 1.2 Integração com o IGDB · RF25, RF26
+
+- [ ] App na Twitch; token com cache e renovação.
+- [ ] Cliente HTTP com limite de 4 req/s, retry e timeout, testado com WireMock.
+- [ ] Importação por id do IGDB (upsert de gêneros, plataformas e metadados).
+- [ ] Busca com fallback: se o resultado local for fraco, consulta o IGDB, importa e devolve.
+- [ ] Job de importação inicial dos jogos mais populares (começando com ~2 mil).
+
+**Pronto quando:** a primeira busca por um jogo fora do banco traz o resultado do IGDB, e a segunda já sai do banco.
+
+### 1.3 Contas e autenticação · RF01–RF08
+
+- [ ] Tabelas `users` e `refresh_tokens`; cadastro validado (RN08, RN09).
+- [ ] Login, refresh com rotação e logout; Spring Security com JWT.
+- [ ] `GET` e `PATCH /me` (nome, bio e gênero opcional, RN14), `PATCH /me/settings`, `PUT /me/password`, `DELETE /me`.
+- [ ] Limite de tentativas no login; CORS configurado por variável de ambiente.
+
+**Pronto quando:** há testes para 401 (sem token), 403 (sem permissão) e para o caso de um refresh reutilizado, que deve revogar a sessão.
+
+### 1.4 Biblioteca · RF30–RF37
+
+- [ ] Tabela `library_entries` com as constraints; `Review`, `Playthrough` e `Acquisition` como `@Embeddable`.
+- [ ] Regras da RN02 num lugar só, com teste parametrizado por status.
+- [ ] `GET`, `PUT`, `PATCH` e `DELETE /me/library/{gameId}`, e `GET /me/library` com filtros.
+- [ ] Publicar o evento `LibraryEntryChanged`, ainda sem ouvintes (prepara as Fases 2 e 3).
+
+**Pronto quando:** todas as células da tabela da RN02 têm teste.
+
+### 1.5 Perfil público · RF40–RF42
+
+- [ ] `GET /users/{username}` e as abas `library`, `favorites` e `reviews`.
+- [ ] Perfil privado e omissão dos dados de aquisição (RN10).
+
+**Pronto quando:** um teste garante que o valor pago nunca aparece numa rota pública quando "mostrar gastos" está desligado.
+
+### 1.6 Estatísticas · RF43
+
+- [ ] `GET /me/stats` e `GET /users/{username}/stats`, com consultas agregadas.
+
+**Pronto quando:** os números batem com um cenário de teste conhecido.
+
+### 1.7 Jogo na comunidade · RF23, RF24
+
+- [ ] Nota média, distribuição, % que recomenda e contagens, só com perfis públicos (RN11).
+- [ ] `GET /games/{slug}/reviews` e `GET /reviews`.
+
+**Pronto quando:** a página do jogo mostra os números da comunidade e as avaliações públicas.
+
+### 1.8 Deploy
+
+- [ ] Imagem Docker (Buildpacks ou Dockerfile multi-stage).
+- [ ] Banco no Neon e API no Render ou no Cloud Run, com deploy automático a partir da `main`.
+- [ ] Swagger público e o link da demo no "About" do repositório.
+
+**Pronto quando:** a API está no ar e o README tem o link.
+
+### 1.9 Front-end do MVP (outro repositório)
+
+- [x] Identidade visual definida a partir das referências em `refs/` ([08 · Front-end](08-frontend.md)).
+- [x] Esqueleto em Vue 3 + TypeScript no repositório `game-log-frontend`.
+- [ ] Telas da Fase 1 de [02 · Telas](02-telas.md).
+
+A partir da 1.4, as telas podem ser feitas em paralelo com o back-end, usando o Swagger como contrato.
+
+## Fase 2 · Social e polimento
+
+- [ ] 2.1 Seguir, seguidores e seguidos (RF50)
+- [ ] 2.2 Feed de atividade a partir do evento `LibraryEntryChanged` (RF51)
+- [ ] 2.3 Curtidas em avaliações e ordenação por mais curtidas (RF52)
+- [ ] 2.4 Denúncias e tela de moderação (RF53)
+- [ ] 2.5 Listas personalizadas com reordenação, evoluindo o `GameList`/`Belonging` atual (RF54)
+- [ ] 2.6 Favoritos em destaque, em ordem (RF38)
+- [ ] 2.7 E-mail: verificação e recuperação de senha (RF09)
+- [ ] 2.8 Exportação de dados (RF10)
+- [ ] 2.9 Cache com Caffeine e números da comunidade pré-calculados
+- [ ] 2.10 Logs estruturados com traceId e métricas
+
+## Fase 3 · IA
+
+Detalhes em [06 · Recomendações com IA](06-recomendacoes-ia.md).
+
+- [ ] 3.1 Catálogo maior (~10 mil jogos) com metadados completos
+- [ ] 3.2 pgvector, embeddings dos jogos e job de reindexação por hash
+- [ ] 3.3 Jogos parecidos (RF60), comparados com o `similar_games` do IGDB
+- [ ] 3.4 "Você poderá gostar" só com busca (RF61)
+- [ ] 3.5 O Claude reordena e explica, com saída estruturada e fallback (RF62)
+- [ ] 3.6 Feedback nas sugestões (RF63) e tela de primeiros passos (RF64)
+- [ ] 3.7 Avaliação offline (Recall@10) e métricas de uso
+- [ ] 3.8 (Opcional) Busca em linguagem natural (RF65)
+
+## Ideias para depois
+
+- Importar a biblioteca da Steam: a Steam Web API traz os jogos e as horas jogadas, e o IGDB mapeia os ids da Steam.
+- Alerta de preço para a lista de desejos.
+- Inicialização mais rápida da JVM (AOT cache do Java 25 ou imagem nativa com GraalVM), útil em hospedagem que hiberna.
+- Metas anuais ("zerar 20 jogos em 2027") e retrospectiva do ano.
