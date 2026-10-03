@@ -60,9 +60,9 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 ### 1.1 Catálogo local · RF20–RF22
 
-- [ ] Migrations de `games`, `genres`, `platforms`, `stores` e das tabelas de junção.
-- [ ] `GET /games` com busca por trigramas, filtros e paginação; `GET /games/{slug}`; `GET /genres`, `/platforms` e `/stores`.
-- [ ] Seed de desenvolvimento com alguns jogos reais.
+- [x] Migration `V2` com `games`, `genres`, `platforms`, `stores` e as tabelas de junção (as tabelas do curso saem aqui). A coluna `games.metadata` já existe, mas só é preenchida e mapeada na 1.2.
+- [x] `GET /games` com busca por trigramas tolerante a acentos e erros de digitação, filtros, ordenação e paginação; `GET /games/{slug}`; `GET /genres`, `/platforms` e `/stores`.
+- [x] Seed de desenvolvimento com 16 jogos reais (só no perfil `local`).
 
 **Pronto quando:** buscar "witcher" encontra "The Witcher 3: Wild Hunt".
 
@@ -136,7 +136,7 @@ A partir da 1.4, as telas podem ser feitas em paralelo com o back-end, usando o 
 - [ ] 2.2 Feed de atividade a partir do evento `LibraryEntryChanged` (RF51)
 - [ ] 2.3 Curtidas em avaliações e ordenação por mais curtidas (RF52)
 - [ ] 2.4 Denúncias e tela de moderação (RF53)
-- [ ] 2.5 Listas personalizadas com reordenação, evoluindo o `GameList`/`Belonging` atual (RF54)
+- [ ] 2.5 Listas personalizadas com reordenação, sobre a tabela `games` (RF54). O código de listas do curso ficou no histórico, no commit `932d3d4`, como referência.
 - [ ] 2.6 Favoritos em destaque, em ordem (RF38)
 - [ ] 2.7 E-mail: verificação e recuperação de senha (RF09)
 - [ ] 2.8 Exportação de dados (RF10)

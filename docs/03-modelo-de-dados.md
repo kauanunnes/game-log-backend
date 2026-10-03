@@ -209,12 +209,12 @@ Os favoritos em destaque (RF38) cabem numa coluna `favorite_position` (1 a 5) em
 
 Se usarmos o `PgVectorStore` do Spring AI, ele cria a própria tabela (`vector_store`) com metadados em JSON. A escolha fica para a Fase 3.
 
-## Do código atual para o novo modelo
+## Do código do curso para o novo modelo
 
 O projeto hoje é a base do curso DSList. O que muda:
 
-| Hoje | Vira |
+| No curso | No Game Log |
 |---|---|
-| `tb_game`, com gênero e plataformas em texto, `score` fixo e `img_url` | `games` + `genres` + `platforms` normalizados, com dados do IGDB; `score` vira `igdb_rating` |
-| `tb_game_list` + `tb_belonging` (listas globais com posição) | `user_lists` + `user_list_items` na Fase 2: a mesma ideia de posição, agora por usuário. A lógica de reordenar do curso é reaproveitada |
-| `import.sql` com 10 jogos e textos lorem ipsum | Migrations do Flyway + importação real do IGDB; um seed pequeno só para desenvolvimento e testes |
+| `tb_game`, com gênero e plataformas em texto, `score` fixo e `img_url` | `games` + `genres` + `platforms` normalizados (migration `V2`, que também apagou as tabelas do curso) |
+| `tb_game_list` + `tb_belonging` (listas globais com posição) | `user_lists` + `user_list_items` na Fase 2, recriadas sobre `games`; o código do curso ficou no commit `932d3d4` |
+| `import.sql` com 10 jogos e textos lorem ipsum | Seed de desenvolvimento com 16 jogos reais (`db/seed`) e, na 1.2, importação do IGDB |
