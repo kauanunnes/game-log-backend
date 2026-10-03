@@ -6,6 +6,7 @@ import com.kauan.gamelog.library.dto.LibraryCounts;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryEntryRequest;
 import com.kauan.gamelog.library.dto.LibraryFilter;
+import com.kauan.gamelog.library.dto.PublicReviewDTO;
 import com.kauan.gamelog.library.dto.StatsDTO;
 import com.kauan.gamelog.shared.ConflictException;
 import com.kauan.gamelog.shared.FieldIssue;
@@ -28,6 +29,7 @@ public class LibraryService {
     private final LibraryEntryRepository entries;
     private final LibraryQueries queries;
     private final LibraryStats stats;
+    private final CommunityQueries community;
     private final GameService games;
     private final LookupService lookups;
     private final JsonMergePatch mergePatch;
@@ -37,6 +39,7 @@ public class LibraryService {
             LibraryEntryRepository entries,
             LibraryQueries queries,
             LibraryStats stats,
+            CommunityQueries community,
             GameService games,
             LookupService lookups,
             JsonMergePatch mergePatch,
@@ -44,6 +47,7 @@ public class LibraryService {
         this.entries = entries;
         this.queries = queries;
         this.stats = stats;
+        this.community = community;
         this.games = games;
         this.lookups = lookups;
         this.mergePatch = mergePatch;
@@ -68,6 +72,18 @@ public class LibraryService {
     @Transactional(readOnly = true)
     public StatsDTO stats(long userId, Integer year) {
         return stats.of(userId, year);
+    }
+
+    /** RF24: avaliações públicas de um jogo, das mais recentes para as mais antigas. */
+    @Transactional(readOnly = true)
+    public Page<PublicReviewDTO> reviewsOf(String gameSlug, Pageable pageable) {
+        return community.reviews(games.idOf(gameSlug), pageable);
+    }
+
+    /** Avaliações públicas recentes do site todo (página inicial). */
+    @Transactional(readOnly = true)
+    public Page<PublicReviewDTO> recentReviews(Pageable pageable) {
+        return community.reviews(null, pageable);
     }
 
     @Transactional(readOnly = true)

@@ -9,7 +9,11 @@ public enum GameSort {
     POPULAR("g.igdb_rating_count DESC NULLS LAST, g.title"),
     RATING("g.igdb_rating DESC NULLS LAST, g.title"),
     RELEASE("g.release_date DESC NULLS LAST, g.title"),
-    TITLE("g.title");
+    TITLE("g.title"),
+    /** Mais adicionados às bibliotecas públicas nos últimos 7 dias. */
+    TRENDING("(SELECT count(*) FROM library_entries le JOIN users u ON u.id = le.user_id"
+            + " WHERE le.game_id = g.id AND u.profile_visibility = 'PUBLIC' AND le.created_at > now() - interval '7 days')"
+            + " DESC, g.igdb_rating_count DESC NULLS LAST, g.title");
 
     private final String orderBy;
 

@@ -18,12 +18,17 @@ public class GameService {
     private final GameRepository gameRepository;
     private final GameSearchRepository gameSearchRepository;
     private final IgdbCatalogSync igdbCatalogSync;
+    private final GameCommunity community;
 
     public GameService(
-            GameRepository gameRepository, GameSearchRepository gameSearchRepository, IgdbCatalogSync igdbCatalogSync) {
+            GameRepository gameRepository,
+            GameSearchRepository gameSearchRepository,
+            IgdbCatalogSync igdbCatalogSync,
+            GameCommunity community) {
         this.gameRepository = gameRepository;
         this.gameSearchRepository = gameSearchRepository;
         this.igdbCatalogSync = igdbCatalogSync;
+        this.community = community;
     }
 
     public Page<GameSummaryDTO> search(GameSearch search, Pageable pageable) {
@@ -41,7 +46,7 @@ public class GameService {
     public GameDetailsDTO findBySlug(String slug) {
         return gameRepository
                 .findBySlug(slug)
-                .map(GameDetailsDTO::from)
+                .map(game -> GameDetailsDTO.from(game, community.of(game.getId())))
                 .orElseThrow(() -> new NotFoundException("Jogo \"" + slug + "\" não encontrado."));
     }
 
@@ -66,6 +71,14 @@ public class GameService {
         return importFromIgdb(igdbId);
     }
 
+    /** Id do jogo dono do slug, para rotas como {@code /games/{slug}/reviews}. */
+    @Transactional(readOnly = true)
+    public long idOf(String slug) {
+        return gameRepository
+                .findIdBySlug(slug)
+                .orElseThrow(() -> new NotFoundException("Jogo \"" + slug + "\" não encontrado."));
+    }
+
     @Transactional(readOnly = true)
     public boolean exists(long id) {
         return gameRepository.existsById(id);
@@ -75,7 +88,7 @@ public class GameService {
     public GameDetailsDTO findById(long id) {
         return gameRepository
                 .findDetailedById(id)
-                .map(GameDetailsDTO::from)
+                .map(game -> GameDetailsDTO.from(game, community.of(game.getId())))
                 .orElseThrow(() -> new NotFoundException("Jogo " + id + " não encontrado."));
     }
 }

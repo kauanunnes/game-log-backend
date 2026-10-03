@@ -29,11 +29,12 @@ public record GameDetailsDTO(
         List<String> perspectives,
         // de 0 a 100, arredondada
         Integer igdbRating,
-        Integer igdbRatingCount) {
+        Integer igdbRatingCount,
+        CommunityDTO community) {
 
     private static final GameMetadata EMPTY_METADATA = new GameMetadata(null, null, null, null, null, null, null, null);
 
-    public static GameDetailsDTO from(Game game) {
+    public static GameDetailsDTO from(Game game, CommunityDTO community) {
         GameMetadata metadata = Objects.requireNonNullElse(game.getMetadata(), EMPTY_METADATA);
         return new GameDetailsDTO(
                 game.getId(),
@@ -60,6 +61,7 @@ public record GameDetailsDTO(
                 game.getIgdbRating() == null
                         ? null
                         : game.getIgdbRating().setScale(0, RoundingMode.HALF_UP).intValue(),
-                game.getIgdbRatingCount());
+                game.getIgdbRatingCount(),
+                community);
     }
 }
