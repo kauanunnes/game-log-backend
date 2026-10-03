@@ -14,6 +14,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.jayway.jsonpath.JsonPath;
+import com.kauan.gamelog.Account;
 import com.kauan.gamelog.IntegrationTest;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -21,10 +23,13 @@ import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 @IntegrationTest
 class IgdbImportTests {
@@ -145,6 +150,27 @@ class IgdbImportTests {
         mockMvc.perform(get("/api/v1/games").param("q", query))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.page.totalElements").value(0));
+    }
+
+    @Test
+    void adminImportsAndSyncsThroughTheApi() throws Exception {
+        Account admin = Account.admin(mockMvc, jdbc, "igdb_admin");
+
+        String imported = mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/admin/games/import")
+                        .header(HttpHeaders.AUTHORIZATION, admin.bearer())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"igdbId\": 1942}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("The Witcher 3: Wild Hunt"))
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+        int id = JsonPath.read(imported, "$.id");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/admin/games/{id}/sync", id)
+                        .header(HttpHeaders.AUTHORIZATION, admin.bearer()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.genres[*].name", contains("Role-playing (RPG)")));
     }
 
     @Test

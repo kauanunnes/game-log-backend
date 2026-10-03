@@ -4,6 +4,7 @@ import com.kauan.gamelog.catalog.dto.GameDetailsDTO;
 import com.kauan.gamelog.catalog.dto.GameSummaryDTO;
 import com.kauan.gamelog.catalog.igdb.IgdbCatalogSync;
 import com.kauan.gamelog.shared.NotFoundException;
+import com.kauan.gamelog.shared.UnprocessableException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,34 @@ public class GameService {
                 .findBySlug(slug)
                 .map(GameDetailsDTO::from)
                 .orElseThrow(() -> new NotFoundException("Jogo \"" + slug + "\" não encontrado."));
+    }
+
+    /** RF26: importa ou atualiza pelo id do IGDB. */
+    public GameDetailsDTO importFromIgdb(long igdbId) {
+        long id = igdbCatalogSync
+                .importById(igdbId)
+                .orElseThrow(() ->
+                        new NotFoundException("O IGDB não tem um jogo com id " + igdbId + " que entre no catálogo."));
+        return findById(id);
+    }
+
+    /** RF26: busca de novo no IGDB os dados de um jogo que já está no catálogo. */
+    public GameDetailsDTO syncWithIgdb(long id) {
+        Long igdbId = gameRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("Jogo " + id + " não encontrado."))
+                .getIgdbId();
+        if (igdbId == null) {
+            throw UnprocessableException.field("NOT_FROM_IGDB", "id", "esse jogo não veio do IGDB");
+        }
+        return importFromIgdb(igdbId);
+    }
+
+    @Transactional(readOnly = true)
+    public GameDetailsDTO findById(long id) {
+        return gameRepository
+                .findDetailedById(id)
+                .map(GameDetailsDTO::from)
+                .orElseThrow(() -> new NotFoundException("Jogo " + id + " não encontrado."));
     }
 }

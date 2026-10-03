@@ -24,6 +24,7 @@ public class Game {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long igdbId;
     private String slug;
     private String title;
     private String summary;
@@ -57,6 +58,10 @@ public class Game {
 
     public Long getId() {
         return id;
+    }
+
+    public Long getIgdbId() {
+        return igdbId;
     }
 
     public String getSlug() {

@@ -14,7 +14,13 @@ import org.springframework.context.annotation.Import;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@SpringBootTest(properties = {"game-log.igdb.client-id=", "game-log.igdb.client-secret="})
+@SpringBootTest(
+        properties = {
+            "game-log.igdb.client-id=",
+            "game-log.igdb.client-secret=",
+            // BCrypt no custo 12 deixaria cada cadastro e login dos testes lento
+            "game-log.auth.bcrypt-strength=4"
+        })
 @AutoConfigureMockMvc
 @Import(TestcontainersConfiguration.class)
 public @interface IntegrationTest {}

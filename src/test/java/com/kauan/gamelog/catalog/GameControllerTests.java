@@ -68,8 +68,12 @@ class GameControllerTests {
 
     @Test
     void rejectsInvalidFilters() throws Exception {
-        mockMvc.perform(get("/api/v1/games").param("year", "1800")).andExpect(status().isBadRequest());
-        mockMvc.perform(get("/api/v1/games").param("sort", "random")).andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/v1/games").param("year", "1800"))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.errors[0].field").value("year"));
+        mockMvc.perform(get("/api/v1/games").param("sort", "random"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0].message").value("valor inválido"));
     }
 
     @Test

@@ -31,6 +31,16 @@ class CorsTests {
         preflight("https://evil.example").andExpect(status().isForbidden());
     }
 
+    /** O preflight não leva token: precisa ser respondido antes da checagem de login. */
+    @Test
+    void answersThePreflightOfProtectedRoutes() throws Exception {
+        mockMvc.perform(options("/api/v1/me")
+                        .header(HttpHeaders.ORIGIN, "http://localhost:5173")
+                        .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, "PATCH"))
+                .andExpect(status().isOk())
+                .andExpect(header().string(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://localhost:5173"));
+    }
+
     private ResultActions preflight(String origin) throws Exception {
         return mockMvc.perform(options("/api/v1/games")
                 .header(HttpHeaders.ORIGIN, origin)

@@ -7,7 +7,9 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClientException;
 
 /** Traz jogos do IGDB para o catálogo local: quando uma busca acha pouca coisa ou pelo id do IGDB. */
 @Component
@@ -48,12 +50,21 @@ public class IgdbCatalogSync {
     }
 
     /**
-     * Importa ou atualiza um jogo pelo id do IGDB (RF26). Erros do IGDB sobem para quem chamou.
+     * Importa ou atualiza um jogo pelo id do IGDB (RF26).
      *
      * @return o id local do jogo, ou vazio se o IGDB não o conhece ou se o tipo dele fica fora do catálogo
+     * @throws IgdbUnavailableException se o IGDB não está configurado ou falhou
      */
     public Optional<Long> importById(long igdbId) {
-        return client.findById(igdbId).flatMap(importer::importGame);
+        if (!properties.enabled()) {
+            throw new IgdbUnavailableException(HttpStatus.SERVICE_UNAVAILABLE, "O IGDB não está configurado.");
+        }
+        try {
+            return client.findById(igdbId).flatMap(importer::importGame);
+        } catch (RestClientException e) {
+            log.warn("Importação do jogo {} do IGDB falhou: {}", igdbId, e.getMessage());
+            throw new IgdbUnavailableException(HttpStatus.BAD_GATEWAY, "O IGDB não respondeu como esperado.");
+        }
     }
 
     /** Marca a busca como feita; com putIfAbsent e replace, duas buscas iguais ao mesmo tempo vão ao IGDB uma vez só. */
