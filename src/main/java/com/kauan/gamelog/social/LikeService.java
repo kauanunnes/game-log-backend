@@ -2,6 +2,7 @@ package com.kauan.gamelog.social;
 
 import com.kauan.gamelog.library.LibraryEntryChanged;
 import com.kauan.gamelog.shared.UnprocessableException;
+import com.kauan.gamelog.social.dto.LikedReviewDTO;
 import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -38,6 +39,11 @@ public class LikeService {
     @Transactional(readOnly = true)
     public List<Long> likedAmong(long userId, List<Long> entryIds) {
         return entryIds.isEmpty() ? List.of() : likes.likedAmong(userId, entryIds);
+    }
+
+    @Transactional(readOnly = true)
+    public List<LikedReviewDTO> likedBy(long userId) {
+        return likes.likedBy(userId);
     }
 
     /** Sem texto, a avaliação sai das listas, e as curtidas dela vão junto. */
