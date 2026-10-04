@@ -1,5 +1,6 @@
 package com.kauan.gamelog.catalog.igdb;
 
+import com.kauan.gamelog.catalog.GameImported;
 import com.kauan.gamelog.catalog.GameKind;
 import com.kauan.gamelog.catalog.GameMetadata;
 import com.kauan.gamelog.shared.TextNormalizer;
@@ -10,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,9 +35,11 @@ public class IgdbImporter {
     private static final JsonMapper JSON = JsonMapper.builder().build();
 
     private final JdbcClient jdbc;
+    private final ApplicationEventPublisher events;
 
-    IgdbImporter(JdbcClient jdbc) {
+    IgdbImporter(JdbcClient jdbc, ApplicationEventPublisher events) {
         this.jdbc = jdbc;
+        this.events = events;
     }
 
     @Transactional
@@ -67,6 +71,7 @@ public class IgdbImporter {
                 "platform_id",
                 gameId,
                 orEmpty(game.platforms()).stream().map(this::upsertPlatform).toList());
+        events.publishEvent(new GameImported(gameId));
         return Optional.of(gameId);
     }
 

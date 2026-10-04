@@ -9,6 +9,8 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasItem;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,6 +60,12 @@ class IgdbImportTests {
               "genres": [{"id": 12, "name": "Role-playing (RPG)", "slug": "role-playing-rpg"}]}]
             """;
 
+    private static final String GTA_V = """
+            [{"id": 1020, "name": "Grand Theft Auto V", "slug": "grand-theft-auto-v",
+              "first_release_date": 1379376000, "game_type": 0,
+              "platforms": [{"id": 14, "name": "Mac", "abbreviation": "Mac", "slug": "mac"}]}]
+            """;
+
     @RegisterExtension
     static WireMockExtension igdb = WireMockExtension.newInstance()
             .options(wireMockConfig().dynamicPort())
@@ -90,6 +98,8 @@ class IgdbImportTests {
                 .willReturn(okJson("{\"message\": \"formato inesperado\"}")));
         igdb.stubFor(
                 post("/games").withRequestBody(containing("where id = 1942;")).willReturn(okJson(WITCHER)));
+        igdb.stubFor(
+                post("/games").withRequestBody(containing("where id = 1020;")).willReturn(okJson(GTA_V)));
     }
 
     @Autowired
@@ -171,6 +181,15 @@ class IgdbImportTests {
                         .header(HttpHeaders.AUTHORIZATION, admin.bearer()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.genres[*].name", contains("Role-playing (RPG)")));
+    }
+
+    @Test
+    void theCachedPlatformsShowWhatAnImportBrought() throws Exception {
+        mockMvc.perform(get("/api/v1/platforms")).andExpect(jsonPath("$[*].slug", not(hasItem("mac"))));
+
+        assertThat(catalogSync.importById(1020)).isPresent();
+
+        mockMvc.perform(get("/api/v1/platforms")).andExpect(jsonPath("$[*].slug", hasItem("mac")));
     }
 
     @Test

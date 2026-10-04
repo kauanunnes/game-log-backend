@@ -20,7 +20,7 @@ import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
-/** Estatísticas calculadas na consulta; pré-calcular fica para quando o volume pedir (ver arquitetura). */
+/** Estatísticas calculadas na consulta; as do ano todo ficam em cache no {@link LibraryService}. */
 @Repository
 class LibraryStats {
     private final JdbcClient jdbc;

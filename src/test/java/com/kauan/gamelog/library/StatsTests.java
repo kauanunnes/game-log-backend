@@ -1,6 +1,8 @@
 package com.kauan.gamelog.library;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -9,9 +11,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.kauan.gamelog.Account;
 import com.kauan.gamelog.IntegrationTest;
+import com.kauan.gamelog.shared.Caches;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -30,6 +35,9 @@ class StatsTests {
 
     @Autowired
     private JdbcClient jdbc;
+
+    @Autowired
+    private CacheManager cacheManager;
 
     private Account account;
 
@@ -107,6 +115,29 @@ class StatsTests {
                 .andExpect(jsonPath("$.spending[0].byYear[*].total", contains("46.99", "36.99")))
                 .andExpect(jsonPath("$.spending[1].total").value("24.99"))
                 .andExpect(jsonPath("$.spending[1].byStore[0].storeId").doesNotExist());
+    }
+
+    @Test
+    void theCachedStatsFollowTheLibrary() throws Exception {
+        Cache cache = cacheManager.getCache(Caches.STATS);
+        long userId = jdbc.sql("SELECT id FROM users WHERE username = :username")
+                .param("username", account.username())
+                .query(Long.class)
+                .single();
+        send(get("/api/v1/me/stats"), null).andExpect(jsonPath("$.total").value(6));
+        assertThat(cache.get(userId)).isNotNull();
+
+        send(delete("/api/v1/me/library/{gameId}", id("games", "portal-2")), null)
+                .andExpect(status().isNoContent());
+        send(patch("/api/v1/me/library/{gameId}", id("games", "elden-ring")), """
+                        {"status": "PLAYED"}""")
+                .andExpect(status().isOk());
+        assertThat(cache.get(userId)).isNull();
+
+        send(get("/api/v1/me/stats"), null)
+                .andExpect(jsonPath("$.total").value(5))
+                .andExpect(jsonPath("$.byStatus.WISHLIST").value(0))
+                .andExpect(jsonPath("$.byStatus.PLAYED").value(3));
     }
 
     @Test

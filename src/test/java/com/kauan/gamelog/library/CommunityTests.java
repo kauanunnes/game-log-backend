@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -80,6 +81,27 @@ class CommunityTests {
     }
 
     @Test
+    void numbersFollowPrivacyChangesAndDeletedAccounts() throws Exception {
+        Account hugo = Account.register(mockMvc, "cm_hugo");
+        Account iris = Account.register(mockMvc, "cm_iris");
+        add(hugo, "baldurs-gate-3", """
+                {"status": "PLAYED", "review": {"rating": 5, "recommends": true}}""");
+        add(iris, "baldurs-gate-3", """
+                {"status": "PLAYED", "review": {"rating": 3, "recommends": false}}""");
+        expectRatings("baldurs-gate-3", 2, 4.0, 50);
+
+        send(patch("/api/v1/me/settings"), iris, """
+                {"profileVisibility": "PRIVATE"}""");
+        expectRatings("baldurs-gate-3", 1, 5.0, 100);
+
+        send(patch("/api/v1/me/settings"), iris, """
+                {"profileVisibility": "PUBLIC"}""");
+        send(delete("/api/v1/me"), hugo, """
+                {"password": "%s"}""".formatted(Account.PASSWORD));
+        expectRatings("baldurs-gate-3", 1, 3.0, 0);
+    }
+
+    @Test
     void trendingPutsTheMostAddedOfTheWeekFirst() throws Exception {
         add(Account.register(mockMvc, "cm_fabi"), "chrono-trigger", """
                 {"status": "PLAYING"}""");
@@ -95,6 +117,13 @@ class CommunityTests {
         List<String> titles = JsonPath.read(page, "$.content[*].title");
 
         assertThat(titles.indexOf("Chrono Trigger")).isLessThan(titles.indexOf("Super Mario World"));
+    }
+
+    private void expectRatings(String slug, int count, double average, int recommendPercent) throws Exception {
+        mockMvc.perform(get("/api/v1/games/{slug}", slug))
+                .andExpect(jsonPath("$.community.ratingsCount").value(count))
+                .andExpect(jsonPath("$.community.averageRating").value(average))
+                .andExpect(jsonPath("$.community.recommendPercent").value(recommendPercent));
     }
 
     private void add(Account account, String slug, String body) throws Exception {

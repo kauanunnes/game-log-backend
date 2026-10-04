@@ -1,10 +1,9 @@
 package com.kauan.gamelog.catalog.igdb;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,10 @@ public class IgdbCatalogSync {
     private final IgdbProperties properties;
     private final IgdbClient client;
     private final IgdbImporter importer;
-    private final Map<String, Instant> recentSearches = new ConcurrentHashMap<>();
+    private final Cache<String, Boolean> recentSearches = Caffeine.newBuilder()
+            .expireAfterWrite(SEARCH_COOLDOWN)
+            .maximumSize(MAX_REMEMBERED_SEARCHES)
+            .build();
 
     IgdbCatalogSync(IgdbProperties properties, IgdbClient client, IgdbImporter importer) {
         this.properties = properties;
@@ -43,7 +45,7 @@ public class IgdbCatalogSync {
         try {
             return importer.importGames(client.search(query, SEARCH_LIMIT)) > 0;
         } catch (RuntimeException e) {
-            recentSearches.remove(query);
+            recentSearches.invalidate(query);
             log.warn("Busca no IGDB falhou para \"{}\": {}", query, e.getMessage());
             return false;
         }
@@ -67,16 +69,8 @@ public class IgdbCatalogSync {
         }
     }
 
-    /** Marca a busca como feita; com putIfAbsent e replace, duas buscas iguais ao mesmo tempo vão ao IGDB uma vez só. */
+    /** Marca a busca como feita; com putIfAbsent, duas buscas iguais ao mesmo tempo vão ao IGDB uma vez só. */
     private boolean searchedRecently(String query) {
-        if (recentSearches.size() >= MAX_REMEMBERED_SEARCHES) {
-            recentSearches.clear();
-        }
-        Instant now = Instant.now();
-        Instant last = recentSearches.putIfAbsent(query, now);
-        if (last == null) {
-            return false;
-        }
-        return last.isAfter(now.minus(SEARCH_COOLDOWN)) || !recentSearches.replace(query, last, now);
+        return recentSearches.asMap().putIfAbsent(query, true) != null;
     }
 }

@@ -10,26 +10,26 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntUnaryOperator;
 import java.util.stream.IntStream;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.jdbc.core.RowCallbackHandler;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 /**
  * O que a comunidade diz de um jogo. Os números e as listas de avaliações consideram só perfis públicos (RN11): com
  * poucos usuários, incluir os privados poderia expor a nota de alguém. As avaliações de uma pessoa ficam com quem
- * chama, que confere o perfil.
+ * chama, que confere o perfil. Os números vêm prontos da tabela {@code game_community}, que gatilhos no banco refazem
+ * a cada escrita (migration V13).
  */
 @Repository
 class CommunityQueries implements GameCommunity {
-    private static final String PUBLIC_ENTRIES =
-            " FROM library_entries e JOIN users u ON u.id = e.user_id WHERE u.profile_visibility = 'PUBLIC'";
+    /** Um jogo que ninguém de perfil público pôs na biblioteca. */
+    private static final CommunityDTO NOBODY = new CommunityDTO(null, 0, distribution(half -> 0), null, 0, 0);
 
     private static final String REVIEWS = """
             SELECT e.id, u.username, u.display_name, e.status, e.rating, e.recommends, e.review_text,
@@ -52,35 +52,26 @@ class CommunityQueries implements GameCommunity {
 
     @Override
     public CommunityDTO of(long gameId) {
-        Map<Double, Long> ratings = new HashMap<>();
-        jdbc.sql("SELECT floor(e.rating * 2) / 2 AS stars, count(*) AS total" + PUBLIC_ENTRIES
-                        + " AND e.game_id = :gameId AND e.rating IS NOT NULL GROUP BY 1")
-                .param("gameId", gameId)
-                .query((RowCallbackHandler) rs -> ratings.put(rs.getDouble("stars"), rs.getLong("total")));
-        List<RatingCount> distribution = IntStream.rangeClosed(0, 10)
-                .mapToObj(half -> new RatingCount(half / 2.0, ratings.getOrDefault(half / 2.0, 0L)))
-                .toList();
-
-        return jdbc.sql("""
-                        SELECT round(avg(e.rating), 2) AS average,
-                               count(e.rating) AS ratings,
-                               count(e.recommends) AS answered,
-                               count(*) FILTER (WHERE e.recommends) AS recommend,
-                               count(*) FILTER (WHERE e.status IN ('PLAYING', 'PLAYED', 'DROPPED')) AS players,
-                               count(*) FILTER (WHERE e.status IN ('BACKLOG', 'WISHLIST')) AS want_to_play
-                        """ + PUBLIC_ENTRIES + " AND e.game_id = :gameId")
+        return jdbc.sql("SELECT * FROM game_community WHERE game_id = :gameId")
                 .param("gameId", gameId)
                 .query((rs, row) -> {
-                    long answered = rs.getLong("answered");
+                    Integer[] counts = (Integer[]) rs.getArray("rating_counts").getArray();
                     return new CommunityDTO(
-                            rs.getBigDecimal("average"),
-                            rs.getLong("ratings"),
-                            distribution,
-                            answered == 0 ? null : Math.round(rs.getLong("recommend") * 100f / answered),
-                            rs.getLong("players"),
-                            rs.getLong("want_to_play"));
+                            rs.getBigDecimal("average_rating"),
+                            rs.getLong("ratings_count"),
+                            distribution(half -> counts[half]),
+                            rs.getObject("recommend_percent", Integer.class),
+                            rs.getLong("players_count"),
+                            rs.getLong("want_to_play_count"));
                 })
-                .single();
+                .optional()
+                .orElse(NOBODY);
+    }
+
+    private static List<RatingCount> distribution(IntUnaryOperator countOfHalf) {
+        return IntStream.rangeClosed(0, 10)
+                .mapToObj(half -> new RatingCount(half / 2.0, countOfHalf.applyAsInt(half)))
+                .toList();
     }
 
     /** @param gameId {@code null} para as avaliações do site todo */

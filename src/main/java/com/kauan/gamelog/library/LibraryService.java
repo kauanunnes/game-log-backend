@@ -9,6 +9,7 @@ import com.kauan.gamelog.library.dto.LibraryEntryRequest;
 import com.kauan.gamelog.library.dto.LibraryFilter;
 import com.kauan.gamelog.library.dto.PublicReviewDTO;
 import com.kauan.gamelog.library.dto.StatsDTO;
+import com.kauan.gamelog.shared.Caches;
 import com.kauan.gamelog.shared.ConflictException;
 import com.kauan.gamelog.shared.FieldIssue;
 import com.kauan.gamelog.shared.JsonMergePatch;
@@ -19,12 +20,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 import tools.jackson.databind.JsonNode;
 
 @Service
@@ -71,11 +75,19 @@ public class LibraryService {
         return community.reviewsBy(userId, pageable);
     }
 
-    /** Estatísticas completas; quem expõe numa rota pública decide se mostra os gastos. */
+    /**
+     * Estatísticas completas; quem expõe numa rota pública decide se mostra os gastos. As do ano todo ficam em cache
+     * até a biblioteca mudar; as de um ano são calculadas na hora.
+     */
+    @Cacheable(cacheNames = Caches.STATS, key = "#userId", condition = "#year == null")
     @Transactional(readOnly = true)
     public StatsDTO stats(long userId, Integer year) {
         return stats.of(userId, year);
     }
+
+    @TransactionalEventListener
+    @CacheEvict(cacheNames = Caches.STATS, key = "#event.userId()")
+    public void forgetStats(LibraryEntryChanged event) {}
 
     /** RF24: avaliações públicas de um jogo, das mais recentes ou das mais curtidas. */
     @Transactional(readOnly = true)
