@@ -79,7 +79,8 @@ src/
 | `ErrorMessage` | Diálogo de erro do Win95 com "Tentar de novo" |
 | `PageNav` | Anterior e próxima, pela `?page=` da rota atual |
 | `RatingHistogram` | Distribuição das notas, uma barra a cada meia estrela |
-| `ReviewCard` | Avaliação pública com autor (ou o jogo, no perfil), nota e "recomenda"; o spoiler fica escondido até o clique |
+| `ReviewCard` | Avaliação pública com autor (ou o jogo, no perfil), nota, "recomenda" e o botão de curtir; o spoiler fica escondido até o clique |
+| `LikeButton` | Curtir e descurtir, com a contagem; sem sessão leva ao login, e na própria avaliação só mostra a contagem. Quais a pessoa curtiu vem de uma chamada só por página (`useLikedReviews`) |
 | `FollowButton` | Seguir e deixar de seguir, como botão de alternar do Win95; sem sessão, leva ao login |
 | `GameRow` | Capa pequena à esquerda e o conteúdo ao lado (avaliações do Início e feed) |
 | `ActivityItem` | Item do feed: a frase ("Bia zerou Hollow Knight · há 2 horas") e, nas avaliações, nota, recomendação e texto |
@@ -100,7 +101,7 @@ src/
 
 - **Início** (`/`): os jogos mais adicionados na semana (`sort=trending`, que também aparece no Explorar) e as avaliações recentes (`GET /reviews`). Com sessão, o atalho "Criar conta" vira "Jogando agora".
 - **Explorar** (`/games`): busca, filtros e ordenação ficam na URL; a busca só dispara no Enter, porque cada busca com poucos resultados consulta o IGDB.
-- **Página do jogo** (`/games/:slug`): dados do IGDB, números da comunidade, avaliações públicas e o bloco "Sua biblioteca".
+- **Página do jogo** (`/games/:slug`): dados do IGDB, números da comunidade, avaliações públicas (das mais recentes ou das mais curtidas, pela URL) e o bloco "Sua biblioteca".
 - **Registrar jogo** (modal): cada seção aparece só nos status que a aceitam; a tabela da [RN02](01-requisitos.md#regras-de-negócio) fica espelhada em `lib/entryRules.ts`. Ao trocar para um status que não aceita algo já preenchido, o modal avisa o que vai sair.
 - **Perfil** (`/u/:username`): o dono usa `/me`, que traz loja e valor pago e funciona mesmo com o perfil privado; visitantes usam as rotas públicas. As abas de jogos são um componente só, com ordenação e página na URL; "Jogados" filtra Todos, Zerados e Abandonados, e o dono edita cada jogo dali. O cabeçalho mostra seguidores e seguidos, que levam às listas, e o botão Seguir para quem visita.
 - **Feed** (`/feed`): o que fizeram as pessoas que eu sigo, com o tempo relativo; atalhos no menu Iniciar e na janela da conta.
@@ -110,4 +111,4 @@ src/
 
 - Deploy no Vercel, com o rewrite de `/api/*` para a API publicada (depende da 1.8).
 - Testes E2E com Playwright nos fluxos principais: cadastro, registrar jogo e perfil.
-- Telas da Fase 2: curtidas, denúncias e listas.
+- Telas da Fase 2: denúncias e listas.

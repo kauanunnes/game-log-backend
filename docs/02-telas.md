@@ -23,7 +23,7 @@ flowchart LR
 |---|---|---|---|---|
 | Início | `/` | Jogos mais adicionados na semana e avaliações recentes; logado, atalho para "Jogando" e (Fase 3) "Você poderá gostar" | `GET /games?sort=trending`, `GET /reviews` | 1 |
 | Explorar | `/games` | Busca por nome com filtros (gênero, plataforma, ano) e ordenação | `GET /games`, `GET /genres`, `GET /platforms` | 1 |
-| Página do jogo | `/games/:slug` | Capa, dados, números da comunidade, avaliações, botão "Adicionar" com escolha de status; (Fase 3) "Jogos parecidos" | `GET /games/{slug}`, `GET /games/{slug}/reviews`, `GET /me/library/{gameId}` se logado, `GET /games/{slug}/similar` | 1 |
+| Página do jogo | `/games/:slug` | Capa, dados, números da comunidade, avaliações (mais recentes ou mais curtidas, com o botão de curtir), botão "Adicionar" com escolha de status; (Fase 3) "Jogos parecidos" | `GET /games/{slug}`, `GET /games/{slug}/reviews`, `GET /me/library/{gameId}` se logado, `GET /games/{slug}/similar` | 1 |
 | Perfil | `/u/:username` | Cabeçalho e abas (abaixo) | `GET /users/{username}` e as rotas de cada aba | 1 |
 | Entrar / Criar conta | `/login`, `/signup` | Formulários | `POST /auth/login`, `POST /auth/register` | 1 |
 | Recuperar senha | `/forgot-password`, `/reset-password` | Formulários | `POST /auth/password/forgot`, `POST /auth/password/reset` | 2 |
@@ -40,14 +40,14 @@ flowchart LR
 | Quero jogar | Backlog | `GET /users/{u}/library?status=BACKLOG` | 1 |
 | Lista de desejos | O que quer comprar | `GET /users/{u}/library?status=WISHLIST` | 1 |
 | Favoritos | Jogos marcados como favoritos | `GET /users/{u}/library?favorite=true` | 1 |
-| Avaliações | Só entradas com texto; spoiler escondido até clicar | `GET /users/{u}/library?reviewed=true` | 1 |
+| Avaliações | Só entradas com texto; spoiler escondido até clicar; curtidas | `GET /users/{u}/reviews` | 1 |
 | Estatísticas | Gráficos por ano, gênero, plataforma, notas e horas; gastos, se o dono permitir | `GET /users/{u}/stats` | 1 |
 | Seguidores e seguidos | Fora da faixa de abas: abrem pelos contadores do cabeçalho | `GET /users/{u}/followers`, `GET /users/{u}/following` | 2 |
 | Listas | Listas personalizadas | `GET /users/{u}/lists` | 2 |
 
 Todas as abas de jogos usam o mesmo componente: uma grade de capas com nota, ícone de "recomenda" e de favorito, filtros (gênero, plataforma, nota), ordenação e paginação.
 
-Quando o dono abre o próprio perfil, o front usa `GET /me/profile` e `GET /me/library`, que valem com o perfil privado e incluem loja e valor pago, e mostra os botões de editar. Assim, as rotas públicas devolvem a mesma resposta para qualquer pessoa.
+Quando o dono abre o próprio perfil, o front usa `GET /me/profile`, `GET /me/library` e `GET /me/reviews`, que valem com o perfil privado e incluem loja e valor pago, e mostra os botões de editar. Assim, as rotas públicas devolvem a mesma resposta para qualquer pessoa.
 
 ## Telas logadas
 

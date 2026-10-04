@@ -83,6 +83,8 @@ Formato estável do Spring Data (`PagedModel`):
 | DELETE | `/me` | usuário | Exclui a conta; exige a senha no corpo (`{ "password": "..." }`); 204 | 1 |
 | GET | `/me/profile` | usuário | O cabeçalho do meu perfil, no formato de `/users/{username}`, completo mesmo com o perfil privado | 2 |
 | GET | `/me/followers` e `/me/following` | usuário | Quem me segue e quem eu sigo, como nas rotas públicas, mas valendo com o perfil privado | 2 |
+| GET | `/me/reviews` | usuário | Minhas avaliações no formato público, das editadas por último, mesmo com o perfil privado | 2 |
+| GET | `/me/likes?entryIds=1,2,3` | usuário | Quais destas avaliações eu curti (até 100 ids); as listas de avaliações não dizem isso, porque respondem igual para todos | 2 |
 | GET | `/me/export` | usuário | Exporta todos os dados | 2 |
 
 ### Minha biblioteca
@@ -148,7 +150,7 @@ Respondem igual para qualquer pessoa, inclusive o dono, que vê os próprios dad
 | GET | `/users/{username}` | público | Cabeçalho (nome, bio, gênero se informado, `memberSince`) e `counts` de cada aba, de seguidores (`followers`) e de seguidos (`following`); num perfil privado, só `username`, `displayName` e `"private": true` | 1 |
 | GET | `/users/{username}/library` | público | Mesmos filtros de `/me/library`; 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/favorites` | público | Favoritos | 1 |
-| GET | `/users/{username}/reviews` | público | Entradas com texto de avaliação, das editadas por último | 1 |
+| GET | `/users/{username}/reviews` | público | Avaliações da pessoa no formato público (com `id` e `likes`, nunca loja nem valor pago), das editadas por último; 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/stats` | público | Estatísticas, sem gastos (salvo se o dono permitir); 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/followers` e `/following` | público | Seguidores e seguidos (`username`, `displayName`, `followedAt`), dos mais recentes para os mais antigos; 403 se o perfil for privado | 2 |
 | GET / PUT / DELETE | `/users/{username}/follow` | usuário | Se eu sigo a pessoa (204 ou 404), seguir e deixar de seguir. PUT e DELETE são idempotentes e respondem 204; seguir o próprio perfil dá 422 com `CANNOT_FOLLOW_SELF` (RN15) | 2 |
@@ -162,7 +164,7 @@ A busca devolve só jogos já salvos no banco, com id próprio. Quando o resulta
 |---|---|---|---|---|
 | GET | `/games` | público | `q`, `genreId`, `platformId`, `year` e `sort`: `relevance` (padrão quando há `q`), `popular` (padrão sem `q`; por enquanto usa o número de avaliações no IGDB e, quando a biblioteca existir, a presença nas bibliotecas), `rating`, `release`, `title`; `trending` (mais adicionados a bibliotecas públicas em 7 dias) | 1 |
 | GET | `/games/{slug}` | público | Detalhes, com desenvolvedoras, publicadoras, franquias, temas, modos, perspectivas e nota do IGDB (0 a 100), + números da comunidade (RF23) | 1 |
-| GET | `/games/{slug}/reviews` | público | Avaliações públicas (perfis públicos, com texto), das mais recentes para as mais antigas (Fase 2: também as mais curtidas) | 1 |
+| GET | `/games/{slug}/reviews` | público | Avaliações públicas (perfis públicos, com texto), das mais recentes para as mais antigas, ou das mais curtidas com `sort=likes`. Cada uma traz o `id` da entrada e quantas curtidas tem (`likes`) | 1 |
 | GET | `/games/{slug}/similar` | público | Jogos parecidos | 3 |
 | GET | `/reviews` | público | Avaliações recentes do site todo (página inicial), com o autor e o resumo do jogo | 1 |
 | GET | `/genres`, `/platforms`, `/stores` | público | Listas para filtros e formulários (em cache) | 1 |
@@ -192,7 +194,7 @@ A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemp
 | Método | Rota | Acesso | Descrição |
 |---|---|---|---|
 | GET | `/me/feed` | usuário | Atividade de quem eu sigo, das mais recentes para as mais antigas, só de perfis públicos (RN16). Cada item tem `type` (`STATUS`, `REVIEW` ou `FAVORITE`), `user`, `game`, `status` (em `STATUS`, o daquele momento), `completed` em `STATUS` e `review` em `REVIEW`, como está agora. Nunca traz loja nem valor pago |
-| PUT / DELETE | `/reviews/{entryId}/like` | usuário | Curtir e descurtir |
+| PUT / DELETE | `/reviews/{entryId}/like` | usuário | Curtir e descurtir; os dois são idempotentes e respondem 204. Só avaliações que aparecem nas listas (404 nas outras) e nunca a própria (422 com `CANNOT_LIKE_OWN_REVIEW`, RN17) |
 | POST | `/reviews/{entryId}/reports` | usuário | Denunciar |
 | GET / POST | `/me/lists` | usuário | Minhas listas |
 | GET / PATCH / DELETE | `/me/lists/{listId}` | usuário | Uma lista |

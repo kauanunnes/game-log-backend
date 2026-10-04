@@ -12,6 +12,8 @@ erDiagram
     users ||--o{ follows : "é seguido"
     users ||--o{ activities : "feed"
     library_entries ||--o{ activities : "gera"
+    users ||--o{ review_likes : "curte"
+    library_entries ||--o{ review_likes : "recebe"
     games ||--o{ library_entries : "registrado em"
     games }o--o{ genres : "game_genres"
     games }o--o{ platforms : "game_platforms"
@@ -178,6 +180,18 @@ O feed ([RN16](01-requisitos.md#regras-de-negócio)). Cada linha é algo que a p
 
 A avaliação não é copiada: o feed mostra a de `library_entries`, como está agora. A V7 trouxe as entradas que já existiam, com o status atual e a avaliação, nas datas delas.
 
+### `review_likes`
+
+Curtidas em avaliações ([RN17](01-requisitos.md#regras-de-negócio)). A avaliação é a entrada da biblioteca, então a curtida aponta para ela.
+
+| Coluna | Tipo | Regras |
+|---|---|---|
+| `user_id` | bigint | FK `users`, `ON DELETE CASCADE`; quem curtiu |
+| `entry_id` | bigint | FK `library_entries`, `ON DELETE CASCADE` |
+| `created_at` | timestamptz | |
+
+A PK é `(user_id, entry_id)`: cada pessoa curte uma vez. Quando a avaliação perde o texto, o módulo social apaga as curtidas dela, ouvindo o `LibraryEntryChanged`.
+
 ## Restrições no banco
 
 As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no domínio (Java), que devolve mensagens claras. Os CHECKs são a rede de segurança caso algum código fuja da regra.
@@ -208,6 +222,7 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | `refresh_tokens` | `UNIQUE (token_hash)` e `(user_id)` | refresh e logout |
 | `follows` | PK `(follower_id, followee_id)` e `(followee_id, created_at DESC)` | quem a pessoa segue e quem segue a pessoa |
 | `activities` | `(user_id, created_at DESC)` e `(entry_id)` | feed e limpeza por entrada |
+| `review_likes` | PK `(user_id, entry_id)` e `(entry_id)` | o que eu curti e quantas curtidas cada avaliação tem |
 
 ## Por que assim
 
@@ -225,7 +240,6 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 
 | Tabela | Colunas | Observação |
 |---|---|---|
-| `review_likes` | `user_id`, `entry_id`, `created_at` | PK composta |
 | `reports` | `id`, `reporter_id`, `entry_id`, `reason`, `status`, `resolved_by`, `resolved_at`, `created_at` | moderação |
 | `user_lists` | `id`, `user_id`, `title`, `description`, `visibility`, `created_at`, `updated_at` | listas personalizadas |
 | `user_list_items` | `list_id`, `game_id`, `position`, `note` | PK `(list_id, game_id)`; `UNIQUE (list_id, position) DEFERRABLE INITIALLY DEFERRED`, para trocar posições numa transação só |

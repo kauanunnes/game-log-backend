@@ -48,7 +48,7 @@ A coluna **Fase** indica quando o requisito entra.
 | RF21 | Filtrar por gênero, plataforma e ano; ordenar por popularidade, nota e lançamento | 1 |
 | RF22 | Ver a página do jogo: capa, resumo, gêneros, plataformas, desenvolvedora, lançamento | 1 |
 | RF23 | Ver os números da comunidade no jogo: nota média, distribuição das notas, % que recomendam, quantos jogaram e quantos querem jogar | 1 |
-| RF24 | Ler as avaliações públicas do jogo, das mais recentes para as mais antigas (Fase 2: também as mais curtidas) | 1 |
+| RF24 | Ler as avaliações públicas do jogo, das mais recentes para as mais antigas ou das mais curtidas (RF52) | 1 |
 | RF25 | Trazer do IGDB, sem o usuário perceber, um jogo que ainda não está no banco quando ele aparece na busca | 1 |
 | RF26 | Administrador importa ou ressincroniza um jogo pelo id do IGDB | 1 |
 | RF27 | Administrador corrige os dados de um jogo manualmente | 2 |
@@ -141,6 +141,8 @@ Exemplo: um jogo avaliado só volta para Lista de desejos depois que a avaliaç�
 **RN15 · Seguir.** Qualquer perfil pode ser seguido, inclusive um privado, menos o próprio. Seguir não dá acesso a nada: num perfil privado, as listas de seguidores e de seguidos ficam escondidas como as abas (RN10).
 
 **RN16 · Feed.** Mostra o que fizeram as pessoas que eu sigo, só de perfis públicos (RN15), das atividades mais recentes para as mais antigas. Cada vez que alguém salva um jogo, entra no máximo uma atividade: a avaliação nova ou editada; senão, o status novo ou "zerou"; senão, o favorito. Editar uma avaliação a leva para o topo sem repetir, e tirar a avaliação, o favorito ou o jogo da biblioteca tira a atividade junto. Loja e valor pago nunca aparecem.
+
+**RN17 · Curtidas.** Só dá para curtir avaliações que aparecem nas listas (com texto e de perfil público), e nunca a própria; cada pessoa curte uma vez. Tirar o texto da avaliação, o jogo da biblioteca ou a conta leva as curtidas junto. As listas trazem só a contagem e respondem igual para todos; quem está logado pergunta à parte quais curtiu.
 
 ## Requisitos não funcionais
 
