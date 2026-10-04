@@ -60,6 +60,10 @@ class LibraryEntry {
         acquisition = Acquisition.from(request.acquisition());
     }
 
+    void removeReviewText() {
+        review = review == null ? null : review.withoutText();
+    }
+
     /** Só o que interessa a quem ouve {@link LibraryEntryChanged}. */
     LibraryEntryChanged.State state() {
         return new LibraryEntryChanged.State(

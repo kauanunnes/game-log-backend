@@ -5,8 +5,11 @@ import com.kauan.gamelog.catalog.dto.CommunityDTO;
 import com.kauan.gamelog.catalog.dto.CommunityDTO.RatingCount;
 import com.kauan.gamelog.catalog.dto.GameSummaryDTO;
 import com.kauan.gamelog.library.dto.PublicReviewDTO;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,23 +106,38 @@ class CommunityQueries implements GameCommunity {
                 .params(params)
                 .param("limit", pageable.getPageSize())
                 .param("offset", pageable.getOffset())
-                .query((rs, row) -> new PublicReviewDTO(
-                        rs.getLong("id"),
-                        new PublicReviewDTO.Reviewer(rs.getString("username"), rs.getString("display_name")),
-                        GameSummaryDTO.of(
-                                rs.getLong("game_id"),
-                                rs.getString("slug"),
-                                rs.getString("title"),
-                                rs.getString("cover_image_id"),
-                                rs.getObject("release_date", LocalDate.class)),
-                        EntryStatus.valueOf(rs.getString("status")),
-                        rs.getBigDecimal("rating"),
-                        rs.getObject("recommends", Boolean.class),
-                        rs.getString("review_text"),
-                        Boolean.TRUE.equals(rs.getObject("has_spoilers", Boolean.class)),
-                        rs.getObject("reviewed_at", OffsetDateTime.class).toInstant(),
-                        rs.getLong("likes")))
+                .query(CommunityQueries::review)
                 .list();
         return new PageImpl<>(content, pageable, total);
+    }
+
+    /** As avaliações destas entradas, de qualquer perfil: é a moderação que pergunta. */
+    List<PublicReviewDTO> reviewsByIds(Collection<Long> entryIds) {
+        if (entryIds.isEmpty()) {
+            return List.of();
+        }
+        return jdbc.sql(REVIEWS + REVIEWS_FROM + " AND e.id IN (:entryIds)")
+                .param("entryIds", entryIds)
+                .query(CommunityQueries::review)
+                .list();
+    }
+
+    private static PublicReviewDTO review(ResultSet rs, int row) throws SQLException {
+        return new PublicReviewDTO(
+                rs.getLong("id"),
+                new PublicReviewDTO.Reviewer(rs.getString("username"), rs.getString("display_name")),
+                GameSummaryDTO.of(
+                        rs.getLong("game_id"),
+                        rs.getString("slug"),
+                        rs.getString("title"),
+                        rs.getString("cover_image_id"),
+                        rs.getObject("release_date", LocalDate.class)),
+                EntryStatus.valueOf(rs.getString("status")),
+                rs.getBigDecimal("rating"),
+                rs.getObject("recommends", Boolean.class),
+                rs.getString("review_text"),
+                Boolean.TRUE.equals(rs.getObject("has_spoilers", Boolean.class)),
+                rs.getObject("reviewed_at", OffsetDateTime.class).toInstant(),
+                rs.getLong("likes"));
     }
 }

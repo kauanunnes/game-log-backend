@@ -14,6 +14,7 @@ import com.kauan.gamelog.shared.JsonMergePatch;
 import com.kauan.gamelog.shared.NotFoundException;
 import com.kauan.gamelog.shared.UnprocessableException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
@@ -84,6 +85,27 @@ public class LibraryService {
     @Transactional(readOnly = true)
     public Page<PublicReviewDTO> recentReviews(Pageable pageable) {
         return community.reviews(null, ReviewSort.RECENT, pageable);
+    }
+
+    /** Para a moderação: as avaliações destas entradas, de qualquer perfil. */
+    @Transactional(readOnly = true)
+    public List<PublicReviewDTO> reviewsByIds(Collection<Long> entryIds) {
+        return community.reviewsByIds(entryIds);
+    }
+
+    /**
+     * Moderação (RF53): tira o texto da avaliação, que sai das listas; a nota e o resto da entrada ficam. Quem ouve
+     * o evento apaga as curtidas.
+     */
+    @Transactional
+    public void removeReviewText(long entryId) {
+        LibraryEntry entry =
+                entries.findById(entryId).orElseThrow(() -> new NotFoundException("Avaliação não encontrada."));
+        LibraryEntryChanged.State before = entry.state();
+        entry.removeReviewText();
+        entries.saveAndFlush(entry);
+        events.publishEvent(
+                new LibraryEntryChanged(entry.getUserId(), entry.getGameId(), entry.getId(), before, entry.state()));
     }
 
     @Transactional(readOnly = true)

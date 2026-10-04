@@ -33,6 +33,11 @@ record Review(
                 unchanged ? previous.reviewedAt : Instant.now());
     }
 
+    /** Moderação: sai o texto, e a data fica, porque não é uma avaliação nova. Sem nota nem "recomenda", não sobra nada. */
+    Review withoutText() {
+        return rating == null && recommends == null ? null : new Review(rating, recommends, null, false, reviewedAt);
+    }
+
     /** 4.5 e 4.50 são a mesma nota. */
     private static boolean sameRating(BigDecimal a, BigDecimal b) {
         return a == null ? b == null : b != null && a.compareTo(b) == 0;

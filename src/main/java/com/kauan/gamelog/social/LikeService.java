@@ -1,7 +1,6 @@
 package com.kauan.gamelog.social;
 
 import com.kauan.gamelog.library.LibraryEntryChanged;
-import com.kauan.gamelog.shared.NotFoundException;
 import com.kauan.gamelog.shared.UnprocessableException;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -13,16 +12,17 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Service
 public class LikeService {
     private final ReviewLikes likes;
+    private final ListedReviews listed;
 
-    LikeService(ReviewLikes likes) {
+    LikeService(ReviewLikes likes, ListedReviews listed) {
         this.likes = likes;
+        this.listed = listed;
     }
 
     /** Só avaliações que aparecem nas listas, e nunca a própria. */
     @Transactional
     public void like(long userId, long entryId) {
-        long authorId = likes.authorOfPublicReview(entryId)
-                .orElseThrow(() -> new NotFoundException("Avaliação não encontrada."));
+        long authorId = listed.authorOf(entryId);
         if (authorId == userId) {
             throw new UnprocessableException(
                     "CANNOT_LIKE_OWN_REVIEW", "Não dá para curtir a própria avaliação.", List.of());

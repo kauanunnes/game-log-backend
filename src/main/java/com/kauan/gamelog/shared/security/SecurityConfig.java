@@ -44,7 +44,10 @@ class SecurityConfig {
                 .authorizeHttpRequests(requests -> requests.requestMatchers(API_PREFIX + "/admin/**")
                         .hasRole("ADMIN")
                         .requestMatchers(
-                                API_PREFIX + "/me/**", API_PREFIX + "/users/*/follow", API_PREFIX + "/reviews/*/like")
+                                API_PREFIX + "/me/**",
+                                API_PREFIX + "/users/*/follow",
+                                API_PREFIX + "/reviews/*/like",
+                                API_PREFIX + "/reviews/*/reports")
                         .authenticated()
                         .anyRequest()
                         .permitAll())
