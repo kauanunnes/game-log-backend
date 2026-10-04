@@ -138,6 +138,8 @@ Exemplo: um jogo avaliado só volta para Lista de desejos depois que a avaliaç�
 
 **RN14 · Gênero do usuário.** Opcional, com as opções Feminino, Masculino, Não binário e Outro. "Prefiro não informar" equivale a não ter gênero definido (`null`), que é o padrão. Pode ser alterado ou removido a qualquer momento. Se preenchido, aparece no cabeçalho do perfil público (num perfil privado, não aparece). Não é usado nas recomendações nem nos números da comunidade.
 
+**RN15 · Seguir.** Qualquer perfil pode ser seguido, inclusive um privado, menos o próprio. Seguir não dá acesso a nada: num perfil privado, as listas de seguidores e de seguidos ficam escondidas como as abas (RN10).
+
 ## Requisitos não funcionais
 
 | ID | Requisito |

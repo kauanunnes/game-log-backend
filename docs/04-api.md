@@ -81,6 +81,8 @@ Formato estável do Spring Data (`PagedModel`):
 | PATCH | `/me/settings` | usuário | Perfil privado, mostrar gastos, moeda padrão | 1 |
 | PUT | `/me/password` | usuário | Troca a senha; exige a senha atual e encerra todas as sessões (é preciso entrar de novo) | 1 |
 | DELETE | `/me` | usuário | Exclui a conta; exige a senha no corpo (`{ "password": "..." }`); 204 | 1 |
+| GET | `/me/profile` | usuário | O cabeçalho do meu perfil, no formato de `/users/{username}`, completo mesmo com o perfil privado | 2 |
+| GET | `/me/followers` e `/me/following` | usuário | Quem me segue e quem eu sigo, como nas rotas públicas, mas valendo com o perfil privado | 2 |
 | GET | `/me/export` | usuário | Exporta todos os dados | 2 |
 
 ### Minha biblioteca
@@ -143,13 +145,13 @@ Respondem igual para qualquer pessoa, inclusive o dono, que vê os próprios dad
 
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
-| GET | `/users/{username}` | público | Cabeçalho (nome, bio, gênero se informado, `memberSince`) e `counts` de cada aba; num perfil privado, só `username`, `displayName` e `"private": true` | 1 |
+| GET | `/users/{username}` | público | Cabeçalho (nome, bio, gênero se informado, `memberSince`) e `counts` de cada aba, de seguidores (`followers`) e de seguidos (`following`); num perfil privado, só `username`, `displayName` e `"private": true` | 1 |
 | GET | `/users/{username}/library` | público | Mesmos filtros de `/me/library`; 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/favorites` | público | Favoritos | 1 |
 | GET | `/users/{username}/reviews` | público | Entradas com texto de avaliação, das editadas por último | 1 |
 | GET | `/users/{username}/stats` | público | Estatísticas, sem gastos (salvo se o dono permitir); 403 se o perfil for privado | 1 |
-| GET | `/users/{username}/followers` e `/following` | público | Seguidores e seguidos | 2 |
-| PUT / DELETE | `/users/{username}/follow` | usuário | Seguir e deixar de seguir | 2 |
+| GET | `/users/{username}/followers` e `/following` | público | Seguidores e seguidos (`username`, `displayName`, `followedAt`), dos mais recentes para os mais antigos; 403 se o perfil for privado | 2 |
+| GET / PUT / DELETE | `/users/{username}/follow` | usuário | Se eu sigo a pessoa (204 ou 404), seguir e deixar de seguir. PUT e DELETE são idempotentes e respondem 204; seguir o próprio perfil dá 422 com `CANNOT_FOLLOW_SELF` (RN15) | 2 |
 | GET | `/users/{username}/lists` | público | Listas personalizadas | 2 |
 
 ### Catálogo

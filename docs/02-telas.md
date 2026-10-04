@@ -30,7 +30,7 @@ flowchart LR
 
 ## Abas do perfil
 
-**Cabeçalho:** nome, @username, bio, gênero (se informado), "membro desde" e contadores (jogados, jogando, quero jogar, desejos, favoritos, avaliações). Na Fase 2 entram seguidores, seguidos e o botão Seguir.
+**Cabeçalho:** nome, @username, bio, gênero (se informado), "membro desde" e contadores (jogados, jogando, quero jogar, desejos, favoritos, avaliações). Seguidores e seguidos levam às listas, e quem visita tem o botão Seguir.
 
 | Aba | Conteúdo | Endpoint | Fase |
 |---|---|---|---|
@@ -42,11 +42,12 @@ flowchart LR
 | Favoritos | Jogos marcados como favoritos | `GET /users/{u}/library?favorite=true` | 1 |
 | Avaliações | Só entradas com texto; spoiler escondido até clicar | `GET /users/{u}/library?reviewed=true` | 1 |
 | Estatísticas | Gráficos por ano, gênero, plataforma, notas e horas; gastos, se o dono permitir | `GET /users/{u}/stats` | 1 |
+| Seguidores e seguidos | Fora da faixa de abas: abrem pelos contadores do cabeçalho | `GET /users/{u}/followers`, `GET /users/{u}/following` | 2 |
 | Listas | Listas personalizadas | `GET /users/{u}/lists` | 2 |
 
 Todas as abas de jogos usam o mesmo componente: uma grade de capas com nota, ícone de "recomenda" e de favorito, filtros (gênero, plataforma, nota), ordenação e paginação.
 
-Quando o dono abre o próprio perfil, o front usa `GET /me/library`, que inclui loja e valor pago, e mostra os botões de editar. Assim, as rotas públicas devolvem a mesma resposta para qualquer pessoa.
+Quando o dono abre o próprio perfil, o front usa `GET /me/profile` e `GET /me/library`, que valem com o perfil privado e incluem loja e valor pago, e mostra os botões de editar. Assim, as rotas públicas devolvem a mesma resposta para qualquer pessoa.
 
 ## Telas logadas
 

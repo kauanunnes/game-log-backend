@@ -46,7 +46,7 @@ src/main/java/com/kauan/gamelog/
 │   └── igdb/        cliente e importação do IGDB
 ├── library/         entradas da biblioteca e regras por status
 ├── profile/         leitura pública: abas e estatísticas
-├── social/          (Fase 2) seguir, feed, curtidas, denúncias
+├── social/          seguir; na Fase 2 também feed, curtidas e denúncias
 ├── lists/           (Fase 2) listas personalizadas
 └── recommendation/  (Fase 3) embeddings e sugestões
 ```

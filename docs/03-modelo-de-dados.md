@@ -2,12 +2,14 @@
 
 PostgreSQL. Tabelas no plural, em snake_case e sem prefixo `tb_`. O schema nasce e evolui por migrations do Flyway.
 
-## Diagrama (MVP)
+## Diagrama
 
 ```mermaid
 erDiagram
     users ||--o{ refresh_tokens : "sessões"
     users ||--o{ library_entries : "biblioteca"
+    users ||--o{ follows : "segue"
+    users ||--o{ follows : "é seguido"
     games ||--o{ library_entries : "registrado em"
     games }o--o{ genres : "game_genres"
     games }o--o{ platforms : "game_platforms"
@@ -146,6 +148,18 @@ Uma linha por usuário + jogo. No JPA, `LibraryEntry` agrupa três `@Embeddable`
 | `acquired_on` | date | |
 | `created_at`, `updated_at` | timestamptz | |
 
+## Tabelas da Fase 2
+
+### `follows`
+
+| Coluna | Tipo | Regras |
+|---|---|---|
+| `follower_id` | bigint | FK `users`, `ON DELETE CASCADE`; quem segue |
+| `followee_id` | bigint | FK `users`, `ON DELETE CASCADE`; quem é seguido |
+| `created_at` | timestamptz | quando começou a seguir; seguir de novo não muda a data |
+
+A PK é `(follower_id, followee_id)`, então seguir duas vezes não duplica a linha.
+
 ## Restrições no banco
 
 As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no domínio (Java), que devolve mensagens claras. Os CHECKs são a rede de segurança caso algum código fuja da regra.
@@ -159,6 +173,7 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | `CHECK (favorite = false OR status IN ('PLAYING', 'PLAYED'))` | RN02 |
 | `CHECK (status IN ('PLAYING', 'PLAYED', 'DROPPED') OR (rating IS NULL AND review_text IS NULL AND recommends IS NULL))` | RN02 |
 | `CHECK` com os valores de `status`, `acquisition`, `role`, `profile_visibility` e `gender` | enums |
+| `CHECK (follower_id <> followee_id)` em `follows` | RN15 |
 
 ## Índices
 
@@ -173,6 +188,7 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | `library_entries` | `(game_id)` | números da comunidade |
 | `library_entries` | `(game_id, reviewed_at DESC) WHERE review_text IS NOT NULL` | avaliações do jogo |
 | `refresh_tokens` | `UNIQUE (token_hash)` e `(user_id)` | refresh e logout |
+| `follows` | PK `(follower_id, followee_id)` e `(followee_id, created_at DESC)` | quem a pessoa segue e quem segue a pessoa |
 
 ## Por que assim
 
@@ -190,7 +206,6 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 
 | Tabela | Colunas | Observação |
 |---|---|---|
-| `follows` | `follower_id`, `followee_id`, `created_at` | PK composta; `CHECK (follower_id <> followee_id)` |
 | `review_likes` | `user_id`, `entry_id`, `created_at` | PK composta |
 | `reports` | `id`, `reporter_id`, `entry_id`, `reason`, `status`, `resolved_by`, `resolved_at`, `created_at` | moderação |
 | `activities` | `id`, `user_id`, `type`, `game_id`, `entry_id`, `data` (jsonb), `created_at` | feed; índice `(user_id, created_at DESC)` |
