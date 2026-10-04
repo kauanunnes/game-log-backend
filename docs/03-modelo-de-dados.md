@@ -20,6 +20,7 @@ erDiagram
     user_lists ||--o{ user_list_items : "tem"
     games ||--o{ user_list_items : "aparece em"
     games ||--o{ library_entries : "registrado em"
+    games ||--o| game_community : "números"
     games }o--o{ genres : "game_genres"
     games }o--o{ platforms : "game_platforms"
     platforms |o--o{ library_entries : "jogado em"
@@ -246,6 +247,23 @@ Listas personalizadas ([RN19](01-requisitos.md#regras-de-negócio)), recriadas s
 | `user_list_items.note` | varchar(300) | |
 
 A PK de `user_list_items` é `(list_id, game_id)`, e `UNIQUE (list_id, position)` fica adiado até o commit (`DEFERRABLE INITIALLY DEFERRED`), para trocar posições numa transação só. Hoje a API troca os itens inteiros de uma vez.
+
+### `game_community`
+
+Os números da comunidade de cada jogo ([RF23 e RN11](01-requisitos.md#regras-de-negócio)), pré-calculados: a página do jogo lê uma linha em vez de contar as bibliotecas de todo mundo. Sem linha, o jogo ainda não entrou em nenhuma biblioteca, e os números saem zerados.
+
+| Coluna | Tipo | Regras |
+|---|---|---|
+| `game_id` | bigint | PK, FK `games`, `ON DELETE CASCADE` |
+| `average_rating` | numeric(3,2) | `null` sem notas |
+| `ratings_count` | integer | |
+| `rating_counts` | integer[] | 11 faixas de meia estrela, de 0 a 5 |
+| `recommend_percent` | smallint | entre quem respondeu; `null` se ninguém respondeu |
+| `players_count` | integer | jogando, jogou ou abandonou |
+| `want_to_play_count` | integer | quero jogar ou lista de desejos |
+| `updated_at` | timestamptz | |
+
+Gatilhos refazem a linha do jogo em toda escrita que muda a conta: entrada nova ou removida (inclusive na exclusão em cascata de uma conta); status, nota ou "recomenda" alterados; e a troca de privacidade de um perfil, que refaz todos os jogos da pessoa. A função `refresh_game_community` trava a linha antes de contar, então duas escritas no mesmo jogo não se atropelam.
 
 ## Restrições no banco
 

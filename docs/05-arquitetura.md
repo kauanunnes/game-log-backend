@@ -26,7 +26,7 @@ flowchart LR
 | Segurança | Spring Security 7 + OAuth2 Resource Server (JWT) | Validação de JWT pronta, sem biblioteca extra |
 | Validação | Jakarta Bean Validation | Anotações nos DTOs de entrada |
 | HTTP externo | `RestClient` | Cliente do IGDB, com limite de taxa e retry |
-| Cache | Spring Cache + Caffeine | Listas auxiliares e respostas do IGDB. Redis só se houver mais de uma instância |
+| Cache | Spring Cache + Caffeine | Listas auxiliares, estatísticas do ano todo e as buscas já levadas ao IGDB. Redis só se houver mais de uma instância |
 | Documentação | springdoc-openapi | Swagger UI gerado do código |
 | Testes | JUnit, AssertJ, Mockito, Testcontainers, WireMock | Banco real nos testes e IGDB simulado |
 | Qualidade | Spotless, JaCoCo, Dependabot, CodeQL | Formatação, cobertura e alertas de segurança automáticos |
@@ -79,8 +79,8 @@ Regras:
 
 | Evento | Publicado por | Quem ouve |
 |---|---|---|
-| `LibraryEntryChanged`, com o estado antes e depois (sem loja nem valor pago) | `library` | `social` (feed, limpeza das curtidas e fechamento das denúncias), `profile` (cache das estatísticas, 2.9), `recommendation` (gosto do usuário, Fase 3) |
-| `GameImported` / `GameUpdated` | `catalog` | `recommendation` (reindexar o embedding, Fase 3) |
+| `LibraryEntryChanged`, com o estado antes e depois (sem loja nem valor pago) | `library` | `social` (feed, limpeza das curtidas e fechamento das denúncias), `library` (tira as estatísticas da pessoa do cache), `recommendation` (gosto do usuário, Fase 3) |
+| `GameImported`, a cada jogo que entra ou muda pelo IGDB | `catalog` | `catalog` (tira gêneros e plataformas do cache), `recommendation` (reindexar o embedding, Fase 3) |
 
 Use `ApplicationEventPublisher` com `@TransactionalEventListener(phase = AFTER_COMMIT)`. Quem ouve e grava no banco abre uma transação própria (`REQUIRES_NEW`), como o feed: assim, um erro ali não desfaz o que a pessoa salvou. Se for preciso garantir a entrega mesmo com a aplicação caindo, o Spring Modulith guarda os eventos numa tabela (padrão outbox).
 
@@ -187,5 +187,8 @@ merge na main → build da imagem → publica no GHCR → deploy (Render ou Clou
 
 - `spring.jpa.open-in-view=false` (já está assim) e consultas com projeções ou `JOIN FETCH` para evitar N+1.
 - Paginação sempre no banco.
-- Listas auxiliares (gêneros, plataformas, lojas) em cache.
-- Números da comunidade calculados na consulta no MVP e pré-calculados na Fase 2, quando o volume justificar.
+- Caches em memória (Caffeine, até 10 mil itens e 10 minutos cada; os nomes ficam em `shared/Caches`):
+  - `lookups`: gêneros, plataformas e lojas. Sai do cache quando uma importação do IGDB termina, porque ela pode trazer gêneros e plataformas novos.
+  - `stats`: as estatísticas do ano todo de cada pessoa. Saem do cache quando a biblioteca dela muda. As de um ano específico são calculadas na hora.
+  - As buscas levadas ao IGDB ficam 24 horas num cache próprio, para a mesma busca não voltar lá.
+- Números da comunidade pré-calculados na tabela `game_community`, que gatilhos no banco mantêm em dia (ver [modelo de dados](03-modelo-de-dados.md#game_community)).
