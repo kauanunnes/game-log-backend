@@ -142,7 +142,7 @@ A partir da 1.4, as telas podem ser feitas em paralelo com o back-end, usando o 
 - [x] 2.7 E-mail: verificação e recuperação de senha (RF09)
 - [x] 2.8 Exportação de dados (RF10)
 - [x] 2.9 Cache com Caffeine e números da comunidade pré-calculados
-- [ ] 2.10 Logs estruturados com traceId e métricas
+- [x] 2.10 Logs estruturados com traceId e métricas
 
 ## Fase 3 · IA
 

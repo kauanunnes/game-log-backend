@@ -225,4 +225,5 @@ A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemp
 | Método | Rota | Acesso | Descrição |
 |---|---|---|---|
 | GET | `/actuator/health` | público | Saúde da aplicação e do banco |
+| GET | `/actuator/metrics`, `/actuator/metrics/{nome}` | admin | Métricas do Micrometer: rotas, chamadas ao IGDB e caches ([arquitetura](05-arquitetura.md#observabilidade)) |
 | GET | `/swagger-ui.html`, `/v3/api-docs` | público | Documentação |

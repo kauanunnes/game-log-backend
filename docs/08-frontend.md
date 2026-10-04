@@ -101,7 +101,7 @@ src/
 - O access token fica só em memória, nunca em `localStorage`.
 - Ao receber 401, o cliente chama `POST /auth/refresh` uma vez e repete a requisição.
 - Ao abrir o app, ele tenta um refresh para restaurar a sessão.
-- Erros da API viram `ApiError`, com o Problem Details da resposta.
+- Erros da API viram `ApiError`, com o Problem Details da resposta. Num erro 500, a mensagem termina com o código do erro (o `traceId`), para quem for relatar o problema.
 - Em desenvolvimento, o proxy do Vite encaminha `/api` para `http://localhost:8080`. Em produção, o rewrite do Vercel faz o mesmo. Assim, front e API ficam na mesma origem, e o cookie do refresh funciona ([arquitetura](05-arquitetura.md#segurança)).
 
 ## Telas

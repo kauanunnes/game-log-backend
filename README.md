@@ -22,6 +22,7 @@ O Spring sobe o PostgreSQL do `compose.yaml` (porta 5433), aplica as migrations 
 | --- | --- |
 | `http://localhost:8080/swagger-ui.html` | Documentação interativa da API |
 | `http://localhost:8080/actuator/health` | Saúde da aplicação e do banco |
+| `http://localhost:8080/actuator/metrics` | Métricas (só com o token de um admin) |
 
 ### Catálogo do IGDB
 

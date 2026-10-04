@@ -179,9 +179,14 @@ merge na main → build da imagem → publica no GHCR → deploy (Render ou Clou
 
 ## Observabilidade
 
-- `/actuator/health` com liveness, readiness e banco.
-- Em produção, logs estruturados em JSON (suporte nativo do Spring Boot), com traceId por requisição.
-- Métricas do Micrometer: latência por rota, chamadas ao IGDB, taxa de acerto do cache. Exportar para Prometheus ou Grafana Cloud na Fase 2, se quiser.
+- `/actuator/health` com liveness, readiness e banco. É a única rota do actuator aberta; as outras são só de admins.
+- Toda linha de log escrita durante uma requisição leva o traceId e o spanId (Micrometer Tracing com Brave, sem exportar os traces). No console local, eles aparecem entre colchetes depois da thread; em produção, como campos do JSON (formato ECS). O envio de e-mail, que roda em outra thread, leva o contexto junto.
+- Um erro 500 devolve o `traceId` no Problem Details, e o front mostra como "Código do erro": com ele, o caso aparece no log.
+- Métricas do Micrometer em `/actuator/metrics`, só para admins:
+  - `http.server.requests`: latência e status por rota;
+  - `http.client.requests` com `client.name=api.igdb.com` (e `id.twitch.tv`, do token): as chamadas ao IGDB;
+  - `cache.gets` por `cache` e `result` (`hit` ou `miss`): a taxa de acerto de cada cache.
+- Para mandar as métricas ao Prometheus ou ao Grafana Cloud, basta adicionar o registry do Micrometer correspondente. Expor numa porta separada (`management.server.port`) mantém as métricas fora da internet.
 
 ## Desempenho
 
