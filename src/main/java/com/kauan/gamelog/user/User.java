@@ -36,6 +36,8 @@ public class User {
     private boolean showSpending;
     private String defaultCurrency = "BRL";
 
+    private Instant emailVerifiedAt;
+
     @CreationTimestamp
     private Instant createdAt;
 
@@ -92,6 +94,16 @@ public class User {
 
     public String getDefaultCurrency() {
         return defaultCurrency;
+    }
+
+    public Instant getEmailVerifiedAt() {
+        return emailVerifiedAt;
+    }
+
+    void markEmailVerified() {
+        if (emailVerifiedAt == null) {
+            emailVerifiedAt = Instant.now();
+        }
     }
 
     public Instant getCreatedAt() {

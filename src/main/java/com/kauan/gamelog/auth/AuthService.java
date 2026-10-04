@@ -22,18 +22,21 @@ public class AuthService {
     private final RefreshTokens refreshTokens;
     private final LoginThrottle throttle;
     private final AuthProperties properties;
+    private final AccountEmails emails;
 
     AuthService(
             UserService users,
             AccessTokens accessTokens,
             RefreshTokens refreshTokens,
             LoginThrottle throttle,
-            AuthProperties properties) {
+            AuthProperties properties,
+            AccountEmails emails) {
         this.users = users;
         this.accessTokens = accessTokens;
         this.refreshTokens = refreshTokens;
         this.throttle = throttle;
         this.properties = properties;
+        this.emails = emails;
     }
 
     /** O access token vai no corpo da resposta; o refresh token, num cookie. */
@@ -41,7 +44,9 @@ public class AuthService {
 
     @Transactional
     public Session register(RegisterRequest request) {
-        return start(users.register(request.username(), request.email(), request.password()));
+        AuthUser user = users.register(request.username(), request.email(), request.password());
+        emails.sendVerification(user.id());
+        return start(user);
     }
 
     @Transactional

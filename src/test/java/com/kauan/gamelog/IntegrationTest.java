@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 
 /**
  * Contexto completo, MockMvc e PostgreSQL 18 num container compartilhado entre as classes de teste. O IGDB
- * fica desligado mesmo que exista um {@code .env} com credenciais.
+ * fica desligado mesmo que exista um {@code .env} com credenciais, e os e-mails ficam em memória.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -22,5 +22,5 @@ import org.springframework.context.annotation.Import;
             "game-log.auth.bcrypt-strength=4"
         })
 @AutoConfigureMockMvc
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, RecordingMailer.class})
 public @interface IntegrationTest {}

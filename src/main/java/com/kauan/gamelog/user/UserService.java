@@ -115,6 +115,33 @@ public class UserService {
         return MeDTO.from(user);
     }
 
+    @Transactional(readOnly = true)
+    public AccountContact contact(long id) {
+        return AccountContact.of(find(id));
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<AccountContact> contactByEmail(String email) {
+        return users.findByEmail(normalize(email)).map(AccountContact::of);
+    }
+
+    @Transactional
+    public void markEmailVerified(long id) {
+        find(id).markEmailVerified();
+    }
+
+    /**
+     * Pelo link do e-mail: troca a senha sem pedir a atual, encerra as sessões e confirma o e-mail, que acabou de
+     * provar ser da pessoa.
+     */
+    @Transactional
+    public void resetPassword(long id, String newPassword) {
+        User user = find(id);
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.markEmailVerified();
+        events.publishEvent(new PasswordChanged(id));
+    }
+
     /** Também encerra todas as sessões abertas (evento {@link PasswordChanged}). */
     @Transactional
     public void changePassword(long id, String currentPassword, String newPassword) {
