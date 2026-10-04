@@ -97,6 +97,18 @@ public class GameService {
         return profiles.of(ids);
     }
 
+    /** Os cards destes jogos, na ordem pedida. */
+    @Transactional(readOnly = true)
+    public List<GameSummaryDTO> summaries(List<Long> ids) {
+        return profiles.summaries(ids);
+    }
+
+    /** Os cards dos jogos com estes ids do IGDB, na ordem pedida; os que não estão no catálogo ficam de fora. */
+    @Transactional(readOnly = true)
+    public List<GameSummaryDTO> summariesByIgdbIds(List<Long> igdbIds) {
+        return profiles.summariesByIgdbIds(igdbIds);
+    }
+
     /** Para percorrer o catálogo inteiro: os próximos {@code limit} ids depois de {@code afterId}, em ordem. */
     @Transactional(readOnly = true)
     public List<Long> idsAfter(long afterId, int limit) {

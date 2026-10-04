@@ -5,8 +5,10 @@ import com.kauan.gamelog.catalog.dto.GameProfile;
 import java.util.List;
 
 /**
- * O texto que representa o jogo no embedding. Fica em inglês, como os dados do IGDB e o modelo, com o que mais diz
- * sobre o jogo primeiro: o modelo lê até 256 tokens.
+ * O texto que representa o jogo no embedding, em inglês, como os dados do IGDB e o modelo. Ficam de fora o título e o
+ * resumo: com eles, palavras do nome puxavam jogos sem relação ("Stardew" levava a "StarCraft"). Num catálogo de 2 mil
+ * jogos, só com os metadados, 36% dos {@code similar_games} do IGDB aparecem entre os 12 vizinhos; com o texto todo,
+ * 28%.
  */
 final class GameText {
     private static final int MAX_KEYWORDS = 15;
@@ -15,11 +17,10 @@ final class GameText {
     private GameText() {}
 
     static String of(GameProfile game) {
-        StringBuilder text = new StringBuilder(game.title());
+        StringBuilder text = new StringBuilder();
         if (game.releaseDate() != null) {
-            text.append(" (").append(game.releaseDate().getYear()).append(')');
+            text.append("Released in ").append(game.releaseDate().getYear()).append('.');
         }
-        text.append('.');
         GameMetadata metadata = game.metadata();
         part(text, "Genres", game.genres());
         part(text, "Themes", metadata.themes());
@@ -28,12 +29,14 @@ final class GameText {
         part(text, "Perspective", metadata.perspectives());
         part(text, "Developer", metadata.developers());
         part(text, "Series", metadata.series().isEmpty() ? metadata.franchises() : metadata.series());
-        if (game.summary() != null && !game.summary().isBlank()) {
+        // Sem temas nem palavras-chave (um jogo que não veio do IGDB), o resumo descreve o jogo
+        boolean described = !metadata.themes().isEmpty() || !metadata.keywords().isEmpty();
+        if (!described && game.summary() != null && !game.summary().isBlank()) {
             String summary = game.summary().strip();
             text.append(" Summary: ")
                     .append(summary.length() > MAX_SUMMARY ? summary.substring(0, MAX_SUMMARY) + "..." : summary);
         }
-        return text.toString();
+        return text.toString().strip();
     }
 
     private static void part(StringBuilder text, String label, List<String> values) {

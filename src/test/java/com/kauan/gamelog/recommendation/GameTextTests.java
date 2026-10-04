@@ -24,23 +24,25 @@ class GameTextTests {
                 null);
         var game = new GameProfile(
                 1,
+                14593L,
                 "Hollow Knight",
                 LocalDate.of(2017, 2, 24),
                 " Um reino de insetos. ",
                 List.of("Adventure"),
                 metadata);
 
+        // Nem o título nem o resumo: as palavras do nome puxariam jogos sem relação
         assertThat(GameText.of(game))
-                .isEqualTo("Hollow Knight (2017). Genres: Adventure. Themes: Action, Fantasy. Keywords: metroidvania."
+                .isEqualTo("Released in 2017. Genres: Adventure. Themes: Action, Fantasy. Keywords: metroidvania."
                         + " Modes: Single player. Perspective: Side view. Developer: Team Cherry."
-                        + " Series: Hollow Knight. Summary: Um reino de insetos.");
+                        + " Series: Hollow Knight.");
     }
 
     @Test
-    void leavesOutWhatTheGameLacksAndShortensLongSummaries() {
-        var empty = new GameMetadata(null, null, null, null, null, null, List.of("Portal"), null, null, null);
-        var game = new GameProfile(2, "Portal", null, "a".repeat(700), List.of(), empty);
+    void withoutThemesOrKeywordsTheSummaryDescribesTheGame() {
+        var sparse = new GameMetadata(null, null, null, null, null, null, List.of("Portal"), null, null, null);
+        var game = new GameProfile(2, null, "Portal", null, "a".repeat(700), List.of(), sparse);
 
-        assertThat(GameText.of(game)).isEqualTo("Portal. Series: Portal. Summary: " + "a".repeat(600) + "...");
+        assertThat(GameText.of(game)).isEqualTo("Series: Portal. Summary: " + "a".repeat(600) + "...");
     }
 }

@@ -6,4 +6,10 @@ import java.util.List;
 
 /** O que descreve um jogo, para quem lê o catálogo em lote, como os embeddings da Fase 3. */
 public record GameProfile(
-        long id, String title, LocalDate releaseDate, String summary, List<String> genres, GameMetadata metadata) {}
+        long id,
+        Long igdbId,
+        String title,
+        LocalDate releaseDate,
+        String summary,
+        List<String> genres,
+        GameMetadata metadata) {}

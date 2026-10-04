@@ -61,6 +61,7 @@ class EmbeddingWorker implements SmartLifecycle {
 
     private void work() {
         enqueueCatalog();
+        boolean caughtUp = false;
         int indexed = 0;
         while (!Thread.currentThread().isInterrupted()) {
             List<Long> batch = new ArrayList<>(BATCH);
@@ -75,8 +76,14 @@ class EmbeddingWorker implements SmartLifecycle {
             } catch (RuntimeException e) {
                 log.warn("Não foi possível indexar os jogos {}", batch, e);
             }
-            if (queue.isEmpty() && indexed > 0) {
-                log.info("Jogos indexados nos embeddings: {}", indexed);
+            // Um aviso só quando o passe da subida termina; depois, cada jogo novo vai para o debug
+            if (queue.isEmpty() && !caughtUp) {
+                log.info("Embeddings em dia: {} jogos indexados na subida", indexed);
+                caughtUp = true;
+            } else if (caughtUp && indexed > 0) {
+                log.debug("Jogos indexados nos embeddings: {}", indexed);
+            }
+            if (caughtUp) {
                 indexed = 0;
             }
         }

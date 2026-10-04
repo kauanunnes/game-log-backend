@@ -2,6 +2,7 @@ package com.kauan.gamelog.recommendation;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import org.springframework.jdbc.core.RowCallbackHandler;
@@ -28,6 +29,24 @@ class GameEmbeddings {
                 .param("model", model)
                 .query((RowCallbackHandler) rs -> hashes.put(rs.getLong("game_id"), rs.getString("text_hash")));
         return hashes;
+    }
+
+    /**
+     * Os jogos de vetor mais próximo (cosseno), do mais parecido ao menos; vazio se o jogo não tem vetor. Só compara
+     * vetores do mesmo modelo.
+     */
+    List<Long> nearest(long gameId, int limit) {
+        return jdbc.sql("""
+                        SELECT game_id FROM game_embeddings
+                        WHERE game_id <> :gameId
+                          AND model = (SELECT model FROM game_embeddings WHERE game_id = :gameId)
+                        ORDER BY embedding <=> (SELECT embedding FROM game_embeddings WHERE game_id = :gameId)
+                        LIMIT :limit
+                        """)
+                .param("gameId", gameId)
+                .param("limit", limit)
+                .query(Long.class)
+                .list();
     }
 
     void save(long gameId, float[] embedding, String textHash, String model) {
