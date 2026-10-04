@@ -33,11 +33,13 @@ IGDB_CLIENT_ID=...
 IGDB_CLIENT_SECRET=...
 ```
 
-Ao subir, a aplicação confere as credenciais e mostra no log `IGDB ligado` ou o motivo de estar desligado. Daí em diante, uma busca com poucos resultados também consulta o IGDB e guarda o que encontrar. Para trazer de uma vez os jogos mais populares:
+Ao subir, a aplicação confere as credenciais e mostra no log `IGDB ligado` ou o motivo de estar desligado. Daí em diante, uma busca com poucos resultados também consulta o IGDB e guarda o que encontrar, e os jogos sincronizados há mais de uma semana são atualizados (na subida e toda segunda). Para trazer de uma vez os jogos mais populares (os jogos do seed ganham capa junto):
 
 ```bash
-./mvnw spring-boot:run -Dspring-boot.run.arguments=--game-log.igdb.bootstrap-limit=2000
+./mvnw spring-boot:run -Dspring-boot.run.arguments=--game-log.igdb.bootstrap-limit=10000
 ```
+
+A importação roda em segundo plano, com a API já respondendo, e não roda de novo quando o catálogo já tem esse tanto de jogos.
 
 ### Contas
 
@@ -72,7 +74,7 @@ A cada push na `main`, o CI roda os testes e publica a imagem em `ghcr.io/kauanu
 2. No Render, crie um Web Service a partir da imagem `ghcr.io/kauanunnes/game-log-backend:latest`, com health check em `/actuator/health`.
 3. Defina `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, `JWT_PRIVATE_KEY`, `IGDB_CLIENT_ID`, `IGDB_CLIENT_SECRET`, `CORS_ORIGINS`, `APP_URL` e as variáveis do SMTP (`SPRING_MAIL_*` e `MAIL_FROM`).
 4. Copie o deploy hook do serviço para o segredo `RENDER_DEPLOY_HOOK_URL` do repositório. Daí em diante, cada push na `main` que passar nos testes vira um deploy.
-5. Para encher o catálogo na primeira vez, suba uma vez com `GAME_LOG_IGDB_BOOTSTRAP_LIMIT=2000` e depois remova a variável.
+5. Para encher o catálogo, defina `GAME_LOG_IGDB_BOOTSTRAP_LIMIT=10000`. A importação roda em segundo plano na primeira subida, e a variável pode ficar: com o catálogo cheio, ela não roda de novo.
 
 ## Documentação
 

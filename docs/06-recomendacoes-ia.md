@@ -165,8 +165,8 @@ Com menos de 3 jogos curtidos, não há sinal suficiente. As opções, em ordem:
 
 ## O que o MVP já precisa fazer
 
-- [ ] Guardar os metadados ricos do IGDB em `games.metadata`: temas, palavras-chave, modos, perspectiva, desenvolvedora, franquia e `similar_games`.
-- [ ] Importar milhares de jogos populares, não só os que os usuários adicionam. A IA precisa de candidatos.
-- [ ] Publicar os eventos `LibraryEntryChanged`, `GameImported` e `GameUpdated`, mesmo sem ninguém ouvindo ainda.
-- [ ] Usar a imagem do PostgreSQL com pgvector desde a Fase 0.
-- [ ] Manter a escala de nota estável (0 a 5, em passos de 0,25).
+- [x] Guardar os metadados ricos do IGDB em `games.metadata`: temas, palavras-chave, modos, perspectiva, desenvolvedora, franquia, série, jogo principal e `similar_games`.
+- [x] Importar milhares de jogos populares, não só os que os usuários adicionam. A IA precisa de candidatos.
+- [x] Publicar os eventos `LibraryEntryChanged` e `GameImported` (este vale para jogo novo e atualizado), mesmo sem ninguém ouvindo ainda.
+- [x] Usar a imagem do PostgreSQL com pgvector desde a Fase 0.
+- [x] Manter a escala de nota estável (0 a 5, em passos de 0,25).

@@ -115,13 +115,13 @@ sequenceDiagram
 - **Chamadas:** `POST https://api.igdb.com/v4/games`, com os headers `Client-ID` e `Authorization: Bearer`. O corpo vai na linguagem Apicalypse (campos, filtros, limite).
 - **Limite:** 4 requisições por segundo por credencial. O cliente espaça as chamadas, lembra por 24 h as buscas já feitas e repete com espera (`RetryTemplate` do Spring Framework 7) os erros temporários: 401, 429 e 5xx. Timeout e erro de rede não repetem, para a busca não travar.
 - **O que importar:** jogos principais, remakes, remasters e expansões; ficam de fora DLCs pequenas e bundles.
-- **Campos:** nome, slug, resumo, lançamento, capa, gêneros, plataformas, temas, palavras-chave, modos, perspectiva, desenvolvedora, publicadora, franquia, nota, número de avaliações e `similar_games`.
+- **Campos:** nome, slug, resumo, lançamento, capa, gêneros, plataformas, temas, palavras-chave, modos, perspectiva, desenvolvedora, publicadora, franquia, série, jogo principal (de expansões, edições e ports), nota, número de avaliações e `similar_games`.
 - **Capas:** guarde só o `image_id` e monte a URL no tamanho desejado: `https://images.igdb.com/igdb/image/upload/t_cover_big/{image_id}.jpg`.
 - **Isolamento:** tudo do IGDB fica em `catalog/igdb`. O resto do sistema lê o catálogo local e só chama `IgdbCatalogSync`, então trocar pelo RAWG fica restrito a esse pacote.
 - **Estratégia:**
-  1. um job inicial importa os jogos mais populares (`--game-log.igdb.bootstrap-limit=2000`);
+  1. na subida, numa thread à parte para a aplicação já atender, a importação inicial traz os jogos mais populares (`--game-log.igdb.bootstrap-limit=10000`), um por transação. Se o catálogo já tem esse tanto de jogos do IGDB, ela não roda, então a variável pode ficar ligada;
   2. a busca usa o IGDB como fallback quando o resultado local é fraco;
-  3. uma ressincronização periódica (ex.: semanal) atualiza os jogos com `synced_at` antigo.
+  3. os jogos sincronizados há mais de 7 dias são atualizados em lotes de 500 por chamada: logo depois da importação inicial e toda segunda às 5h UTC (`game-log.igdb.resync-cron`; `-` desliga). Numa hospedagem que hiberna, a rodada da subida faz o papel do agendamento.
 - **Termos:** o uso segue o Twitch Developer Services Agreement; dê crédito ao IGDB no rodapé do front.
 
 ## Busca

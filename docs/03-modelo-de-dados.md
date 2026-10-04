@@ -126,10 +126,10 @@ Os links por e-mail ([RN21](01-requisitos.md#regras-de-negócio)), com o mesmo f
 | `release_date` | date | `null` se ainda não lançou |
 | `kind` | varchar(20) | `MAIN`, `REMAKE`, `REMASTER`, `EXPANSION`, `STANDALONE`... |
 | `cover_image_id` | varchar(50) | id da imagem no IGDB; a URL é montada na resposta |
-| `metadata` | jsonb | temas, palavras-chave, modos, perspectiva, desenvolvedoras, publicadoras, franquia, `similar_games` |
+| `metadata` | jsonb | temas, palavras-chave, modos, perspectiva, desenvolvedoras, publicadoras, franquia, série, `similar_games` e `parentGame` (no IGDB, o jogo principal de uma expansão, edição ou port) |
 | `igdb_rating` | numeric(5,2) | 0 a 100 |
 | `igdb_rating_count` | integer | ajuda a ordenar por popularidade enquanto o site tem pouco uso |
-| `synced_at` | timestamptz | última sincronização com o IGDB |
+| `synced_at` | timestamptz | última sincronização com o IGDB; depois de 7 dias, o jogo entra na próxima atualização |
 | `created_at`, `updated_at` | timestamptz | |
 
 ### Tabelas auxiliares
