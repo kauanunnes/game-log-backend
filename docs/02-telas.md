@@ -34,13 +34,13 @@ flowchart LR
 
 | Aba | Conteúdo | Endpoint | Fase |
 |---|---|---|---|
-| Visão geral | Favoritos em destaque, jogando agora, atividade recente e resumo das estatísticas | `GET /users/{u}`, `GET /users/{u}/favorites`, `GET /users/{u}/library?status=PLAYING` | 1 |
+| Visão geral | Favoritos em destaque, jogando agora, atividade recente e resumo das estatísticas | `GET /users/{u}`, `GET /users/{u}/library` (favoritos, jogando e os últimos atualizados), `GET /users/{u}/stats` | 1 |
 | Jogados | Jogados e abandonados, com filtro "Todos / Zerados / Abandonados" | `GET /users/{u}/library?status=PLAYED,DROPPED` | 1 |
 | Jogando | Jogos em andamento | `GET /users/{u}/library?status=PLAYING` | 1 |
 | Quero jogar | Backlog | `GET /users/{u}/library?status=BACKLOG` | 1 |
 | Lista de desejos | O que quer comprar | `GET /users/{u}/library?status=WISHLIST` | 1 |
-| Favoritos | Jogos marcados como favoritos | `GET /users/{u}/favorites` | 1 |
-| Avaliações | Só entradas com texto; spoiler escondido até clicar | `GET /users/{u}/reviews` | 1 |
+| Favoritos | Jogos marcados como favoritos | `GET /users/{u}/library?favorite=true` | 1 |
+| Avaliações | Só entradas com texto; spoiler escondido até clicar | `GET /users/{u}/library?reviewed=true` | 1 |
 | Estatísticas | Gráficos por ano, gênero, plataforma, notas e horas; gastos, se o dono permitir | `GET /users/{u}/stats` | 1 |
 | Listas | Listas personalizadas | `GET /users/{u}/lists` | 2 |
 

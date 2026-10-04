@@ -1,6 +1,6 @@
 # 08 · Front-end (Vue 3)
 
-> O código está no repositório **`game-log-frontend`** (pasta irmã deste projeto). Explorar e Página do jogo já usam a API; as outras telas mostram "Em construção" até a vez delas.
+> O código está no repositório **`game-log-frontend`** (pasta irmã deste projeto). Todas as telas da Fase 1 já usam a API.
 
 ## Identidade visual
 
@@ -33,20 +33,20 @@ As cores, sombras e fontes ficam em `src/styles/tokens.css`. Em desenvolvimento,
 | Fontes | Fontsource (servidas pelo próprio app) |
 | Deploy | Vercel, com rewrite de `/api/*` para a API |
 
-Entram quando forem usados: VeeValidate + Zod (formulário "Registrar jogo"), Playwright (testes E2E) e `openapi-typescript` (tipos gerados do Swagger).
+Entram quando forem usados: Playwright (testes E2E) e `openapi-typescript` (tipos gerados do Swagger). Os formulários usam a validação do próprio HTML e as mensagens 422 da API, sem biblioteca.
 
 ## Estrutura de pastas
 
 ```text
 src/
 ├── api/          cliente HTTP e um arquivo por recurso
-├── components/   AppWindow, TaskBar, TabPanel, StarRating, GameCard, PixelStar, UnderConstruction
-├── lib/          rótulos em português dos enums da API
+├── components/   janelas, abas, cards, nota em estrelas, modal da biblioteca...
+├── lib/          rótulos dos enums, formatação, filtros da URL, tabela da RN02 e composables
 ├── router/       rotas, abas e guarda de login
 ├── stores/       Pinia: sessão
 ├── styles/       tokens.css e base.css
 ├── types/        tipos da API (escritos à mão por enquanto)
-└── views/        uma view por rota
+└── views/        uma view por rota; as abas do perfil e das configurações em subpastas
 ```
 
 ## Rotas
@@ -78,7 +78,10 @@ src/
 | `ErrorMessage` | Diálogo de erro do Win95 com "Tentar de novo" |
 | `PageNav` | Anterior e próxima, pela `?page=` da rota atual |
 | `RatingHistogram` | Distribuição das notas, uma barra a cada meia estrela |
-| `ReviewCard` | Avaliação pública com autor, nota e "recomenda"; o spoiler fica escondido até o clique |
+| `ReviewCard` | Avaliação pública com autor (ou o jogo, no perfil), nota e "recomenda"; o spoiler fica escondido até o clique |
+| `LibraryActions` | Bloco "Sua biblioteca" da página do jogo: convite para entrar, "Adicionar" ou o status atual com "Editar" |
+| `LibraryEntryDialog` | Modal de registrar e editar um jogo na biblioteca, com as seções que o status aceita |
+| `BarList` | Barras horizontais das estatísticas (status, ano, gêneros, plataformas) |
 | `UnderConstruction` | Aviso de "em construção" para telas que ainda não existem |
 
 ## Sessão e chamadas à API
@@ -89,8 +92,17 @@ src/
 - Erros da API viram `ApiError`, com o Problem Details da resposta.
 - Em desenvolvimento, o proxy do Vite encaminha `/api` para `http://localhost:8080`. Em produção, o rewrite do Vercel faz o mesmo. Assim, front e API ficam na mesma origem, e o cookie do refresh funciona ([arquitetura](05-arquitetura.md#segurança)).
 
+## Telas
+
+- **Início** (`/`): os jogos mais adicionados na semana (`sort=trending`, que também aparece no Explorar) e as avaliações recentes (`GET /reviews`). Com sessão, o atalho "Criar conta" vira "Jogando agora".
+- **Explorar** (`/games`): busca, filtros e ordenação ficam na URL; a busca só dispara no Enter, porque cada busca com poucos resultados consulta o IGDB.
+- **Página do jogo** (`/games/:slug`): dados do IGDB, números da comunidade, avaliações públicas e o bloco "Sua biblioteca".
+- **Registrar jogo** (modal): cada seção aparece só nos status que a aceitam; a tabela da [RN02](01-requisitos.md#regras-de-negócio) fica espelhada em `lib/entryRules.ts`. Ao trocar para um status que não aceita algo já preenchido, o modal avisa o que vai sair.
+- **Perfil** (`/u/:username`): o dono usa `/me`, que traz loja e valor pago e funciona mesmo com o perfil privado; visitantes usam as rotas públicas. As abas de jogos são um componente só, com ordenação e página na URL; "Jogados" filtra Todos, Zerados e Abandonados, e o dono edita cada jogo dali.
+- **Configurações** (`/settings`): o perfil vai como JSON Merge Patch só com o que mudou. Trocar a senha encerra todas as sessões, então a tela entra de novo com a senha nova. Excluir a conta pede a senha e uma confirmação e volta ao Início com um aviso.
+
 ## Próximos passos
 
-- **Explorar** (`/games`): busca, filtros e ordenação ficam na URL; a busca só dispara no Enter, porque cada busca com poucos resultados consulta o IGDB.
-- **Página do jogo** (`/games/:slug`): dados do IGDB, números da comunidade e avaliações públicas.
-- A seguir: entrar e criar conta, registrar jogo na biblioteca, perfil com abas e estatísticas, e a página inicial com `sort=trending` e `GET /reviews` (a API de todas já existe).
+- Deploy no Vercel, com o rewrite de `/api/*` para a API publicada (depende da 1.8).
+- Testes E2E com Playwright nos fluxos principais: cadastro, registrar jogo e perfil.
+- Telas da Fase 2: feed, seguir, curtidas e listas.

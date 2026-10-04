@@ -127,7 +127,7 @@ Cada item numerado é uma issue e um PR pequeno. Marque `[x]` conforme for concl
 
 - [x] Identidade visual definida a partir das referências em `refs/` ([08 · Front-end](08-frontend.md)).
 - [x] Esqueleto em Vue 3 + TypeScript no repositório `game-log-frontend`.
-- [ ] Telas da Fase 1 de [02 · Telas](02-telas.md).
+- [x] Telas da Fase 1 de [02 · Telas](02-telas.md).
 
 A partir da 1.4, as telas podem ser feitas em paralelo com o back-end, usando o Swagger como contrato.
 
