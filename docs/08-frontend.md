@@ -66,7 +66,7 @@ src/
 | `/admin/reports` | Moderação (só admins; os outros voltam para o Início) | admin |
 | `/_design` | Guia de estilos (só em desenvolvimento) | não |
 | `/feed` | Feed | sim |
-| `/for-you` | Para você (Fase 3) | sim |
+| `/for-you` | Para você | sim |
 
 ## Componentes
 
@@ -108,6 +108,7 @@ src/
 
 - **Início** (`/`): os jogos mais adicionados na semana (`sort=trending`, que também aparece no Explorar) e as avaliações recentes (`GET /reviews`). Com sessão, o atalho "Criar conta" vira "Jogando agora".
 - **Explorar** (`/games`): busca, filtros e ordenação ficam na URL; a busca só dispara no Enter, porque cada busca com poucos resultados consulta o IGDB.
+- **Para você** (`/for-you`): as sugestões numa grade de capas, com o motivo embaixo de cada uma. Sem nada na biblioteca que diga do gosto, um aviso explica que são os populares. O Início mostra as 6 primeiras para quem está logado, com a mesma consulta, e mexer na biblioteca recalcula as duas.
 - **Página do jogo** (`/games/:slug`): dados do IGDB, números da comunidade, avaliações públicas (das mais recentes ou das mais curtidas, pela URL), o bloco "Sua biblioteca" e "Jogos parecidos". Quando o jogo tem vetor, dois botões trocam entre "Pelo conteúdo" (embeddings) e "Pelo IGDB"; sem vetor, aparece só a lista do IGDB.
 - **Registrar jogo** (modal): cada seção aparece só nos status que a aceitam; a tabela da [RN02](01-requisitos.md#regras-de-negócio) fica espelhada em `lib/entryRules.ts`. Ao trocar para um status que não aceita algo já preenchido, o modal avisa o que vai sair.
 - **Perfil** (`/u/:username`): o dono usa `/me`, que traz loja e valor pago e funciona mesmo com o perfil privado; visitantes usam as rotas públicas. As abas de jogos são um componente só, com ordenação e página na URL; "Jogados" filtra Todos, Zerados e Abandonados, e o dono edita cada jogo dali. O cabeçalho mostra seguidores e seguidos, que levam às listas, e o botão Seguir para quem visita. A Visão geral abre com os favoritos em destaque, que a dona escolhe ali mesmo.

@@ -76,9 +76,10 @@ A Anthropic não tem modelo de embeddings próprio. As opções:
 
 | Sinal | Efeito |
 |---|---|
-| Favorito | peso 3 |
-| Nota de 4,5 a 5 | peso 2 |
-| Nota de 3,5 a 4,25 | peso 1 |
+| Jogando, jogou, quero jogar ou lista de desejos | peso 1 (abandonar não conta) |
+| Favorito | +3 |
+| Nota de 4,5 a 5 | +2 |
+| Nota de 3,5 a 4,25 | +1 |
 | Recomenda = sim | +1 |
 | Nota até 2 ou recomenda = não | sinal negativo: afasta candidatos muito parecidos |
 | "Não tenho interesse" numa sugestão | exclui o jogo das próximas sugestões |
@@ -101,6 +102,15 @@ Depois da busca:
 - (opcional) dá preferência às plataformas que o usuário usa.
 
 Sobram cerca de 40 candidatos.
+
+**Como está na 3.4 (só busca, sem o Claude):**
+
+- As 10 entradas de maior peso viram sementes, e cada uma traz os 40 vizinhos mais próximos. As listas se juntam por *Reciprocal Rank Fusion*: cada semente soma `peso / (60 + posição)` a cada vizinho.
+- O sinal negativo é relativo: sai o candidato que fica mais perto de um jogo de que a pessoa não gostou do que da semente que o trouxe. Ele não depende de um limite de distância, que mudaria com o modelo.
+- Saem também as expansões, as edições e ports do que a pessoa já tem (pelo `parentGame`) e os jogos sem data ou ainda não lançados. Entram no máximo 2 por série.
+- O motivo é um template com o sinal mais forte da semente que mais pesou: "Parecido com X, que você favoritou", "que você avaliou com 4,5 estrelas", "que você recomenda"...
+- Sem vetores (em produção, enquanto os embeddings estão desligados), os `similar_games` do IGDB de cada semente fazem o papel dos vizinhos.
+- Com menos de 3 sementes, os populares completam a lista até 20.
 
 ## 4. Geração com o Claude
 

@@ -14,14 +14,14 @@ flowchart LR
     jogo -->|logado| registrar[[Registrar jogo]]
     perfil -->|dono| registrar
     inicio -->|logado| config[Configurações]
-    inicio -->|logado| paraVoce["Para você (Fase 3)"]
+    inicio -->|logado| paraVoce["Para você"]
 ```
 
 ## Telas públicas
 
 | Tela | Rota no front | O que mostra | Endpoints | Fase |
 |---|---|---|---|---|
-| Início | `/` | Jogos mais adicionados na semana e avaliações recentes; logado, atalho para "Jogando" e (Fase 3) "Você poderá gostar" | `GET /games?sort=trending`, `GET /reviews` | 1 |
+| Início | `/` | Jogos mais adicionados na semana e avaliações recentes; logado, atalho para "Jogando" e as 6 primeiras sugestões de "Você poderá gostar" | `GET /games?sort=trending`, `GET /reviews`, `GET /me/recommendations` se logado | 1 |
 | Explorar | `/games` | Busca por nome com filtros (gênero, plataforma, ano) e ordenação | `GET /games`, `GET /genres`, `GET /platforms` | 1 |
 | Página do jogo | `/games/:slug` | Capa, dados, números da comunidade, avaliações (mais recentes ou mais curtidas, com os botões de curtir e de denunciar), botão "Adicionar" com escolha de status; "Jogos parecidos", pelo conteúdo ou segundo o IGDB | `GET /games/{slug}`, `GET /games/{slug}/reviews`, `GET /me/library/{gameId}` se logado, `GET /games/{slug}/similar` | 1 |
 | Perfil | `/u/:username` | Cabeçalho e abas (abaixo) | `GET /users/{username}` e as rotas de cada aba | 1 |
@@ -57,7 +57,7 @@ Quando o dono abre o próprio perfil, o front usa `GET /me/profile`, `GET /me/li
 | Registrar jogo (modal) | Seções **Status**, **Avaliação** (nota, recomenda, texto, spoiler), **Jogatina** (plataforma, horas, datas, zerou), **Aquisição** (forma, loja, valor, moeda, data) e **Favorito**. Cada campo só aparece nos status em que é permitido ([RN02](01-requisitos.md#regras-de-negócio)) | `PUT /me/library/{gameId}`, `DELETE /me/library/{gameId}`, `GET /stores`, `GET /platforms` | 1 |
 | Configurações | Abas **Perfil** (nome, bio, gênero, username), **Conta** (e-mail, senha), **Privacidade** (perfil privado, mostrar gastos, moeda) e **Dados** (baixar tudo num JSON, excluir conta) | `GET /me`, `PATCH /me`, `PATCH /me/settings`, `PUT /me/password`, `GET /me/export`, `DELETE /me` | 1 |
 | Feed | Atividade de quem eu sigo, em frases como "Bia zerou Hollow Knight · há 2 horas"; avaliações com nota, recomendação e spoiler escondido | `GET /me/feed` | 2 |
-| Para você | Sugestões com motivo e os botões "não tenho interesse" e "já joguei" | `GET /me/recommendations`, `POST /me/recommendations/feedback` | 3 |
+| Para você | Sugestões com o motivo embaixo de cada capa; sem nada na biblioteca que diga do gosto, os populares e um aviso. Na 3.6, os botões "não tenho interesse" e "já joguei" | `GET /me/recommendations`, `POST /me/recommendations/feedback` (3.6) | 3 |
 | Primeiros passos | "Escolha 5 jogos que você ama", logo após o cadastro | `GET /games`, `PUT /me/library/{gameId}` | 3 |
 
 ## Administração

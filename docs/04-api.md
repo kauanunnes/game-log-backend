@@ -207,7 +207,7 @@ A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemp
 
 | Método | Rota | Acesso | Descrição |
 |---|---|---|---|
-| GET | `/me/recommendations` | usuário | Sugestões com motivo; cache de até 24 h |
+| GET | `/me/recommendations` | usuário | `{ suggestions: [{ game, reason }], personalized }` (RF61): até 20 sugestões calculadas na hora a partir da biblioteca, cada uma com um motivo que cita um jogo da pessoa ("Parecido com Hollow Knight, que você favoritou."). Com menos de 3 jogos que dizem do gosto, os populares completam a lista; `personalized` é `false` quando a biblioteca não diz nada. Com o Claude (3.5), ganha cache de até 24 h |
 | POST | `/me/recommendations/feedback` | usuário | `{ "gameId": 1942, "type": "NOT_INTERESTED" }` ou `ALREADY_PLAYED` |
 
 ### Administração
