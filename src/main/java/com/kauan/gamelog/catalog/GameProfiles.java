@@ -29,7 +29,7 @@ class GameProfiles {
             return List.of();
         }
         return jdbc.sql("""
-                        SELECT g.id, g.igdb_id, g.title, g.release_date, g.summary, g.metadata::text AS metadata,
+                        SELECT g.id, g.igdb_id, g.title, g.release_date, g.kind, g.summary, g.metadata::text AS metadata,
                                array_remove(array_agg(ge.name ORDER BY ge.name), NULL) AS genres
                         FROM games g
                         LEFT JOIN game_genres gg ON gg.game_id = g.id
@@ -44,6 +44,7 @@ class GameProfiles {
                         rs.getObject("igdb_id", Long.class),
                         rs.getString("title"),
                         rs.getObject("release_date", LocalDate.class),
+                        GameKind.valueOf(rs.getString("kind")),
                         rs.getString("summary"),
                         List.of((String[]) rs.getArray("genres").getArray()),
                         JSON.readValue(rs.getString("metadata"), GameMetadata.class)))
@@ -78,6 +79,15 @@ class GameProfiles {
                                 rs.getString("cover_image_id"),
                                 rs.getObject("release_date", LocalDate.class))));
         return keys.stream().map(found::get).filter(Objects::nonNull).toList();
+    }
+
+    /** Os jogos com mais avaliações no IGDB. */
+    List<Long> popularIds(int limit) {
+        return jdbc.sql("""
+                        SELECT id FROM games WHERE igdb_rating_count IS NOT NULL
+                        ORDER BY igdb_rating_count DESC, title
+                        LIMIT :limit
+                        """).param("limit", limit).query(Long.class).list();
     }
 
     List<Long> idsAfter(long afterId, int limit) {

@@ -1,5 +1,6 @@
 package com.kauan.gamelog.catalog.dto;
 
+import com.kauan.gamelog.catalog.GameKind;
 import com.kauan.gamelog.catalog.GameMetadata;
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ public record GameProfile(
         Long igdbId,
         String title,
         LocalDate releaseDate,
+        GameKind kind,
         String summary,
         List<String> genres,
         GameMetadata metadata) {}

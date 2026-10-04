@@ -9,6 +9,7 @@ import com.kauan.gamelog.library.dto.LibraryEntryRequest;
 import com.kauan.gamelog.library.dto.LibraryFilter;
 import com.kauan.gamelog.library.dto.PublicReviewDTO;
 import com.kauan.gamelog.library.dto.StatsDTO;
+import com.kauan.gamelog.library.dto.TasteSignal;
 import com.kauan.gamelog.shared.Caches;
 import com.kauan.gamelog.shared.ConflictException;
 import com.kauan.gamelog.shared.FieldIssue;
@@ -145,6 +146,12 @@ public class LibraryService {
             throw new UnprocessableException("NOT_A_FAVORITE", "Só favoritos podem ficar em destaque.", issues);
         }
         return featured(userId);
+    }
+
+    /** A biblioteca inteira como sinais de gosto: status, favorito, nota e se recomenda. */
+    @Transactional(readOnly = true)
+    public List<TasteSignal> taste(long userId) {
+        return queries.taste(userId);
     }
 
     @Transactional(readOnly = true)

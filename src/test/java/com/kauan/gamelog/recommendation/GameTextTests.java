@@ -2,6 +2,7 @@ package com.kauan.gamelog.recommendation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.kauan.gamelog.catalog.GameKind;
 import com.kauan.gamelog.catalog.GameMetadata;
 import com.kauan.gamelog.catalog.dto.GameProfile;
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ class GameTextTests {
                 14593L,
                 "Hollow Knight",
                 LocalDate.of(2017, 2, 24),
+                GameKind.MAIN,
                 " Um reino de insetos. ",
                 List.of("Adventure"),
                 metadata);
@@ -41,7 +43,7 @@ class GameTextTests {
     @Test
     void withoutThemesOrKeywordsTheSummaryDescribesTheGame() {
         var sparse = new GameMetadata(null, null, null, null, null, null, List.of("Portal"), null, null, null);
-        var game = new GameProfile(2, null, "Portal", null, "a".repeat(700), List.of(), sparse);
+        var game = new GameProfile(2, null, "Portal", null, GameKind.MAIN, "a".repeat(700), List.of(), sparse);
 
         assertThat(GameText.of(game)).isEqualTo("Series: Portal. Summary: " + "a".repeat(600) + "...");
     }

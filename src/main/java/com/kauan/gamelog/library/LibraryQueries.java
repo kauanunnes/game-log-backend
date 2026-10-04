@@ -8,6 +8,7 @@ import com.kauan.gamelog.library.dto.LibraryFilter;
 import com.kauan.gamelog.library.dto.MoneyDTO;
 import com.kauan.gamelog.library.dto.PlaythroughDTO;
 import com.kauan.gamelog.library.dto.ReviewDTO;
+import com.kauan.gamelog.library.dto.TasteSignal;
 import com.kauan.gamelog.shared.TextNormalizer;
 import com.kauan.gamelog.shared.UnprocessableException;
 import java.math.BigDecimal;
@@ -118,6 +119,22 @@ class LibraryQueries {
                         rs.getString("title"),
                         rs.getString("cover_image_id"),
                         rs.getObject("release_date", LocalDate.class)))
+                .list();
+    }
+
+    List<TasteSignal> taste(long userId) {
+        return jdbc.sql("""
+                        SELECT game_id, status, favorite, rating, recommends, updated_at
+                        FROM library_entries WHERE user_id = :userId
+                        """)
+                .param("userId", userId)
+                .query((rs, row) -> new TasteSignal(
+                        rs.getLong("game_id"),
+                        EntryStatus.valueOf(rs.getString("status")),
+                        rs.getBoolean("favorite"),
+                        rs.getBigDecimal("rating"),
+                        rs.getObject("recommends", Boolean.class),
+                        rs.getObject("updated_at", OffsetDateTime.class).toInstant()))
                 .list();
     }
 

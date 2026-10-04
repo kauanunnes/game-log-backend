@@ -109,6 +109,12 @@ public class GameService {
         return profiles.summariesByIgdbIds(igdbIds);
     }
 
+    /** Os jogos com mais avaliações no IGDB, dos mais populares para os menos. */
+    @Transactional(readOnly = true)
+    public List<Long> popularIds(int limit) {
+        return profiles.popularIds(limit);
+    }
+
     /** Para percorrer o catálogo inteiro: os próximos {@code limit} ids depois de {@code afterId}, em ordem. */
     @Transactional(readOnly = true)
     public List<Long> idsAfter(long afterId, int limit) {
