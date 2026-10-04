@@ -75,6 +75,7 @@ erDiagram
 | `id` | bigint identity | PK |
 | `username` | varchar(20) | único, sempre minúsculo ([RN08](01-requisitos.md#regras-de-negócio)) |
 | `email` | varchar(254) | único, sempre minúsculo |
+| `email_verified_at` | timestamptz | quando o e-mail foi confirmado; `null` = ainda não |
 | `password_hash` | varchar(100) | hash BCrypt |
 | `display_name` | varchar(50) | opcional |
 | `bio` | varchar(300) | opcional |
@@ -96,6 +97,20 @@ erDiagram
 | `expires_at` | timestamptz | |
 | `revoked_at` | timestamptz | `null` = ativo |
 | `created_at` | timestamptz | |
+
+### `account_tokens`
+
+Os links por e-mail ([RN21](01-requisitos.md#regras-de-negócio)), com o mesmo formato dos refresh tokens.
+
+| Coluna | Tipo | Regras |
+|---|---|---|
+| `id` | bigint identity | PK |
+| `user_id` | bigint | FK `users`, `ON DELETE CASCADE` |
+| `purpose` | varchar(14) | `VERIFY_EMAIL` ou `RESET_PASSWORD` |
+| `token_hash` | char(64) | SHA-256 do token (o token só vai no link); único |
+| `expires_at` | timestamptz | 24 h para confirmar, 1 h para redefinir |
+| `used_at` | timestamptz | `null` = ainda vale; um link novo do mesmo tipo anula os anteriores |
+| `created_at` | timestamptz | limita um e-mail por minuto |
 
 ### `games`
 

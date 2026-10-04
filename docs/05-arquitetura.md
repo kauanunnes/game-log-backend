@@ -157,6 +157,9 @@ Os testes rodam contra a mesma imagem de PostgreSQL usada em desenvolvimento, se
 | `JWT_PRIVATE_KEY` | PEM (PKCS#8) | assinatura dos tokens; a chave pública é derivada dela. Obrigatória em `prod`; sem ela, o perfil local gera uma chave a cada subida |
 | `CORS_ORIGINS` | `http://localhost:5173` | origens liberadas, separadas por vírgula |
 | `IGDB_CLIENT_ID` / `IGDB_CLIENT_SECRET` | | app da Twitch |
+| `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` | `smtp.resend.com`, `587` | SMTP dos e-mails da conta. Sem `SPRING_MAIL_HOST`, o e-mail inteiro, com o link, vai para o log (bom para desenvolvimento) |
+| `MAIL_FROM` | `Game Log <nao-responda@seu-dominio>` | remetente |
+| `APP_URL` | `https://gamelog.vercel.app` | endereço do front, usado nos links dos e-mails |
 | `ANTHROPIC_API_KEY`, chave do provedor de embeddings | | Fase 3 |
 
 As variáveis `SPRING_DATASOURCE_*` são lidas pelo Spring sem nenhuma linha no `application.properties`.

@@ -68,9 +68,10 @@ Formato estável do Spring Data (`PagedModel`):
 | POST | `/auth/login` | público | Login com username ou e-mail; 5 erros seguidos do mesmo IP para o mesmo login bloqueiam por 15 minutos (429) | 1 |
 | POST | `/auth/refresh` | cookie | Troca o refresh token (rotação) e devolve um novo access token | 1 |
 | POST | `/auth/logout` | cookie | Revoga a sessão; 204 | 1 |
-| POST | `/auth/password/forgot` | público | Envia o link de redefinição por e-mail | 2 |
-| POST | `/auth/password/reset` | público | Redefine a senha com o token do e-mail | 2 |
-| POST | `/auth/email/verify` | público | Confirma o e-mail | 2 |
+| POST | `/auth/password/forgot` | público | `{ "email": "..." }`: envia o link de redefinição. Responde 204 exista a conta ou não (RN21) | 2 |
+| POST | `/auth/password/reset` | público | `{ "token": "...", "newPassword": "..." }`: redefine a senha, encerra todas as sessões e confirma o e-mail; 204. Link vencido ou já usado dá 422 com `INVALID_TOKEN` | 2 |
+| POST | `/auth/email/verify` | público | `{ "token": "..." }`: confirma o e-mail; 204, ou 422 com `INVALID_TOKEN` | 2 |
+| POST | `/me/email/verification` | usuário | Manda o link de confirmação de novo; 409 se o e-mail já foi confirmado, 429 se o último saiu há menos de um minuto | 2 |
 
 ### Minha conta
 

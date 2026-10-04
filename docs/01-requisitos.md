@@ -150,6 +150,8 @@ Exemplo: um jogo avaliado só volta para Lista de desejos depois que a avaliaç�
 
 **RN20 · Destaques.** Até 5 favoritos ficam em destaque, na ordem escolhida, no topo do perfil. Só um favorito pode ficar em destaque, e desmarcar o favorito tira o jogo do destaque. Num perfil privado, os destaques não aparecem para quem visita (RN10).
 
+**RN21 · Links por e-mail.** O cadastro manda um link para confirmar o e-mail, que vale por 24 horas; "esqueci a senha" manda um que vale por 1 hora. Cada link vale uma vez, e um novo do mesmo tipo anula o anterior. Sai no máximo um e-mail de cada tipo por minuto. Pedir a recuperação responde igual exista a conta ou não. Redefinir a senha encerra todas as sessões e confirma o e-mail, que acabou de provar ser da pessoa.
+
 ## Requisitos não funcionais
 
 | ID | Requisito |

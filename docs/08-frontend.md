@@ -61,6 +61,7 @@ src/
 | `/u/:username/followers`, `/following` | Seguidores e seguidos (fora da faixa de abas; abrem pelos contadores do cabeçalho) | não |
 | `/u/:username/lists/:listId` | Uma lista; a dona edita ali mesmo (`?editar=1` abre o editor) | não |
 | `/login`, `/signup` | Entrar e criar conta | não |
+| `/forgot-password`, `/reset-password`, `/verify-email` | Recuperar a senha e confirmar o e-mail pelos links do e-mail | não |
 | `/settings/profile`, `/account`, `/privacy`, `/data` | Configurações | sim |
 | `/admin/reports` | Moderação (só admins; os outros voltam para o Início) | admin |
 | `/_design` | Guia de estilos (só em desenvolvimento) | não |
@@ -113,6 +114,7 @@ src/
 - **Listas** (aba do perfil e `/u/:username/lists/:listId`): a dona cria pela aba e cai direto no editor; salvar manda os dados da lista e todos os itens na nova ordem.
 - **Moderação** (`/admin/reports`, só admins): as avaliações denunciadas com as denúncias delas; "Manter" ou "Remover texto" vale para todas as denúncias da avaliação, e remover pede confirmação.
 - **Feed** (`/feed`): o que fizeram as pessoas que eu sigo, com o tempo relativo; atalhos no menu Iniciar e na janela da conta.
+- **Links por e-mail**: "Esqueci minha senha" no login leva ao pedido do link; a senha nova encerra a sessão deste navegador também e volta ao login com um aviso. O link de confirmação confirma ao abrir, e a aba Conta mostra se o e-mail foi confirmado, com "Reenviar confirmação".
 - **Configurações** (`/settings`): o perfil vai como JSON Merge Patch só com o que mudou. Trocar a senha encerra todas as sessões, então a tela entra de novo com a senha nova. Excluir a conta pede a senha e uma confirmação e volta ao Início com um aviso.
 
 ## Próximos passos

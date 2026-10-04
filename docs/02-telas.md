@@ -26,7 +26,8 @@ flowchart LR
 | Página do jogo | `/games/:slug` | Capa, dados, números da comunidade, avaliações (mais recentes ou mais curtidas, com os botões de curtir e de denunciar), botão "Adicionar" com escolha de status; (Fase 3) "Jogos parecidos" | `GET /games/{slug}`, `GET /games/{slug}/reviews`, `GET /me/library/{gameId}` se logado, `GET /games/{slug}/similar` | 1 |
 | Perfil | `/u/:username` | Cabeçalho e abas (abaixo) | `GET /users/{username}` e as rotas de cada aba | 1 |
 | Entrar / Criar conta | `/login`, `/signup` | Formulários | `POST /auth/login`, `POST /auth/register` | 1 |
-| Recuperar senha | `/forgot-password`, `/reset-password` | Formulários | `POST /auth/password/forgot`, `POST /auth/password/reset` | 2 |
+| Recuperar senha | `/forgot-password`, `/reset-password?token=` | Pedir o link (a resposta é a mesma exista a conta ou não) e escolher a senha nova | `POST /auth/password/forgot`, `POST /auth/password/reset` | 2 |
+| Confirmar e-mail | `/verify-email?token=` | Confirma ao abrir; se o link venceu, oferece outro | `POST /auth/email/verify`, `POST /me/email/verification` | 2 |
 
 ## Abas do perfil
 
