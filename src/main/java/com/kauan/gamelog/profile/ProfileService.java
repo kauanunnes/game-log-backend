@@ -5,6 +5,9 @@ import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryFilter;
 import com.kauan.gamelog.library.dto.PublicReviewDTO;
 import com.kauan.gamelog.library.dto.StatsDTO;
+import com.kauan.gamelog.lists.ListService;
+import com.kauan.gamelog.lists.dto.ListDTO;
+import com.kauan.gamelog.lists.dto.ListSummaryDTO;
 import com.kauan.gamelog.profile.dto.ProfileCounts;
 import com.kauan.gamelog.profile.dto.ProfileDTO;
 import com.kauan.gamelog.shared.ForbiddenException;
@@ -29,11 +32,13 @@ public class ProfileService {
     private final UserService users;
     private final LibraryService library;
     private final FollowService follows;
+    private final ListService lists;
 
-    ProfileService(UserService users, LibraryService library, FollowService follows) {
+    ProfileService(UserService users, LibraryService library, FollowService follows, ListService lists) {
         this.users = users;
         this.library = library;
         this.follows = follows;
+        this.lists = lists;
     }
 
     @Transactional(readOnly = true)
@@ -74,6 +79,17 @@ public class ProfileService {
     @Transactional(readOnly = true)
     public Page<FollowDTO> following(String username, Pageable pageable) {
         return follows.following(findVisible(username).id(), pageable);
+    }
+
+    /** Só as listas públicas; 403 se o perfil for privado. */
+    @Transactional(readOnly = true)
+    public Page<ListSummaryDTO> lists(String username, Pageable pageable) {
+        return lists.publicListsOf(findVisible(username).id(), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public ListDTO list(String username, long listId) {
+        return lists.publicListOf(findVisible(username).id(), listId);
     }
 
     @Transactional(readOnly = true)

@@ -5,6 +5,8 @@ import com.kauan.gamelog.library.dto.LibraryFilter;
 import com.kauan.gamelog.library.dto.PublicReviewDTO;
 import com.kauan.gamelog.library.dto.StatsDTO;
 import com.kauan.gamelog.library.dto.StatsFilter;
+import com.kauan.gamelog.lists.dto.ListDTO;
+import com.kauan.gamelog.lists.dto.ListSummaryDTO;
 import com.kauan.gamelog.profile.dto.ProfileDTO;
 import com.kauan.gamelog.social.dto.FollowDTO;
 import jakarta.validation.Valid;
@@ -51,6 +53,18 @@ public class ProfileController {
     @GetMapping("/reviews")
     public PagedModel<PublicReviewDTO> reviews(@PathVariable String username, Pageable pageable) {
         return new PagedModel<>(profileService.reviews(username, pageable));
+    }
+
+    /** Só as públicas, das mexidas por último para as mais antigas; 403 se o perfil for privado. */
+    @GetMapping("/lists")
+    public PagedModel<ListSummaryDTO> lists(@PathVariable String username, Pageable pageable) {
+        return new PagedModel<>(profileService.lists(username, pageable));
+    }
+
+    /** 404 se a lista for privada ou de outra pessoa. */
+    @GetMapping("/lists/{listId}")
+    public ListDTO list(@PathVariable String username, @PathVariable long listId) {
+        return profileService.list(username, listId);
     }
 
     /** Dos mais recentes para os mais antigos; 403 se o perfil for privado. */

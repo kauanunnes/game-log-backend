@@ -5,6 +5,8 @@ import com.kauan.gamelog.catalog.dto.GameSummaryDTO;
 import com.kauan.gamelog.catalog.igdb.IgdbCatalogSync;
 import com.kauan.gamelog.shared.NotFoundException;
 import com.kauan.gamelog.shared.UnprocessableException;
+import java.util.Collection;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -82,6 +84,12 @@ public class GameService {
     @Transactional(readOnly = true)
     public boolean exists(long id) {
         return gameRepository.existsById(id);
+    }
+
+    /** Quais destes ids existem no catálogo, numa consulta só. */
+    @Transactional(readOnly = true)
+    public Set<Long> existing(Collection<Long> ids) {
+        return ids.isEmpty() ? Set.of() : gameRepository.findExistingIds(ids);
     }
 
     @Transactional(readOnly = true)
