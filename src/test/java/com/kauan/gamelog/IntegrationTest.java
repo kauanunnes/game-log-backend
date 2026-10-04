@@ -10,7 +10,8 @@ import org.springframework.context.annotation.Import;
 
 /**
  * Contexto completo, MockMvc e PostgreSQL 18 num container compartilhado entre as classes de teste. O IGDB
- * fica desligado mesmo que exista um {@code .env} com credenciais, e os e-mails ficam em memória.
+ * fica desligado mesmo que exista um {@code .env} com credenciais, os e-mails ficam em memória e os embeddings saem de
+ * um modelo falso.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
@@ -19,8 +20,11 @@ import org.springframework.context.annotation.Import;
             "game-log.igdb.client-id=",
             "game-log.igdb.client-secret=",
             // BCrypt no custo 12 deixaria cada cadastro e login dos testes lento
-            "game-log.auth.bcrypt-strength=4"
+            "game-log.auth.bcrypt-strength=4",
+            // Nada de baixar o modelo do perfil local: os testes usam o FakeEmbeddingModel
+            "spring.ai.model.embedding=none",
+            "game-log.embeddings.model=teste"
         })
 @AutoConfigureMockMvc
-@Import({TestcontainersConfiguration.class, RecordingMailer.class})
+@Import({TestcontainersConfiguration.class, RecordingMailer.class, FakeEmbeddingModel.class})
 public @interface IntegrationTest {}

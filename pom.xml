@@ -20,6 +20,7 @@
 		<palantir-java-format.version>2.101.0</palantir-java-format.version>
 		<jacoco.version>0.8.15</jacoco.version>
 		<wiremock.version>3.13.2</wiremock.version>
+		<spring-ai.version>2.0.1</spring-ai.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -49,6 +50,10 @@
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-tracing-bridge-brave</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.ai</groupId>
+			<artifactId>spring-ai-starter-model-transformers</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -119,6 +124,17 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.springframework.ai</groupId>
+				<artifactId>spring-ai-bom</artifactId>
+				<version>${spring-ai.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 	<build>
 		<plugins>

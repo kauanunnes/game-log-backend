@@ -1,11 +1,13 @@
 package com.kauan.gamelog.catalog;
 
 import com.kauan.gamelog.catalog.dto.GameDetailsDTO;
+import com.kauan.gamelog.catalog.dto.GameProfile;
 import com.kauan.gamelog.catalog.dto.GameSummaryDTO;
 import com.kauan.gamelog.catalog.igdb.IgdbCatalogSync;
 import com.kauan.gamelog.shared.NotFoundException;
 import com.kauan.gamelog.shared.UnprocessableException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,16 +23,19 @@ public class GameService {
     private final GameSearchRepository gameSearchRepository;
     private final IgdbCatalogSync igdbCatalogSync;
     private final GameCommunity community;
+    private final GameProfiles profiles;
 
     public GameService(
             GameRepository gameRepository,
             GameSearchRepository gameSearchRepository,
             IgdbCatalogSync igdbCatalogSync,
-            GameCommunity community) {
+            GameCommunity community,
+            GameProfiles profiles) {
         this.gameRepository = gameRepository;
         this.gameSearchRepository = gameSearchRepository;
         this.igdbCatalogSync = igdbCatalogSync;
         this.community = community;
+        this.profiles = profiles;
     }
 
     public Page<GameSummaryDTO> search(GameSearch search, Pageable pageable) {
@@ -84,6 +89,18 @@ public class GameService {
     @Transactional(readOnly = true)
     public boolean exists(long id) {
         return gameRepository.existsById(id);
+    }
+
+    /** O que descreve cada um destes jogos, numa consulta só. */
+    @Transactional(readOnly = true)
+    public List<GameProfile> profiles(Collection<Long> ids) {
+        return profiles.of(ids);
+    }
+
+    /** Para percorrer o catálogo inteiro: os próximos {@code limit} ids depois de {@code afterId}, em ordem. */
+    @Transactional(readOnly = true)
+    public List<Long> idsAfter(long afterId, int limit) {
+        return profiles.idsAfter(afterId, limit);
     }
 
     /** Quais destes ids existem no catálogo, numa consulta só. */
