@@ -49,12 +49,11 @@ flowchart TB
 Para cada jogo, montamos um texto e geramos um embedding, um vetor que representa o "assunto" do texto:
 
 ```text
-Hollow Knight (2017). Genres: Adventure, Indie, Platform. Themes: Action, Fantasy. Keywords: metroidvania, ...
+Released in 2017. Genres: Adventure, Indie, Platform. Themes: Action, Fantasy. Keywords: metroidvania, ...
 Modes: Single player. Perspective: Side view. Developer: Team Cherry. Series: Hollow Knight.
-Summary: Forge your own path in Hollow Knight! An epic action adventure through a vast ruined kingdom...
 ```
 
-O texto fica em inglês, como os dados do IGDB e o modelo, com o que mais diz sobre o jogo primeiro: o modelo lê até 256 tokens, então o resumo vai por último e cortado em 600 caracteres.
+O texto fica em inglês, como os dados do IGDB e o modelo, e leva só os metadados. Com o título e o resumo, palavras do nome puxavam jogos sem relação ("Stardew Valley" trazia "StarCraft"). Medido contra os `similar_games` do IGDB, num catálogo de 2 mil jogos, a proporção deles entre os 12 vizinhos foi de 28% com o texto todo, 28% sem o título e 36% só com os metadados. O resumo só entra quando o jogo não tem temas nem palavras-chave, como os do seed.
 
 - O vetor fica no próprio PostgreSQL, com **pgvector** (o Neon suporta), índice HNSW e distância de cosseno.
 - Junto com o vetor, guardamos o **hash do texto** e o **nome do modelo**. Só recalculamos quando o texto muda. Trocar de modelo exige reindexar tudo, porque vetores de modelos diferentes não se comparam.
@@ -150,6 +149,8 @@ Com menos de 3 jogos curtidos, não há sinal suficiente. As opções, em ordem:
 3. Os populares nos gêneros que ele escolher.
 
 ## Como saber se está bom
+
+**Jogos parecidos (3.3):** a página do jogo mostra os 12 vizinhos mais próximos, sem as expansões e edições do próprio jogo, e ao lado a lista do IGDB, para comparar. Sem vetor (em produção, enquanto os embeddings estão desligados), fica só a lista do IGDB.
 
 **Antes de lançar (offline):** para cada usuário de teste, esconda 1 ou 2 jogos que ele curtiu e veja se eles aparecem no top 10 sugerido (**Recall@10**). Compare cinco abordagens:
 

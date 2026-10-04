@@ -150,7 +150,7 @@ Detalhes em [06 · Recomendações com IA](06-recomendacoes-ia.md).
 
 - [x] 3.1 Catálogo maior (~10 mil jogos) com metadados completos
 - [x] 3.2 pgvector, embeddings dos jogos e job de reindexação por hash (com um modelo local, por enquanto só para teste)
-- [ ] 3.3 Jogos parecidos (RF60), comparados com o `similar_games` do IGDB
+- [x] 3.3 Jogos parecidos (RF60), comparados com o `similar_games` do IGDB
 - [ ] 3.4 "Você poderá gostar" só com busca (RF61)
 - [ ] 3.5 O Claude reordena e explica, com saída estruturada e fallback (RF62)
 - [ ] 3.6 Feedback nas sugestões (RF63) e tela de primeiros passos (RF64)

@@ -168,7 +168,7 @@ A busca devolve só jogos já salvos no banco, com id próprio. Quando o resulta
 | GET | `/games` | público | `q`, `genreId`, `platformId`, `year` e `sort`: `relevance` (padrão quando há `q`), `popular` (padrão sem `q`; por enquanto usa o número de avaliações no IGDB e, quando a biblioteca existir, a presença nas bibliotecas), `rating`, `release`, `title`; `trending` (mais adicionados a bibliotecas públicas em 7 dias) | 1 |
 | GET | `/games/{slug}` | público | Detalhes, com desenvolvedoras, publicadoras, franquias, temas, modos, perspectivas e nota do IGDB (0 a 100), + números da comunidade (RF23) | 1 |
 | GET | `/games/{slug}/reviews` | público | Avaliações públicas (perfis públicos, com texto), das mais recentes para as mais antigas, ou das mais curtidas com `sort=likes`. Cada uma traz o `id` da entrada e quantas curtidas tem (`likes`) | 1 |
-| GET | `/games/{slug}/similar` | público | Jogos parecidos | 3 |
+| GET | `/games/{slug}/similar` | público | `{ byContent, byIgdb }` (RF60): até 12 jogos parecidos pelo conteúdo, os vizinhos nos embeddings sem as expansões e edições do próprio jogo (`null` se o jogo não tem vetor), e os `similar_games` do IGDB que estão no catálogo, na ordem do IGDB, para comparar | 3 |
 | GET | `/reviews` | público | Avaliações recentes do site todo (página inicial), com o autor e o resumo do jogo | 1 |
 | GET | `/genres`, `/platforms`, `/stores` | público | Listas para filtros e formulários (em cache) | 1 |
 
