@@ -60,15 +60,25 @@ class LibraryEntry {
         acquisition = Acquisition.from(request.acquisition());
     }
 
+    /** Só o que interessa a quem ouve {@link LibraryEntryChanged}. */
+    LibraryEntryChanged.State state() {
+        return new LibraryEntryChanged.State(
+                status,
+                favorite,
+                playthrough != null && Boolean.TRUE.equals(playthrough.completed()),
+                review != null && (review.rating() != null || review.text() != null),
+                review == null ? null : review.reviewedAt());
+    }
+
+    Long getId() {
+        return id;
+    }
+
     Long getUserId() {
         return userId;
     }
 
     Long getGameId() {
         return gameId;
-    }
-
-    EntryStatus getStatus() {
-        return status;
     }
 }

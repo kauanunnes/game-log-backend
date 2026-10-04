@@ -119,19 +119,21 @@ public class LibraryService {
     public void delete(long userId, long gameId) {
         LibraryEntry entry = entries.findByUserIdAndGameId(userId, gameId).orElseThrow(LibraryService::notInLibrary);
         entries.delete(entry);
-        events.publishEvent(new LibraryEntryChanged(userId, gameId, null));
+        events.publishEvent(new LibraryEntryChanged(userId, gameId, entry.getId(), entry.state(), null));
     }
 
     private void save(LibraryEntry entry, LibraryEntryRequest request) {
         EntryRules.check(request);
         checkReferences(request);
+        LibraryEntryChanged.State before = entry.getId() == null ? null : entry.state();
         entry.replace(request);
         try {
             entries.saveAndFlush(entry);
         } catch (DataIntegrityViolationException e) {
             throw new ConflictException("A entrada mudou ao mesmo tempo em outra requisição. Tente de novo.");
         }
-        events.publishEvent(new LibraryEntryChanged(entry.getUserId(), entry.getGameId(), entry.getStatus()));
+        events.publishEvent(
+                new LibraryEntryChanged(entry.getUserId(), entry.getGameId(), entry.getId(), before, entry.state()));
     }
 
     /** Plataforma e loja precisam existir no catálogo (RN07: qualquer plataforma, não só as do jogo). */
