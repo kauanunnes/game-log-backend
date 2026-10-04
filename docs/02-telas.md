@@ -55,7 +55,7 @@ Quando o dono abre o próprio perfil, o front usa `GET /me/profile`, `GET /me/li
 | Tela | O que tem | Endpoints | Fase |
 |---|---|---|---|
 | Registrar jogo (modal) | Seções **Status**, **Avaliação** (nota, recomenda, texto, spoiler), **Jogatina** (plataforma, horas, datas, zerou), **Aquisição** (forma, loja, valor, moeda, data) e **Favorito**. Cada campo só aparece nos status em que é permitido ([RN02](01-requisitos.md#regras-de-negócio)) | `PUT /me/library/{gameId}`, `DELETE /me/library/{gameId}`, `GET /stores`, `GET /platforms` | 1 |
-| Configurações | Abas **Perfil** (nome, bio, gênero, username), **Conta** (e-mail, senha), **Privacidade** (perfil privado, mostrar gastos, moeda) e **Dados** (exportar na Fase 2, excluir conta) | `GET /me`, `PATCH /me`, `PATCH /me/settings`, `PUT /me/password`, `DELETE /me` | 1 |
+| Configurações | Abas **Perfil** (nome, bio, gênero, username), **Conta** (e-mail, senha), **Privacidade** (perfil privado, mostrar gastos, moeda) e **Dados** (baixar tudo num JSON, excluir conta) | `GET /me`, `PATCH /me`, `PATCH /me/settings`, `PUT /me/password`, `GET /me/export`, `DELETE /me` | 1 |
 | Feed | Atividade de quem eu sigo, em frases como "Bia zerou Hollow Knight · há 2 horas"; avaliações com nota, recomendação e spoiler escondido | `GET /me/feed` | 2 |
 | Para você | Sugestões com motivo e os botões "não tenho interesse" e "já joguei" | `GET /me/recommendations`, `POST /me/recommendations/feedback` | 3 |
 | Primeiros passos | "Escolha 5 jogos que você ama", logo após o cadastro | `GET /games`, `PUT /me/library/{gameId}` | 3 |

@@ -38,7 +38,7 @@ A coluna **Fase** indica quando o requisito entra.
 | RF07 | Definir a moeda padrão (BRL, se nada for escolhido) | 1 |
 | RF08 | Excluir a própria conta | 1 |
 | RF09 | Verificar o e-mail e recuperar a senha por e-mail | 2 |
-| RF10 | Exportar todos os meus dados (JSON ou CSV) | 2 |
+| RF10 | Exportar todos os meus dados num arquivo JSON | 2 |
 
 ### Catálogo
 
@@ -151,6 +151,8 @@ Exemplo: um jogo avaliado só volta para Lista de desejos depois que a avaliaç�
 **RN20 · Destaques.** Até 5 favoritos ficam em destaque, na ordem escolhida, no topo do perfil. Só um favorito pode ficar em destaque, e desmarcar o favorito tira o jogo do destaque. Num perfil privado, os destaques não aparecem para quem visita (RN10).
 
 **RN21 · Links por e-mail.** O cadastro manda um link para confirmar o e-mail, que vale por 24 horas; "esqueci a senha" manda um que vale por 1 hora. Cada link vale uma vez, e um novo do mesmo tipo anula o anterior. Sai no máximo um e-mail de cada tipo por minuto. Pedir a recuperação responde igual exista a conta ou não. Redefinir a senha encerra todas as sessões e confirma o e-mail, que acabou de provar ser da pessoa.
+
+**RN22 · Exportação.** O arquivo traz tudo o que a conta guardou, inclusive o que é privado: loja e valor pago, listas privadas, quem a pessoa segue e as avaliações que curtiu. Só a própria pessoa baixa o dela. JSON, e não CSV, porque listas e avaliações não cabem numa tabela só.
 
 ## Requisitos não funcionais
 

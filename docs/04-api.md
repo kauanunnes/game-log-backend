@@ -86,7 +86,7 @@ Formato estável do Spring Data (`PagedModel`):
 | GET | `/me/followers` e `/me/following` | usuário | Quem me segue e quem eu sigo, como nas rotas públicas, mas valendo com o perfil privado | 2 |
 | GET | `/me/reviews` | usuário | Minhas avaliações no formato público, das editadas por último, mesmo com o perfil privado | 2 |
 | GET | `/me/likes?entryIds=1,2,3` | usuário | Quais destas avaliações eu curti (até 100 ids); as listas de avaliações não dizem isso, porque respondem igual para todos | 2 |
-| GET | `/me/export` | usuário | Exporta todos os dados | 2 |
+| GET | `/me/export` | usuário | Tudo o que a conta guardou, para baixar (`Content-Disposition: attachment; filename="game-log-<username>-<data>.json"`): `account`, `library` (com loja e valor pago), `featured`, `lists` (inclusive as privadas, com os itens), `following`, `followers` e `likedReviews` (RN22) | 2 |
 
 ### Minha biblioteca
 
