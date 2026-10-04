@@ -148,6 +148,8 @@ Exemplo: um jogo avaliado só volta para Lista de desejos depois que a avaliaç�
 
 **RN19 · Listas.** Cada lista tem título (até 80 caracteres), descrição opcional e até 100 jogos, cada um uma vez, na ordem que a dona escolher e com uma nota opcional por jogo. Salvar troca os itens de uma vez. Uma lista privada só aparece para a dona; num perfil privado, nenhuma aparece para quem visita (RN10).
 
+**RN20 · Destaques.** Até 5 favoritos ficam em destaque, na ordem escolhida, no topo do perfil. Só um favorito pode ficar em destaque, e desmarcar o favorito tira o jogo do destaque. Num perfil privado, os destaques não aparecem para quem visita (RN10).
+
 ## Requisitos não funcionais
 
 | ID | Requisito |

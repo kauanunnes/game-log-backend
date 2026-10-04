@@ -137,6 +137,7 @@ Uma linha por usuário + jogo. No JPA, `LibraryEntry` agrupa três `@Embeddable`
 | `game_id` | bigint | FK `games` |
 | `status` | varchar(10) | `WISHLIST`, `BACKLOG`, `PLAYING`, `PLAYED`, `DROPPED` |
 | `favorite` | boolean | padrão `false` |
+| `favorite_position` | smallint | de 1 a 5 entre os favoritos em destaque ([RN20](01-requisitos.md#regras-de-negócio)); só num favorito; `UNIQUE (user_id, favorite_position)` adiado até o commit, para trocar a ordem numa transação só |
 | **Review** | | |
 | `rating` | numeric(3,2) | 0 a 5, em passos de 0,25 |
 | `recommends` | boolean | `null` = não respondeu |
@@ -284,7 +285,6 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | Tabela | Colunas | Observação |
 |---|---|---|
 
-Os favoritos em destaque (RF38) cabem numa coluna `favorite_position` (1 a 5) em `library_entries`, com `UNIQUE (user_id, favorite_position)`.
 
 ### Fase 3 · IA
 

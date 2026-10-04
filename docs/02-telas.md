@@ -34,7 +34,7 @@ flowchart LR
 
 | Aba | Conteúdo | Endpoint | Fase |
 |---|---|---|---|
-| Visão geral | Favoritos em destaque, jogando agora, atividade recente e resumo das estatísticas | `GET /users/{u}`, `GET /users/{u}/library` (favoritos, jogando e os últimos atualizados), `GET /users/{u}/stats` | 1 |
+| Visão geral | Favoritos em destaque (até 5, em ordem; a dona escolhe ali mesmo), jogando agora, atividade recente e resumo das estatísticas | `GET /users/{u}` (com `featured`), `PUT /me/library/featured`, `GET /users/{u}/library` (favoritos, jogando e os últimos atualizados), `GET /users/{u}/stats` | 1 |
 | Jogados | Jogados e abandonados, com filtro "Todos / Zerados / Abandonados" | `GET /users/{u}/library?status=PLAYED,DROPPED` | 1 |
 | Jogando | Jogos em andamento | `GET /users/{u}/library?status=PLAYING` | 1 |
 | Quero jogar | Backlog | `GET /users/{u}/library?status=BACKLOG` | 1 |

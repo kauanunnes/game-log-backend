@@ -97,6 +97,7 @@ A entrada é identificada por **usuário + jogo**. Por isso o `PUT` cria ou subs
 | GET | `/me/library/counts` | usuário | Quantos jogos em cada status, favoritos e avaliações (os contadores do perfil) | 1 |
 | GET | `/me/library/{gameId}` | usuário | Minha entrada para o jogo; 404 se não existir | 1 |
 | PUT | `/me/library/{gameId}` | usuário | Cria (201) ou substitui (200) a entrada inteira | 1 |
+| PUT | `/me/library/featured` | usuário | `{ "gameIds": [1942, 7] }`: até 5 favoritos em destaque, na ordem do array; lista vazia tira todos. Um jogo que não é favorito dá 422 com `NOT_A_FAVORITE`, e nada muda (RN20) | 2 |
 | PATCH | `/me/library/{gameId}` | usuário | Altera só os campos enviados (ex.: status ou favorito); `null` limpa o campo (JSON Merge Patch, RFC 7396) | 1 |
 | DELETE | `/me/library/{gameId}` | usuário | Remove a entrada; 204 | 1 |
 | GET | `/me/stats` | usuário | Estatísticas completas, inclusive gastos; com `?year=`, contam os jogos terminados no ano e as compras feitas no ano | 1 |
@@ -147,7 +148,7 @@ Respondem igual para qualquer pessoa, inclusive o dono, que vê os próprios dad
 
 | Método | Rota | Acesso | Descrição | F |
 |---|---|---|---|---|
-| GET | `/users/{username}` | público | Cabeçalho (nome, bio, gênero se informado, `memberSince`) e `counts` de cada aba, de seguidores (`followers`) e de seguidos (`following`); num perfil privado, só `username`, `displayName` e `"private": true` | 1 |
+| GET | `/users/{username}` | público | Cabeçalho (nome, bio, gênero se informado, `memberSince`) e `counts` de cada aba, de seguidores (`followers`) e de seguidos (`following`), e os favoritos em destaque (`featured`, em ordem); num perfil privado, só `username`, `displayName` e `"private": true` | 1 |
 | GET | `/users/{username}/library` | público | Mesmos filtros de `/me/library`; 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/favorites` | público | Favoritos | 1 |
 | GET | `/users/{username}/reviews` | público | Avaliações da pessoa no formato público (com `id` e `likes`, nunca loja nem valor pago), das editadas por último; 403 se o perfil for privado | 1 |

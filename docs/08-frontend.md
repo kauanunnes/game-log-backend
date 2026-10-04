@@ -82,6 +82,7 @@ src/
 | `PageNav` | Anterior e próxima, pela `?page=` da rota atual |
 | `RatingHistogram` | Distribuição das notas, uma barra a cada meia estrela |
 | `ReviewCard` | Avaliação pública com autor (ou o jogo, no perfil), nota, "recomenda" e o botão de curtir; o spoiler fica escondido até o clique |
+| `FeaturedEditor` | Escolhe até 5 destaques entre os favoritos e os ordena com ▲ ▼ |
 | `ListCard` | Cartão da lista: mosaico 2×2 com as capas dos quatro primeiros jogos, título e contagem |
 | `ListEditor` | Edita título, descrição, privacidade e jogos: busca para adicionar, ▲ ▼ para reordenar (funcionam no teclado), nota por jogo e excluir |
 | `ReportButton` | Denunciar, com motivo e detalhes numa caixa de diálogo; some sem sessão e na própria avaliação |
@@ -108,7 +109,7 @@ src/
 - **Explorar** (`/games`): busca, filtros e ordenação ficam na URL; a busca só dispara no Enter, porque cada busca com poucos resultados consulta o IGDB.
 - **Página do jogo** (`/games/:slug`): dados do IGDB, números da comunidade, avaliações públicas (das mais recentes ou das mais curtidas, pela URL) e o bloco "Sua biblioteca".
 - **Registrar jogo** (modal): cada seção aparece só nos status que a aceitam; a tabela da [RN02](01-requisitos.md#regras-de-negócio) fica espelhada em `lib/entryRules.ts`. Ao trocar para um status que não aceita algo já preenchido, o modal avisa o que vai sair.
-- **Perfil** (`/u/:username`): o dono usa `/me`, que traz loja e valor pago e funciona mesmo com o perfil privado; visitantes usam as rotas públicas. As abas de jogos são um componente só, com ordenação e página na URL; "Jogados" filtra Todos, Zerados e Abandonados, e o dono edita cada jogo dali. O cabeçalho mostra seguidores e seguidos, que levam às listas, e o botão Seguir para quem visita.
+- **Perfil** (`/u/:username`): o dono usa `/me`, que traz loja e valor pago e funciona mesmo com o perfil privado; visitantes usam as rotas públicas. As abas de jogos são um componente só, com ordenação e página na URL; "Jogados" filtra Todos, Zerados e Abandonados, e o dono edita cada jogo dali. O cabeçalho mostra seguidores e seguidos, que levam às listas, e o botão Seguir para quem visita. A Visão geral abre com os favoritos em destaque, que a dona escolhe ali mesmo.
 - **Listas** (aba do perfil e `/u/:username/lists/:listId`): a dona cria pela aba e cai direto no editor; salvar manda os dados da lista e todos os itens na nova ordem.
 - **Moderação** (`/admin/reports`, só admins): as avaliações denunciadas com as denúncias delas; "Manter" ou "Remover texto" vale para todas as denúncias da avaliação, e remover pede confirmação.
 - **Feed** (`/feed`): o que fizeram as pessoas que eu sigo, com o tempo relativo; atalhos no menu Iniciar e na janela da conta.
