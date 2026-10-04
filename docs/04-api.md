@@ -191,7 +191,7 @@ A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemp
 
 | Método | Rota | Acesso | Descrição |
 |---|---|---|---|
-| GET | `/me/feed` | usuário | Atividade de quem eu sigo |
+| GET | `/me/feed` | usuário | Atividade de quem eu sigo, das mais recentes para as mais antigas, só de perfis públicos (RN16). Cada item tem `type` (`STATUS`, `REVIEW` ou `FAVORITE`), `user`, `game`, `status` (em `STATUS`, o daquele momento), `completed` em `STATUS` e `review` em `REVIEW`, como está agora. Nunca traz loja nem valor pago |
 | PUT / DELETE | `/reviews/{entryId}/like` | usuário | Curtir e descurtir |
 | POST | `/reviews/{entryId}/reports` | usuário | Denunciar |
 | GET / POST | `/me/lists` | usuário | Minhas listas |

@@ -79,10 +79,10 @@ Regras:
 
 | Evento | Publicado por | Quem ouve |
 |---|---|---|
-| `LibraryEntryChanged` | `library` | `social` (feed, Fase 2), `profile` (cache das estatísticas), `recommendation` (gosto do usuário, Fase 3) |
+| `LibraryEntryChanged`, com o estado antes e depois (sem loja nem valor pago) | `library` | `social` (feed), `profile` (cache das estatísticas, 2.9), `recommendation` (gosto do usuário, Fase 3) |
 | `GameImported` / `GameUpdated` | `catalog` | `recommendation` (reindexar o embedding, Fase 3) |
 
-Use `ApplicationEventPublisher` com `@TransactionalEventListener(phase = AFTER_COMMIT)`. Se for preciso garantir a entrega mesmo com a aplicação caindo, o Spring Modulith guarda os eventos numa tabela (padrão outbox).
+Use `ApplicationEventPublisher` com `@TransactionalEventListener(phase = AFTER_COMMIT)`. Quem ouve e grava no banco abre uma transação própria (`REQUIRES_NEW`), como o feed: assim, um erro ali não desfaz o que a pessoa salvou. Se for preciso garantir a entrega mesmo com a aplicação caindo, o Spring Modulith guarda os eventos numa tabela (padrão outbox).
 
 ## Segurança
 

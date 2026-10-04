@@ -10,6 +10,8 @@ erDiagram
     users ||--o{ library_entries : "biblioteca"
     users ||--o{ follows : "segue"
     users ||--o{ follows : "é seguido"
+    users ||--o{ activities : "feed"
+    library_entries ||--o{ activities : "gera"
     games ||--o{ library_entries : "registrado em"
     games }o--o{ genres : "game_genres"
     games }o--o{ platforms : "game_platforms"
@@ -160,6 +162,22 @@ Uma linha por usuário + jogo. No JPA, `LibraryEntry` agrupa três `@Embeddable`
 
 A PK é `(follower_id, followee_id)`, então seguir duas vezes não duplica a linha.
 
+### `activities`
+
+O feed ([RN16](01-requisitos.md#regras-de-negócio)). Cada linha é algo que a pessoa fez; quem segue quem fica em `follows`, e o feed junta os dois na leitura.
+
+| Coluna | Tipo | Regras |
+|---|---|---|
+| `id` | bigint identity | PK |
+| `user_id` | bigint | FK `users`, `ON DELETE CASCADE` |
+| `type` | varchar(10) | `STATUS`, `REVIEW` ou `FAVORITE` |
+| `game_id` | bigint | FK `games` |
+| `entry_id` | bigint | FK `library_entries`, `ON DELETE CASCADE`: tirar o jogo da biblioteca apaga as atividades dele |
+| `data` | jsonb | em `STATUS`, o status daquele momento: `{"status": "PLAYED", "completed": true}` |
+| `created_at` | timestamptz | |
+
+A avaliação não é copiada: o feed mostra a de `library_entries`, como está agora. A V7 trouxe as entradas que já existiam, com o status atual e a avaliação, nas datas delas.
+
 ## Restrições no banco
 
 As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no domínio (Java), que devolve mensagens claras. Os CHECKs são a rede de segurança caso algum código fuja da regra.
@@ -189,6 +207,7 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | `library_entries` | `(game_id, reviewed_at DESC) WHERE review_text IS NOT NULL` | avaliações do jogo |
 | `refresh_tokens` | `UNIQUE (token_hash)` e `(user_id)` | refresh e logout |
 | `follows` | PK `(follower_id, followee_id)` e `(followee_id, created_at DESC)` | quem a pessoa segue e quem segue a pessoa |
+| `activities` | `(user_id, created_at DESC)` e `(entry_id)` | feed e limpeza por entrada |
 
 ## Por que assim
 
@@ -208,7 +227,6 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 |---|---|---|
 | `review_likes` | `user_id`, `entry_id`, `created_at` | PK composta |
 | `reports` | `id`, `reporter_id`, `entry_id`, `reason`, `status`, `resolved_by`, `resolved_at`, `created_at` | moderação |
-| `activities` | `id`, `user_id`, `type`, `game_id`, `entry_id`, `data` (jsonb), `created_at` | feed; índice `(user_id, created_at DESC)` |
 | `user_lists` | `id`, `user_id`, `title`, `description`, `visibility`, `created_at`, `updated_at` | listas personalizadas |
 | `user_list_items` | `list_id`, `game_id`, `position`, `note` | PK `(list_id, game_id)`; `UNIQUE (list_id, position) DEFERRABLE INITIALLY DEFERRED`, para trocar posições numa transação só |
 

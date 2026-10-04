@@ -140,6 +140,8 @@ Exemplo: um jogo avaliado só volta para Lista de desejos depois que a avaliaç�
 
 **RN15 · Seguir.** Qualquer perfil pode ser seguido, inclusive um privado, menos o próprio. Seguir não dá acesso a nada: num perfil privado, as listas de seguidores e de seguidos ficam escondidas como as abas (RN10).
 
+**RN16 · Feed.** Mostra o que fizeram as pessoas que eu sigo, só de perfis públicos (RN15), das atividades mais recentes para as mais antigas. Cada vez que alguém salva um jogo, entra no máximo uma atividade: a avaliação nova ou editada; senão, o status novo ou "zerou"; senão, o favorito. Editar uma avaliação a leva para o topo sem repetir, e tirar a avaliação, o favorito ou o jogo da biblioteca tira a atividade junto. Loja e valor pago nunca aparecem.
+
 ## Requisitos não funcionais
 
 | ID | Requisito |
