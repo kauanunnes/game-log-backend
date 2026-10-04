@@ -49,15 +49,17 @@ flowchart TB
 Para cada jogo, montamos um texto e geramos um embedding, um vetor que representa o "assunto" do texto:
 
 ```text
-Hollow Knight (2017). Gêneros: Plataforma, Aventura, Indie. Temas: Ação, Fantasia.
-Modos: Single player. Perspectiva: Side view. Desenvolvedora: Team Cherry.
-Resumo: Uma aventura de ação em um reino de insetos em ruínas...
+Hollow Knight (2017). Genres: Adventure, Indie, Platform. Themes: Action, Fantasy. Keywords: metroidvania, ...
+Modes: Single player. Perspective: Side view. Developer: Team Cherry. Series: Hollow Knight.
+Summary: Forge your own path in Hollow Knight! An epic action adventure through a vast ruined kingdom...
 ```
+
+O texto fica em inglês, como os dados do IGDB e o modelo, com o que mais diz sobre o jogo primeiro: o modelo lê até 256 tokens, então o resumo vai por último e cortado em 600 caracteres.
 
 - O vetor fica no próprio PostgreSQL, com **pgvector** (o Neon suporta), índice HNSW e distância de cosseno.
 - Junto com o vetor, guardamos o **hash do texto** e o **nome do modelo**. Só recalculamos quando o texto muda. Trocar de modelo exige reindexar tudo, porque vetores de modelos diferentes não se comparam.
-- A indexação roda em background, disparada pelos eventos `GameImported` e `GameUpdated`.
-- Custo: indexar ~10 mil jogos sai por centavos de dólar.
+- A indexação roda numa thread só, em lotes de 32, para não disputar a CPU com as requisições. Na subida, um passe confere o catálogo inteiro pelo hash; depois, cada `GameImported` (jogo novo ou atualizado pelo IGDB) entra na fila.
+- Custo: com o modelo local, nenhum por chamada; com um provedor gerenciado, indexar ~10 mil jogos sai por centavos de dólar.
 
 A Anthropic não tem modelo de embeddings próprio. As opções:
 
@@ -67,7 +69,9 @@ A Anthropic não tem modelo de embeddings próprio. As opções:
 | OpenAI `text-embedding-3-small` | Barata e muito usada | Mais uma conta e uma chave de API |
 | Modelo local com Ollama (ex.: `nomic-embed-text`) | Grátis e ótimo para desenvolvimento | Em produção, é preciso hospedar o modelo |
 
-Sugestão: Ollama em desenvolvimento e um provedor gerenciado em produção. A escolha fica para a Fase 3, depois de conferir o suporte no Spring AI.
+| Modelo dentro da API (Spring AI Transformers, all-MiniLM-L6-v2) | Grátis, sem conta e sem serviço à parte | Qualidade menor; mais memória e CPU no servidor; a primeira subida baixa o modelo e a biblioteca nativa do PyTorch |
+
+**Por enquanto, só para teste:** o all-MiniLM-L6-v2 (384 dimensões) roda dentro da API, pelo Spring AI, e só no perfil local. Em produção, os embeddings ficam desligados (`spring.ai.model.embedding=none`) até a escolha do provedor. Trocar é mudar a dependência e a configuração, com uma migration para a nova dimensão e uma reindexação.
 
 ## 2. Sinais do usuário
 
@@ -159,7 +163,7 @@ Com menos de 3 jogos curtidos, não há sinal suficiente. As opções, em ordem:
 
 ## Tecnologia
 
-- **Spring AI 2.0** (GA em junho de 2026, exige Spring Boot 4): `EmbeddingModel`, `VectorStore` com pgvector e `ChatClient` com o Claude, convertendo a saída direto para records Java.
+- **Spring AI 2.0** (GA em junho de 2026, exige Spring Boot 4): `EmbeddingModel` (hoje, o modelo local) e `ChatClient` com o Claude, convertendo a saída direto para records Java. A tabela dos vetores é nossa, sem o `VectorStore`: o jogo é a chave, e a busca precisa de filtros.
 - A busca de candidatos é nossa (SQL com pgvector e filtros), e não o *advisor* genérico de perguntas e respostas, porque aqui a "pergunta" é o perfil do usuário.
 - Para a geração, uma alternativa é o SDK oficial da Anthropic para Java (`anthropic-java`).
 

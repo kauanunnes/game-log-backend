@@ -21,6 +21,7 @@ erDiagram
     games ||--o{ user_list_items : "aparece em"
     games ||--o{ library_entries : "registrado em"
     games ||--o| game_community : "números"
+    games ||--o| game_embeddings : "vetor"
     games }o--o{ genres : "game_genres"
     games }o--o{ platforms : "game_platforms"
     platforms |o--o{ library_entries : "jogado em"
@@ -265,6 +266,22 @@ Os números da comunidade de cada jogo ([RF23 e RN11](01-requisitos.md#regras-de
 
 Gatilhos refazem a linha do jogo em toda escrita que muda a conta: entrada nova ou removida (inclusive na exclusão em cascata de uma conta); status, nota ou "recomenda" alterados; e a troca de privacidade de um perfil, que refaz todos os jogos da pessoa. A função `refresh_game_community` trava a linha antes de contar, então duas escritas no mesmo jogo não se atropelam.
 
+## Tabelas da Fase 3
+
+### `game_embeddings`
+
+O vetor de cada jogo para as recomendações ([06 · Recomendações](06-recomendacoes-ia.md#1-indexação-dos-jogos)), com pgvector. A tabela é nossa, com o jogo como chave, e não a `vector_store` do Spring AI: a busca de candidatos é SQL, com filtros.
+
+| Coluna | Tipo | Regras |
+|---|---|---|
+| `game_id` | bigint | PK, FK `games`, `ON DELETE CASCADE` |
+| `embedding` | vector(384) | a dimensão do modelo atual (all-MiniLM-L6-v2); outro modelo pede uma migration nova |
+| `text_hash` | char(64) | SHA-256 do texto que gerou o vetor: com o mesmo texto e o mesmo modelo, não recalcula |
+| `model` | varchar(100) | o modelo que gerou o vetor; vetores de modelos diferentes não se comparam |
+| `updated_at` | timestamptz | |
+
+O índice HNSW com `vector_cosine_ops` deixa a busca dos vizinhos mais próximos rápida.
+
 ## Restrições no banco
 
 As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no domínio (Java), que devolve mensagens claras. Os CHECKs são a rede de segurança caso algum código fuja da regra.
@@ -313,21 +330,13 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 
 ## Tabelas das próximas fases
 
-### Fase 2 · Social
-
-| Tabela | Colunas | Observação |
-|---|---|---|
-
-
 ### Fase 3 · IA
 
 | Tabela | Colunas | Observação |
 |---|---|---|
-| `game_embeddings` | `game_id` (PK/FK), `embedding` vector(N), `model`, `content_hash`, `updated_at` | índice HNSW com `vector_cosine_ops`; N depende do modelo de embeddings |
 | `recommendation_feedback` | `user_id`, `game_id`, `type`, `created_at` | PK composta; "não tenho interesse" / "já joguei" |
 | `recommendations` | `user_id`, `game_id`, `rank`, `reason`, `model`, `generated_at` | cache das sugestões |
 
-Se usarmos o `PgVectorStore` do Spring AI, ele cria a própria tabela (`vector_store`) com metadados em JSON. A escolha fica para a Fase 3.
 
 ## Do código do curso para o novo modelo
 

@@ -41,6 +41,14 @@ Ao subir, a aplicação confere as credenciais e mostra no log `IGDB ligado` ou 
 
 A importação roda em segundo plano, com a API já respondendo, e não roda de novo quando o catálogo já tem esse tanto de jogos.
 
+### Embeddings (Fase 3)
+
+No perfil local, a API calcula os embeddings dos jogos com um modelo pequeno que roda dentro dela (all-MiniLM-L6-v2, pelo Spring AI). Por enquanto, é só para testar: em produção fica desligado. A primeira subida baixa o modelo (~90 MB), e o primeiro cálculo, a biblioteca nativa do PyTorch; depois, os dois ficam em cache. Para subir sem ele:
+
+```bash
+SPRING_AI_MODEL_EMBEDDING=none ./mvnw spring-boot:run
+```
+
 ### Contas
 
 O cadastro e o login devolvem um access token (15 minutos) e deixam o refresh token num cookie `HttpOnly`. No Swagger, use o botão **Authorize** com o access token. Não existe rota que crie administrador: o papel é dado direto no banco, e o token só sai com ele depois de entrar de novo.

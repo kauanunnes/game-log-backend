@@ -30,7 +30,7 @@ flowchart LR
 | Documentação | springdoc-openapi | Swagger UI gerado do código |
 | Testes | JUnit, AssertJ, Mockito, Testcontainers, WireMock | Banco real nos testes e IGDB simulado |
 | Qualidade | Spotless, JaCoCo, Dependabot, CodeQL | Formatação, cobertura e alertas de segurança automáticos |
-| IA (Fase 3) | Spring AI 2.0 + pgvector | Embeddings, busca vetorial e chamadas ao Claude |
+| IA (Fase 3) | Spring AI 2.0 + pgvector | Embeddings (por enquanto, um modelo local, só no perfil local), busca vetorial e chamadas ao Claude |
 
 ## Organização do código
 
@@ -48,7 +48,7 @@ src/main/java/com/kauan/gamelog/
 ├── profile/         leitura pública: abas e estatísticas
 ├── social/          seguir; na Fase 2 também feed, curtidas e denúncias
 ├── lists/           listas personalizadas
-└── recommendation/  (Fase 3) embeddings e sugestões
+└── recommendation/  embeddings dos jogos; depois, as sugestões
 ```
 
 Dentro de cada módulo, comece simples e só divida quando crescer:
@@ -80,7 +80,7 @@ Regras:
 | Evento | Publicado por | Quem ouve |
 |---|---|---|
 | `LibraryEntryChanged`, com o estado antes e depois (sem loja nem valor pago) | `library` | `social` (feed, limpeza das curtidas e fechamento das denúncias), `library` (tira as estatísticas da pessoa do cache), `recommendation` (gosto do usuário, Fase 3) |
-| `GameImported`, a cada jogo que entra ou muda pelo IGDB | `catalog` | `catalog` (tira gêneros e plataformas do cache), `recommendation` (reindexar o embedding, Fase 3) |
+| `GameImported`, a cada jogo que entra ou muda pelo IGDB | `catalog` | `catalog` (tira gêneros e plataformas do cache), `recommendation` (fila dos embeddings) |
 
 Use `ApplicationEventPublisher` com `@TransactionalEventListener(phase = AFTER_COMMIT)`. Quem ouve e grava no banco abre uma transação própria (`REQUIRES_NEW`), como o feed: assim, um erro ali não desfaz o que a pessoa salvou. Se for preciso garantir a entrega mesmo com a aplicação caindo, o Spring Modulith guarda os eventos numa tabela (padrão outbox).
 
@@ -160,6 +160,7 @@ Os testes rodam contra a mesma imagem de PostgreSQL usada em desenvolvimento, se
 | `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT`, `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD` | `smtp.resend.com`, `587` | SMTP dos e-mails da conta. Sem `SPRING_MAIL_HOST`, o e-mail inteiro, com o link, vai para o log (bom para desenvolvimento) |
 | `MAIL_FROM` | `Game Log <nao-responda@seu-dominio>` | remetente |
 | `APP_URL` | `https://gamelog.vercel.app` | endereço do front, usado nos links dos e-mails |
+| `SPRING_AI_MODEL_EMBEDDING` | `none` | `transformers` liga o modelo de embeddings dentro da API; é o padrão só no perfil local |
 | `ANTHROPIC_API_KEY`, chave do provedor de embeddings | | Fase 3 |
 
 As variáveis `SPRING_DATASOURCE_*` são lidas pelo Spring sem nenhuma linha no `application.properties`.
