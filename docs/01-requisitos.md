@@ -144,6 +144,8 @@ Exemplo: um jogo avaliado só volta para Lista de desejos depois que a avaliaç�
 
 **RN17 · Curtidas.** Só dá para curtir avaliações que aparecem nas listas (com texto e de perfil público), e nunca a própria; cada pessoa curte uma vez. Tirar o texto da avaliação, o jogo da biblioteca ou a conta leva as curtidas junto. As listas trazem só a contagem e respondem igual para todos; quem está logado pergunta à parte quais curtiu.
 
+**RN18 · Denúncias.** Só dá para denunciar avaliações que aparecem nas listas, e nunca a própria. Cada pessoa tem no máximo uma denúncia aberta por avaliação; resolvida, pode denunciar de novo. A moderação decide por avaliação, e a decisão fecha todas as denúncias abertas dela: manter, ou tirar o texto (a nota e o resto da entrada ficam, e as curtidas vão embora). Se o próprio autor tira o texto, as denúncias abertas fecham sozinhas.
+
 ## Requisitos não funcionais
 
 | ID | Requisito |

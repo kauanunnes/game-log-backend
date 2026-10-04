@@ -23,7 +23,7 @@ flowchart LR
 |---|---|---|---|---|
 | Início | `/` | Jogos mais adicionados na semana e avaliações recentes; logado, atalho para "Jogando" e (Fase 3) "Você poderá gostar" | `GET /games?sort=trending`, `GET /reviews` | 1 |
 | Explorar | `/games` | Busca por nome com filtros (gênero, plataforma, ano) e ordenação | `GET /games`, `GET /genres`, `GET /platforms` | 1 |
-| Página do jogo | `/games/:slug` | Capa, dados, números da comunidade, avaliações (mais recentes ou mais curtidas, com o botão de curtir), botão "Adicionar" com escolha de status; (Fase 3) "Jogos parecidos" | `GET /games/{slug}`, `GET /games/{slug}/reviews`, `GET /me/library/{gameId}` se logado, `GET /games/{slug}/similar` | 1 |
+| Página do jogo | `/games/:slug` | Capa, dados, números da comunidade, avaliações (mais recentes ou mais curtidas, com os botões de curtir e de denunciar), botão "Adicionar" com escolha de status; (Fase 3) "Jogos parecidos" | `GET /games/{slug}`, `GET /games/{slug}/reviews`, `GET /me/library/{gameId}` se logado, `GET /games/{slug}/similar` | 1 |
 | Perfil | `/u/:username` | Cabeçalho e abas (abaixo) | `GET /users/{username}` e as rotas de cada aba | 1 |
 | Entrar / Criar conta | `/login`, `/signup` | Formulários | `POST /auth/login`, `POST /auth/register` | 1 |
 | Recuperar senha | `/forgot-password`, `/reset-password` | Formulários | `POST /auth/password/forgot`, `POST /auth/password/reset` | 2 |
@@ -61,12 +61,12 @@ Quando o dono abre o próprio perfil, o front usa `GET /me/profile`, `GET /me/li
 
 ## Administração
 
-Na Fase 1 existem só os endpoints; a tela entra na Fase 2.
+A moderação de denúncias tem tela desde a 2.4 (`/admin/reports`); o catálogo ainda tem só os endpoints.
 
 | Tela | Endpoints |
 |---|---|
 | Catálogo: importar pelo id do IGDB, ressincronizar, corrigir dados | `POST /admin/games/import`, `POST /admin/games/{id}/sync`, `PATCH /admin/games/{id}` |
-| Denúncias | `GET /admin/reports`, `PATCH /admin/reports/{id}` |
+| Denúncias (`/admin/reports`): as avaliações denunciadas, as mais denunciadas primeiro, com "Manter" e "Remover texto" | `GET /admin/reports`, `PATCH /admin/reports/{id}` |
 
 ## Estados que toda tela precisa ter
 

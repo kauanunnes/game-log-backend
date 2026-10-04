@@ -195,7 +195,7 @@ A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemp
 |---|---|---|---|
 | GET | `/me/feed` | usuário | Atividade de quem eu sigo, das mais recentes para as mais antigas, só de perfis públicos (RN16). Cada item tem `type` (`STATUS`, `REVIEW` ou `FAVORITE`), `user`, `game`, `status` (em `STATUS`, o daquele momento), `completed` em `STATUS` e `review` em `REVIEW`, como está agora. Nunca traz loja nem valor pago |
 | PUT / DELETE | `/reviews/{entryId}/like` | usuário | Curtir e descurtir; os dois são idempotentes e respondem 204. Só avaliações que aparecem nas listas (404 nas outras) e nunca a própria (422 com `CANNOT_LIKE_OWN_REVIEW`, RN17) |
-| POST | `/reviews/{entryId}/reports` | usuário | Denunciar |
+| POST | `/reviews/{entryId}/reports` | usuário | Denunciar: `{ "reason": "SPAM" }` (`SPAM`, `OFFENSIVE`, `SPOILER` ou `OTHER`) e `details` opcional, até 500 caracteres; 201. Só avaliações que aparecem nas listas (404 nas outras), nunca a própria (422 com `CANNOT_REPORT_OWN_REVIEW`) e uma denúncia aberta por pessoa (409) |
 | GET / POST | `/me/lists` | usuário | Minhas listas |
 | GET / PATCH / DELETE | `/me/lists/{listId}` | usuário | Uma lista |
 | PUT | `/me/lists/{listId}/items` | usuário | Define os itens e a ordem |
@@ -214,8 +214,8 @@ A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemp
 | POST | `/admin/games/import` | admin | `{ "igdbId": 1942 }`: importa ou atualiza | 1 |
 | POST | `/admin/games/{id}/sync` | admin | Ressincroniza com o IGDB | 1 |
 | PATCH | `/admin/games/{id}` | admin | Correção manual | 2 |
-| GET | `/admin/reports` | admin | Denúncias pendentes | 2 |
-| PATCH | `/admin/reports/{id}` | admin | Resolver: manter ou remover a avaliação | 2 |
+| GET | `/admin/reports` | admin | Denúncias abertas, agrupadas por avaliação (`review` e `reports`), as mais denunciadas primeiro | 2 |
+| PATCH | `/admin/reports/{id}` | admin | `{ "decision": "KEEP" }` ou `REMOVE` (tira o texto; a nota fica). Fecha todas as denúncias abertas da avaliação; 204, ou 409 se já estava resolvida | 2 |
 
 ### Operação
 

@@ -61,6 +61,7 @@ src/
 | `/u/:username/followers`, `/following` | Seguidores e seguidos (fora da faixa de abas; abrem pelos contadores do cabeçalho) | não |
 | `/login`, `/signup` | Entrar e criar conta | não |
 | `/settings/profile`, `/account`, `/privacy`, `/data` | Configurações | sim |
+| `/admin/reports` | Moderação (só admins; os outros voltam para o Início) | admin |
 | `/_design` | Guia de estilos (só em desenvolvimento) | não |
 | `/feed` | Feed | sim |
 | `/for-you` | Para você (Fase 3) | sim |
@@ -80,6 +81,7 @@ src/
 | `PageNav` | Anterior e próxima, pela `?page=` da rota atual |
 | `RatingHistogram` | Distribuição das notas, uma barra a cada meia estrela |
 | `ReviewCard` | Avaliação pública com autor (ou o jogo, no perfil), nota, "recomenda" e o botão de curtir; o spoiler fica escondido até o clique |
+| `ReportButton` | Denunciar, com motivo e detalhes numa caixa de diálogo; some sem sessão e na própria avaliação |
 | `LikeButton` | Curtir e descurtir, com a contagem; sem sessão leva ao login, e na própria avaliação só mostra a contagem. Quais a pessoa curtiu vem de uma chamada só por página (`useLikedReviews`) |
 | `FollowButton` | Seguir e deixar de seguir, como botão de alternar do Win95; sem sessão, leva ao login |
 | `GameRow` | Capa pequena à esquerda e o conteúdo ao lado (avaliações do Início e feed) |
@@ -104,6 +106,7 @@ src/
 - **Página do jogo** (`/games/:slug`): dados do IGDB, números da comunidade, avaliações públicas (das mais recentes ou das mais curtidas, pela URL) e o bloco "Sua biblioteca".
 - **Registrar jogo** (modal): cada seção aparece só nos status que a aceitam; a tabela da [RN02](01-requisitos.md#regras-de-negócio) fica espelhada em `lib/entryRules.ts`. Ao trocar para um status que não aceita algo já preenchido, o modal avisa o que vai sair.
 - **Perfil** (`/u/:username`): o dono usa `/me`, que traz loja e valor pago e funciona mesmo com o perfil privado; visitantes usam as rotas públicas. As abas de jogos são um componente só, com ordenação e página na URL; "Jogados" filtra Todos, Zerados e Abandonados, e o dono edita cada jogo dali. O cabeçalho mostra seguidores e seguidos, que levam às listas, e o botão Seguir para quem visita.
+- **Moderação** (`/admin/reports`, só admins): as avaliações denunciadas com as denúncias delas; "Manter" ou "Remover texto" vale para todas as denúncias da avaliação, e remover pede confirmação.
 - **Feed** (`/feed`): o que fizeram as pessoas que eu sigo, com o tempo relativo; atalhos no menu Iniciar e na janela da conta.
 - **Configurações** (`/settings`): o perfil vai como JSON Merge Patch só com o que mudou. Trocar a senha encerra todas as sessões, então a tela entra de novo com a senha nova. Excluir a conta pede a senha e uma confirmação e volta ao Início com um aviso.
 
@@ -111,4 +114,4 @@ src/
 
 - Deploy no Vercel, com o rewrite de `/api/*` para a API publicada (depende da 1.8).
 - Testes E2E com Playwright nos fluxos principais: cadastro, registrar jogo e perfil.
-- Telas da Fase 2: denúncias e listas.
+- Telas da Fase 2: listas e o catálogo no painel de administração.

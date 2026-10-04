@@ -136,7 +136,7 @@ A partir da 1.4, as telas podem ser feitas em paralelo com o back-end, usando o 
 - [x] 2.1 Seguir, seguidores e seguidos (RF50)
 - [x] 2.2 Feed de atividade a partir do evento `LibraryEntryChanged` (RF51)
 - [x] 2.3 Curtidas em avaliações e ordenação por mais curtidas (RF52)
-- [ ] 2.4 Denúncias e tela de moderação (RF53)
+- [x] 2.4 Denúncias e tela de moderação (RF53)
 - [ ] 2.5 Listas personalizadas com reordenação, sobre a tabela `games` (RF54). O código de listas do curso ficou no histórico, no commit `932d3d4`, como referência.
 - [ ] 2.6 Favoritos em destaque, em ordem (RF38)
 - [ ] 2.7 E-mail: verificação e recuperação de senha (RF09)

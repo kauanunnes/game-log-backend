@@ -14,6 +14,8 @@ erDiagram
     library_entries ||--o{ activities : "gera"
     users ||--o{ review_likes : "curte"
     library_entries ||--o{ review_likes : "recebe"
+    users ||--o{ reports : "denuncia"
+    library_entries ||--o{ reports : "denunciada"
     games ||--o{ library_entries : "registrado em"
     games }o--o{ genres : "game_genres"
     games }o--o{ platforms : "game_platforms"
@@ -192,6 +194,21 @@ Curtidas em avaliações ([RN17](01-requisitos.md#regras-de-negócio)). A avalia
 
 A PK é `(user_id, entry_id)`: cada pessoa curte uma vez. Quando a avaliação perde o texto, o módulo social apaga as curtidas dela, ouvindo o `LibraryEntryChanged`.
 
+### `reports`
+
+Denúncias de avaliações ([RN18](01-requisitos.md#regras-de-negócio)).
+
+| Coluna | Tipo | Regras |
+|---|---|---|
+| `id` | bigint identity | PK |
+| `reporter_id` | bigint | FK `users`, `ON DELETE CASCADE` |
+| `entry_id` | bigint | FK `library_entries`, `ON DELETE CASCADE` |
+| `reason` | varchar(10) | `SPAM`, `OFFENSIVE`, `SPOILER` ou `OTHER` |
+| `details` | varchar(500) | opcional |
+| `status` | varchar(8) | `OPEN`, `KEPT` ou `REMOVED` |
+| `resolved_by` | bigint | FK `users`, `ON DELETE SET NULL`; vazio quando o próprio autor tirou o texto |
+| `resolved_at`, `created_at` | timestamptz | |
+
 ## Restrições no banco
 
 As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no domínio (Java), que devolve mensagens claras. Os CHECKs são a rede de segurança caso algum código fuja da regra.
@@ -206,6 +223,7 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | `CHECK (status IN ('PLAYING', 'PLAYED', 'DROPPED') OR (rating IS NULL AND review_text IS NULL AND recommends IS NULL))` | RN02 |
 | `CHECK` com os valores de `status`, `acquisition`, `role`, `profile_visibility` e `gender` | enums |
 | `CHECK (follower_id <> followee_id)` em `follows` | RN15 |
+| `UNIQUE (reporter_id, entry_id) WHERE status = 'OPEN'` em `reports` | RN18 |
 
 ## Índices
 
@@ -223,6 +241,7 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | `follows` | PK `(follower_id, followee_id)` e `(followee_id, created_at DESC)` | quem a pessoa segue e quem segue a pessoa |
 | `activities` | `(user_id, created_at DESC)` e `(entry_id)` | feed e limpeza por entrada |
 | `review_likes` | PK `(user_id, entry_id)` e `(entry_id)` | o que eu curti e quantas curtidas cada avaliação tem |
+| `reports` | único parcial `(reporter_id, entry_id) WHERE status = 'OPEN'` e `(entry_id)` | uma denúncia aberta por pessoa e fechar todas as de uma avaliação |
 
 ## Por que assim
 
@@ -240,7 +259,6 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 
 | Tabela | Colunas | Observação |
 |---|---|---|
-| `reports` | `id`, `reporter_id`, `entry_id`, `reason`, `status`, `resolved_by`, `resolved_at`, `created_at` | moderação |
 | `user_lists` | `id`, `user_id`, `title`, `description`, `visibility`, `created_at`, `updated_at` | listas personalizadas |
 | `user_list_items` | `list_id`, `game_id`, `position`, `note` | PK `(list_id, game_id)`; `UNIQUE (list_id, position) DEFERRABLE INITIALLY DEFERRED`, para trocar posições numa transação só |
 
