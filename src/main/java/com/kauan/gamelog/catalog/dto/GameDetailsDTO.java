@@ -24,6 +24,7 @@ public record GameDetailsDTO(
         List<String> developers,
         List<String> publishers,
         List<String> franchises,
+        List<String> series,
         List<String> themes,
         List<String> modes,
         List<String> perspectives,
@@ -32,7 +33,8 @@ public record GameDetailsDTO(
         Integer igdbRatingCount,
         CommunityDTO community) {
 
-    private static final GameMetadata EMPTY_METADATA = new GameMetadata(null, null, null, null, null, null, null, null);
+    private static final GameMetadata EMPTY_METADATA =
+            new GameMetadata(null, null, null, null, null, null, null, null, null, null);
 
     public static GameDetailsDTO from(Game game, CommunityDTO community) {
         GameMetadata metadata = Objects.requireNonNullElse(game.getMetadata(), EMPTY_METADATA);
@@ -55,6 +57,7 @@ public record GameDetailsDTO(
                 metadata.developers(),
                 metadata.publishers(),
                 metadata.franchises(),
+                metadata.series(),
                 metadata.themes(),
                 metadata.modes(),
                 metadata.perspectives(),

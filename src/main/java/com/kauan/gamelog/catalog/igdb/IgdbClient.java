@@ -2,8 +2,10 @@ package com.kauan.gamelog.catalog.igdb;
 
 import io.micrometer.observation.ObservationRegistry;
 import java.time.Duration;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.retry.RetryPolicy;
 import org.springframework.core.retry.RetryTemplate;
@@ -20,8 +22,9 @@ public class IgdbClient {
     static final String FIELDS = "fields name, slug, summary, first_release_date, game_type, cover.image_id,"
             + " genres.name, genres.slug, platforms.name, platforms.abbreviation, platforms.slug,"
             + " themes.name, keywords.name, game_modes.name, player_perspectives.name, franchises.name,"
-            + " involved_companies.company.name, involved_companies.developer, involved_companies.publisher,"
-            + " total_rating, total_rating_count, similar_games; ";
+            + " collections.name, involved_companies.company.name, involved_companies.developer,"
+            + " involved_companies.publisher, total_rating, total_rating_count, similar_games, parent_game,"
+            + " version_parent; ";
 
     /** Jogo principal, expansão, expansão independente, remake, remaster, jogo expandido e port. */
     static final String SUPPORTED_TYPES = "game_type = (0,2,4,8,9,10,11)";
@@ -67,6 +70,12 @@ public class IgdbClient {
 
     public Optional<IgdbGame> findById(long id) {
         return query(FIELDS + "where id = " + id + ";").stream().findFirst();
+    }
+
+    /** Até 500 ids por chamada, o limite do IGDB. */
+    public List<IgdbGame> findByIds(Collection<Long> ids) {
+        String list = ids.stream().map(String::valueOf).collect(Collectors.joining(","));
+        return query(FIELDS + "where id = (" + list + "); limit " + ids.size() + ";");
     }
 
     public List<IgdbGame> popular(int limit, int offset) {

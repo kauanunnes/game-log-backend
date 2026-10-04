@@ -8,6 +8,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.serviceUnavailable
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.not;
@@ -16,6 +17,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder;
 import com.jayway.jsonpath.JsonPath;
 import com.kauan.gamelog.Account;
 import com.kauan.gamelog.IntegrationTest;
@@ -60,6 +62,13 @@ class IgdbImportTests {
               "genres": [{"id": 12, "name": "Role-playing (RPG)", "slug": "role-playing-rpg"}]}]
             """;
 
+    /** O Portal de novo, uma semana depois: mais avaliações e a série. */
+    private static final String PORTAL_LATER = """
+            [{"id": 72, "name": "Portal", "slug": "portal", "first_release_date": 1191888000, "game_type": 0,
+              "genres": [{"id": 9, "name": "Puzzle", "slug": "puzzle"}], "total_rating_count": 3000,
+              "collections": [{"id": 7, "name": "Portal"}]}]
+            """;
+
     private static final String GTA_V = """
             [{"id": 1020, "name": "Grand Theft Auto V", "slug": "grand-theft-auto-v",
               "first_release_date": 1379376000, "game_type": 0,
@@ -100,6 +109,8 @@ class IgdbImportTests {
                 post("/games").withRequestBody(containing("where id = 1942;")).willReturn(okJson(WITCHER)));
         igdb.stubFor(
                 post("/games").withRequestBody(containing("where id = 1020;")).willReturn(okJson(GTA_V)));
+        igdb.stubFor(
+                post("/games").withRequestBody(containing("where id = (72);")).willReturn(okJson(PORTAL_LATER)));
     }
 
     @Autowired
@@ -111,11 +122,17 @@ class IgdbImportTests {
     @Autowired
     private IgdbCatalogSync catalogSync;
 
+    @Autowired
+    private IgdbBootstrap bootstrap;
+
+    @Autowired
+    private IgdbResync resync;
+
     @Test
     void bootstrapImportsPopularGamesAndSkipsUnsupportedTypes() throws Exception {
-        mockMvc.perform(get("/api/v1/games/portal"))
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/games/portal"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.releaseDate").value("2007-10-09"));
+                .andExpect(jsonPath("$.releaseDate").value("2007-10-09")));
         mockMvc.perform(get("/api/v1/games/some-dlc")).andExpect(status().isNotFound());
     }
 
@@ -184,12 +201,46 @@ class IgdbImportTests {
     }
 
     @Test
+    void theBootstrapDoesNotRunAgainOnAFullCatalog() throws Exception {
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/games/portal")).andExpect(status().isOk()));
+        catalogSync.importById(1942);
+        int popularCalls = igdb.findAll(popularRequest()).size();
+
+        bootstrap.prepareCatalog();
+
+        assertThat(igdb.findAll(popularRequest())).hasSize(popularCalls);
+    }
+
+    @Test
+    void staleGamesAreUpdatedInOneCall() throws Exception {
+        await().untilAsserted(() -> mockMvc.perform(get("/api/v1/games/portal")).andExpect(status().isOk()));
+        jdbc.sql("UPDATE games SET synced_at = now() - interval '30 days' WHERE igdb_id = 72")
+                .update();
+
+        // Se a rodada da subida ainda estiver terminando, esta espera a vez
+        await().untilAsserted(() -> {
+            resync.resyncStale();
+            mockMvc.perform(get("/api/v1/games/portal"))
+                    .andExpect(jsonPath("$.igdbRatingCount").value(3000))
+                    .andExpect(jsonPath("$.series", contains("Portal")));
+        });
+        assertThat(jdbc.sql("SELECT synced_at > now() - interval '1 minute' FROM games WHERE igdb_id = 72")
+                        .query(Boolean.class)
+                        .single())
+                .isTrue();
+    }
+
+    @Test
     void theCachedPlatformsShowWhatAnImportBrought() throws Exception {
         mockMvc.perform(get("/api/v1/platforms")).andExpect(jsonPath("$[*].slug", not(hasItem("mac"))));
 
         assertThat(catalogSync.importById(1020)).isPresent();
 
         mockMvc.perform(get("/api/v1/platforms")).andExpect(jsonPath("$[*].slug", hasItem("mac")));
+    }
+
+    private static RequestPatternBuilder popularRequest() {
+        return postRequestedFor(urlEqualTo("/games")).withRequestBody(containing("sort total_rating_count desc"));
     }
 
     @Test

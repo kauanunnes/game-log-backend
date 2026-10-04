@@ -7,6 +7,7 @@ import com.kauan.gamelog.shared.TextNormalizer;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -73,6 +74,34 @@ public class IgdbImporter {
                 orEmpty(game.platforms()).stream().map(this::upsertPlatform).toList());
         events.publishEvent(new GameImported(gameId));
         return Optional.of(gameId);
+    }
+
+    /** Quantos jogos do catálogo vieram do IGDB. */
+    long importedCount() {
+        return jdbc.sql("SELECT count(*) FROM games WHERE igdb_id IS NOT NULL")
+                .query(Long.class)
+                .single();
+    }
+
+    /** Ids no IGDB dos jogos sincronizados há mais de {@code days} dias, dos mais antigos aos mais novos. */
+    List<Long> staleIgdbIds(int days, int limit) {
+        return jdbc.sql("""
+                        SELECT igdb_id FROM games
+                        WHERE igdb_id IS NOT NULL
+                          AND (synced_at IS NULL OR synced_at < now() - make_interval(days => :days))
+                        ORDER BY synced_at NULLS FIRST
+                        LIMIT :limit
+                        """)
+                .param("days", days)
+                .param("limit", limit)
+                .query(Long.class)
+                .list();
+    }
+
+    void markSynced(Collection<Long> igdbIds) {
+        jdbc.sql("UPDATE games SET synced_at = now() WHERE igdb_id IN (:igdbIds)")
+                .param("igdbIds", igdbIds)
+                .update();
     }
 
     private long upsertGame(IgdbGame game, GameKind kind) {
@@ -178,7 +207,9 @@ public class IgdbImporter {
                 companies(game, IgdbGame.InvolvedCompany::developer),
                 companies(game, IgdbGame.InvolvedCompany::publisher),
                 names(game.franchises()),
-                orEmpty(game.similarGames())));
+                orEmpty(game.similarGames()),
+                names(game.collections()),
+                game.parentGame() != null ? game.parentGame() : game.versionParent()));
     }
 
     private static List<String> names(List<IgdbGame.Named> items) {

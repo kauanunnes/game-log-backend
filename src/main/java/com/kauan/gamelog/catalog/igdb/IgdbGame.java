@@ -24,7 +24,10 @@ public record IgdbGame(
         @JsonProperty("involved_companies") List<InvolvedCompany> involvedCompanies,
         @JsonProperty("total_rating") Double totalRating,
         @JsonProperty("total_rating_count") Integer totalRatingCount,
-        @JsonProperty("similar_games") List<Long> similarGames) {
+        @JsonProperty("similar_games") List<Long> similarGames,
+        List<Named> collections,
+        @JsonProperty("parent_game") Long parentGame,
+        @JsonProperty("version_parent") Long versionParent) {
 
     @JsonIgnoreProperties(ignoreUnknown = true)
     public record Cover(@JsonProperty("image_id") String imageId) {}

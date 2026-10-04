@@ -19,6 +19,7 @@ import io.micrometer.observation.ObservationRegistry;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.time.Duration;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -118,6 +119,17 @@ class IgdbClientTests {
                 .isInstanceOf(RestClientException.class)
                 .hasRootCauseInstanceOf(SocketTimeoutException.class);
         igdb.verify(1, postRequestedFor(urlEqualTo("/games")));
+    }
+
+    @Test
+    void findsSeveralGamesInOneCall() {
+        igdb.stubFor(post("/games").willReturn(okJson(HADES)));
+
+        assertThat(client.findByIds(List.of(113112L, 1942L)))
+                .extracting(IgdbGame::slug)
+                .containsExactly("hades--1");
+        igdb.verify(postRequestedFor(urlEqualTo("/games"))
+                .withRequestBody(containing("where id = (113112,1942); limit 2;")));
     }
 
     @Test
