@@ -5,6 +5,7 @@ import com.kauan.gamelog.library.dto.LibraryFilter;
 import com.kauan.gamelog.library.dto.StatsDTO;
 import com.kauan.gamelog.library.dto.StatsFilter;
 import com.kauan.gamelog.profile.dto.ProfileDTO;
+import com.kauan.gamelog.social.dto.FollowDTO;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
@@ -49,5 +50,16 @@ public class ProfileController {
     @GetMapping("/reviews")
     public PagedModel<LibraryEntryDTO> reviews(@PathVariable String username, Pageable pageable) {
         return new PagedModel<>(profileService.reviews(username, pageable));
+    }
+
+    /** Dos mais recentes para os mais antigos; 403 se o perfil for privado. */
+    @GetMapping("/followers")
+    public PagedModel<FollowDTO> followers(@PathVariable String username, Pageable pageable) {
+        return new PagedModel<>(profileService.followers(username, pageable));
+    }
+
+    @GetMapping("/following")
+    public PagedModel<FollowDTO> following(@PathVariable String username, Pageable pageable) {
+        return new PagedModel<>(profileService.following(username, pageable));
     }
 }

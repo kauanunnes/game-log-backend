@@ -43,7 +43,7 @@ class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(requests -> requests.requestMatchers(API_PREFIX + "/admin/**")
                         .hasRole("ADMIN")
-                        .requestMatchers(API_PREFIX + "/me/**")
+                        .requestMatchers(API_PREFIX + "/me/**", API_PREFIX + "/users/*/follow")
                         .authenticated()
                         .anyRequest()
                         .permitAll())

@@ -2,7 +2,6 @@ package com.kauan.gamelog.profile.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.kauan.gamelog.library.dto.LibraryCounts;
 import com.kauan.gamelog.user.Gender;
 import com.kauan.gamelog.user.PublicUser;
 import java.time.LocalDate;
@@ -17,13 +16,13 @@ public record ProfileDTO(
         String bio,
         Gender gender,
         LocalDate memberSince,
-        LibraryCounts counts) {
+        ProfileCounts counts) {
 
-    public static ProfileDTO of(PublicUser user, LibraryCounts counts) {
+    public static ProfileDTO of(PublicUser user, ProfileCounts counts) {
         return new ProfileDTO(
                 user.username(),
                 user.displayName(),
-                false,
+                user.privateProfile(),
                 user.bio(),
                 user.gender(),
                 LocalDate.ofInstant(user.createdAt(), ZoneOffset.UTC),

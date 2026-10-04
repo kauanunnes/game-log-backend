@@ -68,8 +68,15 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<PublicUser> findPublic(String username) {
-        return users.findByUsername(normalize(username)).map(PublicUser::of);
+    public PublicUser getPublic(String username) {
+        return users.findByUsername(normalize(username))
+                .map(PublicUser::of)
+                .orElseThrow(() -> new NotFoundException("Ninguém usa o username \"" + username + "\"."));
+    }
+
+    @Transactional(readOnly = true)
+    public PublicUser getPublic(long id) {
+        return PublicUser.of(find(id));
     }
 
     @Transactional(readOnly = true)

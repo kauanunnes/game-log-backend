@@ -4,9 +4,11 @@ import com.kauan.gamelog.library.LibraryService;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryFilter;
 import com.kauan.gamelog.library.dto.StatsDTO;
+import com.kauan.gamelog.profile.dto.ProfileCounts;
 import com.kauan.gamelog.profile.dto.ProfileDTO;
 import com.kauan.gamelog.shared.ForbiddenException;
-import com.kauan.gamelog.shared.NotFoundException;
+import com.kauan.gamelog.social.FollowService;
+import com.kauan.gamelog.social.dto.FollowDTO;
 import com.kauan.gamelog.user.PublicUser;
 import com.kauan.gamelog.user.UserService;
 import org.springframework.data.domain.Page;
@@ -25,16 +27,24 @@ public class ProfileService {
 
     private final UserService users;
     private final LibraryService library;
+    private final FollowService follows;
 
-    ProfileService(UserService users, LibraryService library) {
+    ProfileService(UserService users, LibraryService library, FollowService follows) {
         this.users = users;
         this.library = library;
+        this.follows = follows;
     }
 
     @Transactional(readOnly = true)
     public ProfileDTO profile(String username) {
-        PublicUser user = find(username);
-        return user.privateProfile() ? ProfileDTO.privateHeader(user) : ProfileDTO.of(user, library.counts(user.id()));
+        PublicUser user = users.getPublic(username);
+        return user.privateProfile() ? ProfileDTO.privateHeader(user) : header(user);
+    }
+
+    /** O cabeçalho completo para o dono, mesmo com o perfil privado. */
+    @Transactional(readOnly = true)
+    public ProfileDTO mine(long userId) {
+        return header(users.getPublic(userId));
     }
 
     @Transactional(readOnly = true)
@@ -56,20 +66,29 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
+    public Page<FollowDTO> followers(String username, Pageable pageable) {
+        return follows.followers(findVisible(username).id(), pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<FollowDTO> following(String username, Pageable pageable) {
+        return follows.following(findVisible(username).id(), pageable);
+    }
+
+    @Transactional(readOnly = true)
     public StatsDTO stats(String username, Integer year) {
         PublicUser user = findVisible(username);
         StatsDTO stats = library.stats(user.id(), year);
         return user.showSpending() ? stats : stats.withoutSpending();
     }
 
-    private PublicUser find(String username) {
-        return users.findPublic(username)
-                .orElseThrow(() -> new NotFoundException("Ninguém usa o username \"" + username + "\"."));
+    private ProfileDTO header(PublicUser user) {
+        return ProfileDTO.of(user, new ProfileCounts(library.counts(user.id()), follows.counts(user.id())));
     }
 
     /** RF42: num perfil privado, quem visita vê só o cabeçalho. */
     private PublicUser findVisible(String username) {
-        PublicUser user = find(username);
+        PublicUser user = users.getPublic(username);
         if (user.privateProfile()) {
             throw new ForbiddenException("Este perfil é privado.");
         }

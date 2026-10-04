@@ -122,6 +122,26 @@ class ProfileControllerTests {
     }
 
     @Test
+    void theOwnerSeesTheWholeHeaderEvenWhenPrivate() throws Exception {
+        Account account = Account.register(mockMvc, "pf_lia");
+        send(patch("/api/v1/me"), account, """
+                {"displayName": "Lia", "bio": "Só eu vejo."}
+                """);
+        send(patch("/api/v1/me/settings"), account, """
+                {"profileVisibility": "PRIVATE"}
+                """);
+        add(account, "celeste", """
+                {"status": "PLAYING"}""");
+
+        mockMvc.perform(get("/api/v1/me/profile").header(HttpHeaders.AUTHORIZATION, account.bearer()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.private").value(true))
+                .andExpect(jsonPath("$.bio").value("Só eu vejo."))
+                .andExpect(jsonPath("$.counts.playing").value(1))
+                .andExpect(jsonPath("$.counts.followers").value(0));
+    }
+
+    @Test
     void unknownUsersAre404() throws Exception {
         mockMvc.perform(get("/api/v1/users/ninguem_aqui"))
                 .andExpect(status().isNotFound())
