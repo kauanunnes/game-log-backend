@@ -1,5 +1,7 @@
 package com.kauan.gamelog.shared.mail;
 
+import io.micrometer.context.ContextExecutorService;
+import io.micrometer.context.ContextSnapshotFactory;
 import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +25,10 @@ class MailConfig {
             return mail -> log.info("E-mail para {}: {}\n{}", mail.to(), mail.subject(), mail.text());
         }
         // Numa thread à parte: quem pediu não espera o SMTP, e o tempo de resposta não revela se a conta existe.
-        var executor = Executors.newVirtualThreadPerTaskExecutor();
+        // O contexto da requisição vai junto, para uma falha sair no log com o mesmo traceId.
+        var executor = ContextExecutorService.wrap(
+                Executors.newVirtualThreadPerTaskExecutor(),
+                ContextSnapshotFactory.builder().build());
         return mail -> executor.execute(() -> {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(settings.from());

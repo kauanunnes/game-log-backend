@@ -15,6 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import io.micrometer.observation.ObservationRegistry;
 import java.net.SocketTimeoutException;
 import java.net.URI;
 import java.time.Duration;
@@ -129,13 +130,15 @@ class IgdbClientTests {
     }
 
     private static IgdbClient client(Duration timeout) {
-        return new IgdbClient(new IgdbProperties(
-                "client-id",
-                "client-secret",
-                URI.create(igdb.baseUrl()),
-                URI.create(igdb.baseUrl() + "/oauth2/token"),
-                100,
-                timeout,
-                0));
+        return new IgdbClient(
+                new IgdbProperties(
+                        "client-id",
+                        "client-secret",
+                        URI.create(igdb.baseUrl()),
+                        URI.create(igdb.baseUrl() + "/oauth2/token"),
+                        100,
+                        timeout,
+                        0),
+                ObservationRegistry.NOOP);
     }
 }

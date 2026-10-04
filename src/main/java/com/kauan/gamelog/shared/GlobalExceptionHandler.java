@@ -3,6 +3,7 @@ package com.kauan.gamelog.shared;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -67,12 +68,17 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         return problem;
     }
 
+    /** O {@code traceId} volta na resposta: quem relatar o erro passa o código, e o caso aparece no log. */
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpected(Exception ex) {
         log.error("Erro inesperado", ex);
         ProblemDetail problem = ProblemDetail.forStatusAndDetail(
                 HttpStatus.INTERNAL_SERVER_ERROR, "Algo deu errado. Tente de novo em instantes.");
         problem.setTitle("Erro inesperado");
+        String traceId = MDC.get("traceId");
+        if (traceId != null) {
+            problem.setProperty("traceId", traceId);
+        }
         return problem;
     }
 }

@@ -1,5 +1,6 @@
 package com.kauan.gamelog.catalog.igdb;
 
+import io.micrometer.observation.ObservationRegistry;
 import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +34,7 @@ public class IgdbClient {
     private final IgdbRateLimiter rateLimiter;
     private final RetryTemplate retry;
 
-    IgdbClient(IgdbProperties properties) {
+    IgdbClient(IgdbProperties properties, ObservationRegistry observations) {
         // HttpURLConnection: bloqueante e sem threads próprias, o bastante para poucas chamadas por segundo.
         var requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(properties.timeout());
@@ -42,6 +43,8 @@ public class IgdbClient {
         this.restClient = RestClient.builder()
                 .requestFactory(requestFactory)
                 .baseUrl(properties.baseUrl().toString())
+                // Cada chamada entra nas métricas (http.client.requests) e no trace da requisição que a causou.
+                .observationRegistry(observations)
                 .build();
         this.tokens = new TwitchTokenProvider(properties, restClient);
         this.rateLimiter = new IgdbRateLimiter(properties.requestsPerSecond());
