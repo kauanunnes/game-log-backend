@@ -19,8 +19,9 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 /**
- * O que a comunidade diz de um jogo. Tudo aqui considera só perfis públicos (RN11): com poucos usuários, incluir os
- * privados poderia expor a nota de alguém.
+ * O que a comunidade diz de um jogo. Os números e as listas de avaliações consideram só perfis públicos (RN11): com
+ * poucos usuários, incluir os privados poderia expor a nota de alguém. As avaliações de uma pessoa ficam com quem
+ * chama, que confere o perfil.
  */
 @Repository
 class CommunityQueries implements GameCommunity {
@@ -28,12 +29,16 @@ class CommunityQueries implements GameCommunity {
             " FROM library_entries e JOIN users u ON u.id = e.user_id WHERE u.profile_visibility = 'PUBLIC'";
 
     private static final String REVIEWS = """
-            SELECT u.username, u.display_name, e.status, e.rating, e.recommends, e.review_text, e.has_spoilers,
-                   e.reviewed_at, g.id AS game_id, g.slug, g.title, g.cover_image_id, g.release_date
-            FROM library_entries e
-            JOIN users u ON u.id = e.user_id
-            JOIN games g ON g.id = e.game_id
-            WHERE e.review_text IS NOT NULL AND u.profile_visibility = 'PUBLIC'
+            SELECT e.id, u.username, u.display_name, e.status, e.rating, e.recommends, e.review_text,
+                   e.has_spoilers, e.reviewed_at, g.id AS game_id, g.slug, g.title, g.cover_image_id, g.release_date,
+                   (SELECT count(*) FROM review_likes l WHERE l.entry_id = e.id) AS likes
+            """;
+
+    private static final String REVIEWS_FROM = """
+             FROM library_entries e
+             JOIN users u ON u.id = e.user_id
+             JOIN games g ON g.id = e.game_id
+             WHERE e.review_text IS NOT NULL
             """;
 
     private final JdbcClient jdbc;
@@ -76,19 +81,30 @@ class CommunityQueries implements GameCommunity {
     }
 
     /** @param gameId {@code null} para as avaliações do site todo */
-    Page<PublicReviewDTO> reviews(Long gameId, Pageable pageable) {
-        String where = gameId == null ? "" : " AND e.game_id = :gameId";
+    Page<PublicReviewDTO> reviews(Long gameId, ReviewSort sort, Pageable pageable) {
+        String where = " AND u.profile_visibility = 'PUBLIC'" + (gameId == null ? "" : " AND e.game_id = :gameId");
         Map<String, Object> params = gameId == null ? Map.of() : Map.of("gameId", gameId);
-        long total = jdbc.sql("SELECT count(*)" + PUBLIC_ENTRIES + " AND e.review_text IS NOT NULL" + where)
+        return reviewPage(where, params, sort, pageable);
+    }
+
+    /** Das editadas por último; quem chama confere se o perfil pode ser visto. */
+    Page<PublicReviewDTO> reviewsBy(long userId, Pageable pageable) {
+        return reviewPage(" AND e.user_id = :userId", Map.of("userId", userId), ReviewSort.RECENT, pageable);
+    }
+
+    private Page<PublicReviewDTO> reviewPage(
+            String where, Map<String, Object> params, ReviewSort sort, Pageable pageable) {
+        long total = jdbc.sql("SELECT count(*)" + REVIEWS_FROM + where)
                 .params(params)
                 .query(Long.class)
                 .single();
         List<PublicReviewDTO> content = jdbc.sql(
-                        REVIEWS + where + " ORDER BY e.reviewed_at DESC, e.id DESC LIMIT :limit OFFSET :offset")
+                        REVIEWS + REVIEWS_FROM + where + " ORDER BY " + sort.orderBy() + " LIMIT :limit OFFSET :offset")
                 .params(params)
                 .param("limit", pageable.getPageSize())
                 .param("offset", pageable.getOffset())
                 .query((rs, row) -> new PublicReviewDTO(
+                        rs.getLong("id"),
                         new PublicReviewDTO.Reviewer(rs.getString("username"), rs.getString("display_name")),
                         GameSummaryDTO.of(
                                 rs.getLong("game_id"),
@@ -101,7 +117,8 @@ class CommunityQueries implements GameCommunity {
                         rs.getObject("recommends", Boolean.class),
                         rs.getString("review_text"),
                         Boolean.TRUE.equals(rs.getObject("has_spoilers", Boolean.class)),
-                        rs.getObject("reviewed_at", OffsetDateTime.class).toInstant()))
+                        rs.getObject("reviewed_at", OffsetDateTime.class).toInstant(),
+                        rs.getLong("likes")))
                 .list();
         return new PageImpl<>(content, pageable, total);
     }

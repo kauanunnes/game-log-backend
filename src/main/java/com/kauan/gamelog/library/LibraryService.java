@@ -62,10 +62,10 @@ public class LibraryService {
         return queries.find(userId, filter, pageable);
     }
 
-    /** Entradas com texto de avaliação, das editadas por último. */
+    /** As avaliações de uma pessoa, das editadas por último; quem expõe numa rota pública confere o perfil. */
     @Transactional(readOnly = true)
-    public Page<LibraryEntryDTO> reviews(long userId, Pageable pageable) {
-        return queries.findReviews(userId, pageable);
+    public Page<PublicReviewDTO> reviewsBy(long userId, Pageable pageable) {
+        return community.reviewsBy(userId, pageable);
     }
 
     /** Estatísticas completas; quem expõe numa rota pública decide se mostra os gastos. */
@@ -74,16 +74,16 @@ public class LibraryService {
         return stats.of(userId, year);
     }
 
-    /** RF24: avaliações públicas de um jogo, das mais recentes para as mais antigas. */
+    /** RF24: avaliações públicas de um jogo, das mais recentes ou das mais curtidas. */
     @Transactional(readOnly = true)
-    public Page<PublicReviewDTO> reviewsOf(String gameSlug, Pageable pageable) {
-        return community.reviews(games.idOf(gameSlug), pageable);
+    public Page<PublicReviewDTO> reviewsOf(String gameSlug, ReviewSort sort, Pageable pageable) {
+        return community.reviews(games.idOf(gameSlug), sort, pageable);
     }
 
     /** Avaliações públicas recentes do site todo (página inicial). */
     @Transactional(readOnly = true)
     public Page<PublicReviewDTO> recentReviews(Pageable pageable) {
-        return community.reviews(null, pageable);
+        return community.reviews(null, ReviewSort.RECENT, pageable);
     }
 
     @Transactional(readOnly = true)

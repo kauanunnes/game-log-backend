@@ -103,14 +103,6 @@ class LibraryQueries {
         return page(conditions, params, orderBy(pageable.getSort()), pageable);
     }
 
-    Page<LibraryEntryDTO> findReviews(long userId, Pageable pageable) {
-        return page(
-                List.of("e.user_id = :userId", "e.review_text IS NOT NULL"),
-                Map.of("userId", userId),
-                "e.reviewed_at DESC, e.id DESC",
-                pageable);
-    }
-
     LibraryCounts counts(long userId) {
         return jdbc.sql("""
                         SELECT count(*) FILTER (WHERE status = 'PLAYED') AS played,

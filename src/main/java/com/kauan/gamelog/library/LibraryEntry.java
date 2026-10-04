@@ -67,6 +67,7 @@ class LibraryEntry {
                 favorite,
                 playthrough != null && Boolean.TRUE.equals(playthrough.completed()),
                 review != null && (review.rating() != null || review.text() != null),
+                review != null && review.text() != null,
                 review == null ? null : review.reviewedAt());
     }
 

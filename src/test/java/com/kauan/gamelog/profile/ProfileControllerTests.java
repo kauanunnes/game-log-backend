@@ -63,7 +63,7 @@ class ProfileControllerTests {
         Account account = Account.register(mockMvc, "pf_bia");
         add(account, "celeste", PURCHASE.formatted(store("steam")));
 
-        for (String tab : new String[] {"library", "favorites", "reviews"}) {
+        for (String tab : new String[] {"library", "favorites"}) {
             mockMvc.perform(get("/api/v1/users/pf_bia/" + tab))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.content[0].acquisition.method").value("PURCHASED"))
@@ -76,6 +76,10 @@ class ProfileControllerTests {
                 """);
         mockMvc.perform(get("/api/v1/users/pf_bia/library"))
                 .andExpect(jsonPath("$.content[0].acquisition.price.amount").value("46.99"));
+        // As avaliações saem no formato público, que nunca traz a aquisição.
+        mockMvc.perform(get("/api/v1/users/pf_bia/reviews"))
+                .andExpect(jsonPath("$.content[0].text").value("Obra-prima."))
+                .andExpect(jsonPath("$.content[0].acquisition").doesNotExist());
     }
 
     @Test

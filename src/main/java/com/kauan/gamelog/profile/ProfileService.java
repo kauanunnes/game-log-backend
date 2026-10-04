@@ -3,6 +3,7 @@ package com.kauan.gamelog.profile;
 import com.kauan.gamelog.library.LibraryService;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryFilter;
+import com.kauan.gamelog.library.dto.PublicReviewDTO;
 import com.kauan.gamelog.library.dto.StatsDTO;
 import com.kauan.gamelog.profile.dto.ProfileCounts;
 import com.kauan.gamelog.profile.dto.ProfileDTO;
@@ -59,10 +60,10 @@ public class ProfileService {
         return hideSpending(user, library.list(user.id(), FAVORITES, pageable));
     }
 
+    /** No formato das avaliações públicas, que nunca trazem loja nem valor pago. */
     @Transactional(readOnly = true)
-    public Page<LibraryEntryDTO> reviews(String username, Pageable pageable) {
-        PublicUser user = findVisible(username);
-        return hideSpending(user, library.reviews(user.id(), pageable));
+    public Page<PublicReviewDTO> reviews(String username, Pageable pageable) {
+        return library.reviewsBy(findVisible(username).id(), pageable);
     }
 
     @Transactional(readOnly = true)

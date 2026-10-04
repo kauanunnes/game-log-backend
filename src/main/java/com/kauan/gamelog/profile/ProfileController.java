@@ -2,6 +2,7 @@ package com.kauan.gamelog.profile;
 
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryFilter;
+import com.kauan.gamelog.library.dto.PublicReviewDTO;
 import com.kauan.gamelog.library.dto.StatsDTO;
 import com.kauan.gamelog.library.dto.StatsFilter;
 import com.kauan.gamelog.profile.dto.ProfileDTO;
@@ -48,7 +49,7 @@ public class ProfileController {
     }
 
     @GetMapping("/reviews")
-    public PagedModel<LibraryEntryDTO> reviews(@PathVariable String username, Pageable pageable) {
+    public PagedModel<PublicReviewDTO> reviews(@PathVariable String username, Pageable pageable) {
         return new PagedModel<>(profileService.reviews(username, pageable));
     }
 
