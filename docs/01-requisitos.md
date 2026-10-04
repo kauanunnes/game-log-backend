@@ -146,6 +146,8 @@ Exemplo: um jogo avaliado só volta para Lista de desejos depois que a avaliaç�
 
 **RN18 · Denúncias.** Só dá para denunciar avaliações que aparecem nas listas, e nunca a própria. Cada pessoa tem no máximo uma denúncia aberta por avaliação; resolvida, pode denunciar de novo. A moderação decide por avaliação, e a decisão fecha todas as denúncias abertas dela: manter, ou tirar o texto (a nota e o resto da entrada ficam, e as curtidas vão embora). Se o próprio autor tira o texto, as denúncias abertas fecham sozinhas.
 
+**RN19 · Listas.** Cada lista tem título (até 80 caracteres), descrição opcional e até 100 jogos, cada um uma vez, na ordem que a dona escolher e com uma nota opcional por jogo. Salvar troca os itens de uma vez. Uma lista privada só aparece para a dona; num perfil privado, nenhuma aparece para quem visita (RN10).
+
 ## Requisitos não funcionais
 
 | ID | Requisito |

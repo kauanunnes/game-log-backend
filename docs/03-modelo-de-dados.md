@@ -16,6 +16,9 @@ erDiagram
     library_entries ||--o{ review_likes : "recebe"
     users ||--o{ reports : "denuncia"
     library_entries ||--o{ reports : "denunciada"
+    users ||--o{ user_lists : "cria"
+    user_lists ||--o{ user_list_items : "tem"
+    games ||--o{ user_list_items : "aparece em"
     games ||--o{ library_entries : "registrado em"
     games }o--o{ genres : "game_genres"
     games }o--o{ platforms : "game_platforms"
@@ -209,6 +212,25 @@ Denúncias de avaliações ([RN18](01-requisitos.md#regras-de-negócio)).
 | `resolved_by` | bigint | FK `users`, `ON DELETE SET NULL`; vazio quando o próprio autor tirou o texto |
 | `resolved_at`, `created_at` | timestamptz | |
 
+### `user_lists` e `user_list_items`
+
+Listas personalizadas ([RN19](01-requisitos.md#regras-de-negócio)), recriadas sobre `games` a partir da ideia das listas do curso.
+
+| Coluna | Tipo | Regras |
+|---|---|---|
+| `user_lists.id` | bigint identity | PK |
+| `user_lists.user_id` | bigint | FK `users`, `ON DELETE CASCADE` |
+| `user_lists.title` | varchar(80) | obrigatório |
+| `user_lists.description` | varchar(500) | |
+| `user_lists.visibility` | varchar(8) | `PUBLIC` ou `PRIVATE` |
+| `user_lists.created_at`, `updated_at` | timestamptz | `updated_at` muda também quando os itens mudam |
+| `user_list_items.list_id` | bigint | FK `user_lists`, `ON DELETE CASCADE` |
+| `user_list_items.game_id` | bigint | FK `games` |
+| `user_list_items.position` | integer | a partir de 1 |
+| `user_list_items.note` | varchar(300) | |
+
+A PK de `user_list_items` é `(list_id, game_id)`, e `UNIQUE (list_id, position)` fica adiado até o commit (`DEFERRABLE INITIALLY DEFERRED`), para trocar posições numa transação só. Hoje a API troca os itens inteiros de uma vez.
+
 ## Restrições no banco
 
 As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no domínio (Java), que devolve mensagens claras. Os CHECKs são a rede de segurança caso algum código fuja da regra.
@@ -224,6 +246,7 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | `CHECK` com os valores de `status`, `acquisition`, `role`, `profile_visibility` e `gender` | enums |
 | `CHECK (follower_id <> followee_id)` em `follows` | RN15 |
 | `UNIQUE (reporter_id, entry_id) WHERE status = 'OPEN'` em `reports` | RN18 |
+| PK `(list_id, game_id)` e `UNIQUE (list_id, position) DEFERRABLE` em `user_list_items` | RN19 |
 
 ## Índices
 
@@ -242,6 +265,7 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 | `activities` | `(user_id, created_at DESC)` e `(entry_id)` | feed e limpeza por entrada |
 | `review_likes` | PK `(user_id, entry_id)` e `(entry_id)` | o que eu curti e quantas curtidas cada avaliação tem |
 | `reports` | único parcial `(reporter_id, entry_id) WHERE status = 'OPEN'` e `(entry_id)` | uma denúncia aberta por pessoa e fechar todas as de uma avaliação |
+| `user_lists` | `(user_id, updated_at DESC)` | as listas de uma pessoa, das mexidas por último |
 
 ## Por que assim
 
@@ -259,8 +283,6 @@ As regras completas da [RN02](01-requisitos.md#regras-de-negócio) ficam no dom�
 
 | Tabela | Colunas | Observação |
 |---|---|---|
-| `user_lists` | `id`, `user_id`, `title`, `description`, `visibility`, `created_at`, `updated_at` | listas personalizadas |
-| `user_list_items` | `list_id`, `game_id`, `position`, `note` | PK `(list_id, game_id)`; `UNIQUE (list_id, position) DEFERRABLE INITIALLY DEFERRED`, para trocar posições numa transação só |
 
 Os favoritos em destaque (RF38) cabem numa coluna `favorite_position` (1 a 5) em `library_entries`, com `UNIQUE (user_id, favorite_position)`.
 

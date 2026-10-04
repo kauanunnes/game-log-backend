@@ -43,7 +43,7 @@ flowchart LR
 | Avaliações | Só entradas com texto; spoiler escondido até clicar; curtidas | `GET /users/{u}/reviews` | 1 |
 | Estatísticas | Gráficos por ano, gênero, plataforma, notas e horas; gastos, se o dono permitir | `GET /users/{u}/stats` | 1 |
 | Seguidores e seguidos | Fora da faixa de abas: abrem pelos contadores do cabeçalho | `GET /users/{u}/followers`, `GET /users/{u}/following` | 2 |
-| Listas | Listas personalizadas | `GET /users/{u}/lists` | 2 |
+| Listas | Listas personalizadas, com um mosaico das capas; a dona cria a partir do título. Cada lista tem página própria (`/u/:username/lists/:listId`), onde a dona edita título, descrição, privacidade, jogos, ordem e notas | `GET /users/{u}/lists`, `GET /users/{u}/lists/{id}` | 2 |
 
 Todas as abas de jogos usam o mesmo componente: uma grade de capas com nota, ícone de "recomenda" e de favorito, filtros (gênero, plataforma, nota), ordenação e paginação.
 

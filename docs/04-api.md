@@ -154,7 +154,8 @@ Respondem igual para qualquer pessoa, inclusive o dono, que vê os próprios dad
 | GET | `/users/{username}/stats` | público | Estatísticas, sem gastos (salvo se o dono permitir); 403 se o perfil for privado | 1 |
 | GET | `/users/{username}/followers` e `/following` | público | Seguidores e seguidos (`username`, `displayName`, `followedAt`), dos mais recentes para os mais antigos; 403 se o perfil for privado | 2 |
 | GET / PUT / DELETE | `/users/{username}/follow` | usuário | Se eu sigo a pessoa (204 ou 404), seguir e deixar de seguir. PUT e DELETE são idempotentes e respondem 204; seguir o próprio perfil dá 422 com `CANNOT_FOLLOW_SELF` (RN15) | 2 |
-| GET | `/users/{username}/lists` | público | Listas personalizadas | 2 |
+| GET | `/users/{username}/lists` | público | Só as listas públicas, das mexidas por último, com `itemCount` e os quatro primeiros jogos (`preview`); 403 se o perfil for privado | 2 |
+| GET | `/users/{username}/lists/{listId}` | público | Uma lista pública com os itens em ordem (`position`, `game`, `note`); 404 se for privada | 2 |
 
 ### Catálogo
 
@@ -196,9 +197,9 @@ A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemp
 | GET | `/me/feed` | usuário | Atividade de quem eu sigo, das mais recentes para as mais antigas, só de perfis públicos (RN16). Cada item tem `type` (`STATUS`, `REVIEW` ou `FAVORITE`), `user`, `game`, `status` (em `STATUS`, o daquele momento), `completed` em `STATUS` e `review` em `REVIEW`, como está agora. Nunca traz loja nem valor pago |
 | PUT / DELETE | `/reviews/{entryId}/like` | usuário | Curtir e descurtir; os dois são idempotentes e respondem 204. Só avaliações que aparecem nas listas (404 nas outras) e nunca a própria (422 com `CANNOT_LIKE_OWN_REVIEW`, RN17) |
 | POST | `/reviews/{entryId}/reports` | usuário | Denunciar: `{ "reason": "SPAM" }` (`SPAM`, `OFFENSIVE`, `SPOILER` ou `OTHER`) e `details` opcional, até 500 caracteres; 201. Só avaliações que aparecem nas listas (404 nas outras), nunca a própria (422 com `CANNOT_REPORT_OWN_REVIEW`) e uma denúncia aberta por pessoa (409) |
-| GET / POST | `/me/lists` | usuário | Minhas listas |
-| GET / PATCH / DELETE | `/me/lists/{listId}` | usuário | Uma lista |
-| PUT | `/me/lists/{listId}/items` | usuário | Define os itens e a ordem |
+| GET / POST | `/me/lists` | usuário | Minhas listas, públicas e privadas; criar com `{ "title": "Top 10 RPGs", "description": null, "visibility": "PUBLIC" }` (201) |
+| GET / PATCH / DELETE | `/me/lists/{listId}` | usuário | Uma lista minha; o PATCH é JSON Merge Patch sobre título, descrição e visibilidade. A lista de outra pessoa responde 404 |
+| PUT | `/me/lists/{listId}/items` | usuário | `{ "items": [{ "gameId": 1942, "note": "..." }] }`: define os itens e a ordem de uma vez, até 100. Jogo repetido dá 422 com `DUPLICATE_GAME`; jogo que não existe, `UNKNOWN_REFERENCE` |
 
 ### Recomendações (Fase 3)
 
