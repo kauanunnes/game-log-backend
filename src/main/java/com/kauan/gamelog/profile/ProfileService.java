@@ -100,7 +100,10 @@ public class ProfileService {
     }
 
     private ProfileDTO header(PublicUser user) {
-        return ProfileDTO.of(user, new ProfileCounts(library.counts(user.id()), follows.counts(user.id())));
+        return ProfileDTO.of(
+                user,
+                new ProfileCounts(library.counts(user.id()), follows.counts(user.id())),
+                library.featured(user.id()));
     }
 
     /** RF42: num perfil privado, quem visita vê só o cabeçalho. */

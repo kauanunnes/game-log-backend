@@ -103,6 +103,24 @@ class LibraryQueries {
         return page(conditions, params, orderBy(pageable.getSort()), pageable);
     }
 
+    /** Os favoritos em destaque, na ordem escolhida (RF38). */
+    List<GameSummaryDTO> featured(long userId) {
+        return jdbc.sql("""
+                        SELECT g.id, g.slug, g.title, g.cover_image_id, g.release_date
+                        FROM library_entries e JOIN games g ON g.id = e.game_id
+                        WHERE e.user_id = :userId AND e.favorite_position IS NOT NULL
+                        ORDER BY e.favorite_position
+                        """)
+                .param("userId", userId)
+                .query((rs, row) -> GameSummaryDTO.of(
+                        rs.getLong("id"),
+                        rs.getString("slug"),
+                        rs.getString("title"),
+                        rs.getString("cover_image_id"),
+                        rs.getObject("release_date", LocalDate.class)))
+                .list();
+    }
+
     LibraryCounts counts(long userId) {
         return jdbc.sql("""
                         SELECT count(*) FILTER (WHERE status = 'PLAYED') AS played,

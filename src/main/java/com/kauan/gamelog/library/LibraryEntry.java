@@ -29,6 +29,9 @@ class LibraryEntry {
 
     private boolean favorite;
 
+    /** De 1 a 5 entre os favoritos em destaque (RF38); muda por {@link LibraryEntryRepository#feature}. */
+    private Short favoritePosition;
+
     @Embedded
     private Review review;
 
@@ -55,6 +58,9 @@ class LibraryEntry {
     void replace(LibraryEntryRequest request) {
         status = request.status();
         favorite = request.favorite();
+        if (!favorite) {
+            favoritePosition = null;
+        }
         review = Review.from(request.review(), review);
         playthrough = Playthrough.from(request.playthrough());
         acquisition = Acquisition.from(request.acquisition());

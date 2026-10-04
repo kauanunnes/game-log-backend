@@ -2,6 +2,7 @@ package com.kauan.gamelog.library;
 
 import com.kauan.gamelog.catalog.GameService;
 import com.kauan.gamelog.catalog.LookupService;
+import com.kauan.gamelog.catalog.dto.GameSummaryDTO;
 import com.kauan.gamelog.library.dto.LibraryCounts;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryEntryRequest;
@@ -15,6 +16,7 @@ import com.kauan.gamelog.shared.NotFoundException;
 import com.kauan.gamelog.shared.UnprocessableException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.context.ApplicationEventPublisher;
@@ -106,6 +108,31 @@ public class LibraryService {
         entries.saveAndFlush(entry);
         events.publishEvent(
                 new LibraryEntryChanged(entry.getUserId(), entry.getGameId(), entry.getId(), before, entry.state()));
+    }
+
+    /** Os favoritos em destaque, na ordem escolhida. */
+    @Transactional(readOnly = true)
+    public List<GameSummaryDTO> featured(long userId) {
+        return queries.featured(userId);
+    }
+
+    /** Até 5 favoritos em destaque, na ordem recebida (RF38); quem não veio sai do destaque. */
+    @Transactional
+    public List<GameSummaryDTO> setFeatured(long userId, List<Long> gameIds) {
+        if (new HashSet<>(gameIds).size() < gameIds.size()) {
+            throw new UnprocessableException("DUPLICATE_GAME", "Cada jogo entra uma vez no destaque.", List.of());
+        }
+        entries.clearFeatured(userId);
+        List<FieldIssue> issues = new ArrayList<>();
+        for (int i = 0; i < gameIds.size(); i++) {
+            if (entries.feature(userId, gameIds.get(i), (short) (i + 1)) == 0) {
+                issues.add(new FieldIssue("gameIds[" + i + "]", "não é um favorito seu"));
+            }
+        }
+        if (!issues.isEmpty()) {
+            throw new UnprocessableException("NOT_A_FAVORITE", "Só favoritos podem ficar em destaque.", issues);
+        }
+        return featured(userId);
     }
 
     @Transactional(readOnly = true)

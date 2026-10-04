@@ -2,7 +2,9 @@ package com.kauan.gamelog.library;
 
 import static com.kauan.gamelog.shared.WebConfig.API_PREFIX;
 
+import com.kauan.gamelog.catalog.dto.GameSummaryDTO;
 import com.kauan.gamelog.library.LibraryService.Saved;
+import com.kauan.gamelog.library.dto.FeaturedRequest;
 import com.kauan.gamelog.library.dto.LibraryCounts;
 import com.kauan.gamelog.library.dto.LibraryEntryDTO;
 import com.kauan.gamelog.library.dto.LibraryEntryRequest;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import java.net.URI;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PagedModel;
 import org.springframework.http.HttpStatus;
@@ -45,6 +48,12 @@ public class LibraryController {
     public PagedModel<LibraryEntryDTO> list(
             @CurrentUserId Long userId, @Valid LibraryFilter filter, Pageable pageable) {
         return new PagedModel<>(libraryService.list(userId, filter, pageable));
+    }
+
+    /** Até 5 favoritos em destaque, na ordem do array; lista vazia tira todos. */
+    @PutMapping("/featured")
+    public List<GameSummaryDTO> featured(@CurrentUserId Long userId, @Valid @RequestBody FeaturedRequest request) {
+        return libraryService.setFeatured(userId, request.gameIds());
     }
 
     /** Contadores das abas do perfil, para o dono (as rotas públicas escondem tudo num perfil privado). */
