@@ -161,7 +161,7 @@ Os testes rodam contra a mesma imagem de PostgreSQL usada em desenvolvimento, se
 | `MAIL_FROM` | `Game Log <nao-responda@seu-dominio>` | remetente |
 | `APP_URL` | `https://gamelog.vercel.app` | endereço do front, usado nos links dos e-mails |
 | `SPRING_AI_MODEL_EMBEDDING` | `none` | `transformers` liga o modelo de embeddings dentro da API; é o padrão só no perfil local |
-| `ANTHROPIC_API_KEY`, chave do provedor de embeddings | | Fase 3 |
+| `ANTHROPIC_API_KEY` | | liga a curadoria do Claude em "Para você" (3.5); sem ela, as sugestões ficam só com a busca. Modelo e esforço em `game-log.ai.model` (`claude-opus-5-5`) e `game-log.ai.effort` (`medium`) |
 
 As variáveis `SPRING_DATASOURCE_*` são lidas pelo Spring sem nenhuma linha no `application.properties`.
 

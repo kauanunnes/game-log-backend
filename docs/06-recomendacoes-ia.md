@@ -139,6 +139,15 @@ Cuidados:
 - **Prompt injection:** o texto das avaliações é escrito pelo usuário. Por isso, entra só o texto do próprio usuário (no máximo ele afetaria as próprias sugestões), marcado como dado. A validação dos ids impede sugerir algo fora do catálogo.
 - **Privacidade:** nada de e-mail, username ou gênero no prompt. O gênero também não entra no cálculo das sugestões, para não gerar recomendação por estereótipo ([RN14](01-requisitos.md#regras-de-negócio)). A política de privacidade deve informar que as avaliações podem ser processadas por um provedor de IA, e o usuário deve poder desligar a personalização.
 
+**Como está na 3.5:**
+
+- A chamada usa o SDK oficial da Anthropic para Java (`anthropic-java`), com saída estruturada: o SDK gera o JSON Schema a partir de dois records (`Choices` e `Choice`) e devolve a resposta já convertida. Vão para o Claude as 10 sementes, os jogos de que a pessoa não gostou e os 40 primeiros candidatos da busca, e ele escolhe até 10.
+- O pedido leva `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`). Se o classificador de segurança recusar, a própria API tenta de novo no modelo que indica para o caso. Uma recusa final, um erro ou uma escolha fora dos candidatos não chegam à tela: a lista fica com a busca.
+- O texto da pessoa vai entre `<avaliacao>`, sem os sinais `<` e `>`, para não fechar a tag antes da hora. O pedido de sistema diz que ele é dado, não instrução.
+- A chamada leva alguns segundos, então roda em segundo plano. A primeira resposta traz a busca com `curating: true`, e a tela pergunta de novo a cada 3 segundos. As escolhidas ficam em memória por 24 h ou até a biblioteca mudar; depois de uma falha, a próxima tentativa espera 10 minutos.
+- Sem `ANTHROPIC_API_KEY`, nada disso roda, e as sugestões são as da busca (3.4).
+- Não há cache de prompt: a parte fixa (instruções e schema) fica abaixo do mínimo que a API guarda.
+
 ## Modelo e custo
 
 - Modelo padrão: **Claude Opus 5.5** (`claude-opus-5-5`), a US$ 4 por milhão de tokens de entrada e US$ 20 por milhão de saída.
@@ -176,7 +185,7 @@ Com menos de 3 jogos curtidos, não há sinal suficiente. As opções, em ordem:
 
 - **Spring AI 2.0** (GA em junho de 2026, exige Spring Boot 4): `EmbeddingModel` (hoje, o modelo local) e `ChatClient` com o Claude, convertendo a saída direto para records Java. A tabela dos vetores é nossa, sem o `VectorStore`: o jogo é a chave, e a busca precisa de filtros.
 - A busca de candidatos é nossa (SQL com pgvector e filtros), e não o *advisor* genérico de perguntas e respostas, porque aqui a "pergunta" é o perfil do usuário.
-- Para a geração, uma alternativa é o SDK oficial da Anthropic para Java (`anthropic-java`).
+- A geração usa o SDK oficial da Anthropic para Java (`anthropic-java`), e não o `ChatClient` do Spring AI, por ser o cliente oficial e já trazer saída estruturada a partir de records e o fallback do servidor.
 
 ## O que o MVP já precisa fazer
 

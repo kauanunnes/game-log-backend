@@ -49,6 +49,14 @@ No perfil local, a API calcula os embeddings dos jogos com um modelo pequeno que
 SPRING_AI_MODEL_EMBEDDING=none ./mvnw spring-boot:run
 ```
 
+### Sugestões com o Claude (Fase 3)
+
+Com uma chave da API da Anthropic no `.env`, o Claude escolhe e explica as sugestões de "Para você" (`claude-opus-5-5`, alguns centavos de dólar por pessoa a cada 24 h ou mudança na biblioteca). Sem ela, as sugestões vêm só da busca por semelhança.
+
+```dotenv
+ANTHROPIC_API_KEY=...
+```
+
 ### Contas
 
 O cadastro e o login devolvem um access token (15 minutos) e deixam o refresh token num cookie `HttpOnly`. No Swagger, use o botão **Authorize** com o access token. Não existe rota que crie administrador: o papel é dado direto no banco, e o token só sai com ele depois de entrar de novo.
