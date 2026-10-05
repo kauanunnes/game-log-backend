@@ -10,14 +10,16 @@
 | Paleta base | Cores do Windows 95: cinza `#C0C0C0` nas janelas, azul-marinho `#000080` → `#1084D0` na barra de título, verde-água `#008080` na área de trabalho |
 | Acentos | Rosa `#FF6EC7` / `#C2185B` nas janelas de destaque, ciano `#00FFFF` como marca-texto, amarelo `#FFD800` nas estrelas, gradiente pastel rosa → lilás → ciano |
 | Estados | Erro `#C00000`, sucesso `#008000`, fita amarela e preta para "em construção" |
-| Tema | Claro, como o Windows 95; o tema escuro fica para depois |
+| Tema | Claro, como o Windows 95, ou escuro, uma noite vaporwave: área de trabalho roxa `#1D1438` com grade rosa e janelas `#2E2E3E`. Segue o sistema, a menos que a pessoa escolha outro no menu **Exibir** |
 | Layout | Duas janelas: a da conta à esquerda, parada enquanto a principal rola; no celular, ela vai para depois do conteúdo |
 | Tipografia | Press Start 2P (logo e destaques), Pixelify Sans (interface e títulos), IBM Plex Mono (textos longos e números) |
 | Componentes | CSS próprio com tokens, sem biblioteca: botão, campo e fieldset nativos ganham o visual do Win95 |
 | Ícones | Pixel art em SVG feita no projeto (ex.: a estrela da nota) |
 | Inspirações | Pasta `refs/` deste repositório (local, fora do Git): Instagram.exe (perfil), CD Player e Paint (barras de ferramentas e de status), diálogos de erro, Word rosa, Miku e Kirby (pastel), tbd (amarelo, preto e marca-texto), Seed Club (layout em painéis) |
 
-As cores, sombras e fontes ficam em `src/styles/tokens.css`. Em desenvolvimento, a rota `/_design` mostra a paleta, a tipografia e os componentes.
+As cores, sombras e fontes ficam em `src/styles/tokens.css`. Em desenvolvimento, a rota `/_design` mostra as cores do tema, a tipografia e os componentes.
+
+Os componentes usam as cores pelo papel (`--surface`, `--text`, `--danger`, `--bevel-shadow`…), e não pela paleta fixa. Assim, o tema escuro só troca os papéis: ele vale com `data-theme="dark"` na raiz, ou com o sistema escuro quando a pessoa não escolheu o claro. A escolha fica no `localStorage` (`game-log:theme`), e um script no `index.html` a aplica antes da primeira pintura, para a tela não piscar.
 
 ## Stack
 
@@ -73,7 +75,7 @@ src/
 | Componente | Faz |
 |---|---|
 | `AppWindow` | Janela com barra de título (azul ou rosa) e barra de status opcional |
-| `MenuBar` | Barra de menus no topo, como a de uma janela do Windows: **Jogos** (início, explorar, em alta, lançamentos), **Usuário** (entrar e criar conta, ou, com sessão e o nome da pessoa no lugar, perfil, Para você, feed, configurações, moderação e sair) e **Ajuda**, mais o relógio. Com um menu aberto, passar o mouse em outro troca; Esc e clique fora fecham |
+| `MenuBar` | Barra de menus no topo, como a de uma janela do Windows: **Jogos** (início, explorar, em alta, lançamentos), **Usuário** (entrar e criar conta, ou, com sessão e o nome da pessoa no lugar, perfil, Para você, feed, configurações, moderação e sair), **Exibir** (tema claro, escuro ou do sistema, com a bolinha na opção escolhida) e **Ajuda**, mais o relógio. Com um menu aberto, passar o mouse em outro troca; Esc, clique fora e escolher um item fecham. No celular, o nome de quem está logado encolhe com reticências, e o menu aberto ocupa a largura da barra |
 | `TabPanel` | Abas no estilo Win95, ligadas às rotas filhas, com o painel embaixo |
 | `StarRating` | Mostra e edita a nota de 0 a 5 em passos de 0,25, com preenchimento parcial da estrela. Funciona no teclado (setas mudam 0,25; Home, End e Delete) |
 | `GameCard` | Capa (ou padrão pontilhado sem capa), título, ano, nota, status e favorito |
