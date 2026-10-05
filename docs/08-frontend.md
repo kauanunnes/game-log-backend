@@ -73,11 +73,11 @@ src/
 | Componente | Faz |
 |---|---|
 | `AppWindow` | Janela com barra de título (azul ou rosa) e barra de status opcional |
-| `TaskBar` | Barra de tarefas fixa com menu Iniciar (navegação), janela atual e relógio |
+| `MenuBar` | Barra de menus no topo, como a de uma janela do Windows: **Jogos** (início, explorar, em alta, lançamentos), **Usuário** (entrar e criar conta, ou, com sessão e o nome da pessoa no lugar, perfil, Para você, feed, configurações, moderação e sair) e **Ajuda**, mais o relógio. Com um menu aberto, passar o mouse em outro troca; Esc e clique fora fecham |
 | `TabPanel` | Abas no estilo Win95, ligadas às rotas filhas, com o painel embaixo |
 | `StarRating` | Mostra e edita a nota de 0 a 5 em passos de 0,25, com preenchimento parcial da estrela. Funciona no teclado (setas mudam 0,25; Home, End e Delete) |
 | `GameCard` | Capa (ou padrão pontilhado sem capa), título, ano, nota, status e favorito |
-| `UserWindow` | Janela da conta: convite para entrar (que volta para a página atual) ou nome, contadores por status, "Jogando agora" e atalhos para perfil, configurações e sair |
+| `UserWindow` | Janela da conta: convite para entrar (que volta para a página atual) ou nome, contadores por status e "Jogando agora"; os atalhos ficam no menu Usuário |
 | `GameCardSkeleton` | Card pontilhado que pisca enquanto os jogos carregam |
 | `ErrorMessage` | Diálogo de erro do Win95 com "Tentar de novo" |
 | `PageNav` | Anterior e próxima, pela `?page=` da rota atual |
@@ -114,7 +114,7 @@ src/
 - **Perfil** (`/u/:username`): o dono usa `/me`, que traz loja e valor pago e funciona mesmo com o perfil privado; visitantes usam as rotas públicas. As abas de jogos são um componente só, com ordenação e página na URL; "Jogados" filtra Todos, Zerados e Abandonados, e o dono edita cada jogo dali. O cabeçalho mostra seguidores e seguidos, que levam às listas, e o botão Seguir para quem visita. A Visão geral abre com os favoritos em destaque, que a dona escolhe ali mesmo.
 - **Listas** (aba do perfil e `/u/:username/lists/:listId`): a dona cria pela aba e cai direto no editor; salvar manda os dados da lista e todos os itens na nova ordem.
 - **Moderação** (`/admin/reports`, só admins): as avaliações denunciadas com as denúncias delas; "Manter" ou "Remover texto" vale para todas as denúncias da avaliação, e remover pede confirmação.
-- **Feed** (`/feed`): o que fizeram as pessoas que eu sigo, com o tempo relativo; atalhos no menu Iniciar e na janela da conta.
+- **Feed** (`/feed`): o que fizeram as pessoas que eu sigo, com o tempo relativo; atalho no menu Usuário.
 - **Links por e-mail**: "Esqueci minha senha" no login leva ao pedido do link; a senha nova encerra a sessão deste navegador também e volta ao login com um aviso. O link de confirmação confirma ao abrir, e a aba Conta mostra se o e-mail foi confirmado, com "Reenviar confirmação".
 - **Configurações** (`/settings`): o perfil vai como JSON Merge Patch só com o que mudou. Trocar a senha encerra todas as sessões, então a tela entra de novo com a senha nova. Exportar baixa o JSON da API como arquivo, com o mesmo nome que ela sugere. Excluir a conta pede a senha e uma confirmação e volta ao Início com um aviso.
 
