@@ -69,6 +69,7 @@ class RecommendationsTests {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.personalized").value(true))
                 .andExpect(jsonPath("$.source").value("SEARCH"))
+                .andExpect(jsonPath("$.curator").doesNotExist())
                 .andExpect(jsonPath("$.curating").value(false))
                 .andReturn()
                 .getResponse()

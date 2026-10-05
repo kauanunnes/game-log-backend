@@ -58,7 +58,7 @@ class CuratedRecommendationsTests {
     }
 
     @Test
-    void claudeChoosesAndExplainsInTheBackground() throws Exception {
+    void theModelChoosesAndExplainsInTheBackground() throws Exception {
         AtomicReference<Curator.Input> asked = new AtomicReference<>();
         curator.answerWith(input -> {
             asked.set(input);
@@ -70,10 +70,12 @@ class CuratedRecommendationsTests {
 
         recommendations(ana)
                 .andExpect(jsonPath("$.source").value("SEARCH"))
+                .andExpect(jsonPath("$.curator").value("Teste"))
                 .andExpect(jsonPath("$.curating").value(true));
 
         await().untilAsserted(() -> recommendations(ana)
-                .andExpect(jsonPath("$.source").value("CLAUDE"))
+                .andExpect(jsonPath("$.source").value("AI"))
+                .andExpect(jsonPath("$.curator").value("Teste"))
                 .andExpect(jsonPath("$.curating").value(false))
                 .andExpect(jsonPath("$.suggestions[0].game.slug").value("cr-colmeia-prata"))
                 .andExpect(jsonPath("$.suggestions[0].reason").value("Tem as mesmas abelhas de Colmeia Dourada.")));
@@ -114,7 +116,7 @@ class CuratedRecommendationsTests {
                 {"status": "PLAYED", "favorite": true}""");
         recommendations(caio);
         await().untilAsserted(() ->
-                recommendations(caio).andExpect(jsonPath("$.source").value("CLAUDE")));
+                recommendations(caio).andExpect(jsonPath("$.source").value("AI")));
 
         save(caio, liked, """
                 {"status": "PLAYED", "favorite": true, "review": {"rating": 4.5}}""");

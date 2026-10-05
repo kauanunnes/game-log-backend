@@ -7,7 +7,7 @@ import java.util.function.Function;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Primary;
 
-/** No lugar do Claude: desligado, a menos que o teste diga o que responder (e desligue no fim). */
+/** No lugar do modelo: desligado, a menos que o teste diga o que responder (e desligue no fim). */
 @Primary
 @TestConfiguration(proxyBeanMethods = false)
 public class FakeCurator implements Curator {
@@ -25,6 +25,11 @@ public class FakeCurator implements Curator {
 
     public int calls() {
         return calls.get();
+    }
+
+    @Override
+    public String name() {
+        return "Teste";
     }
 
     @Override

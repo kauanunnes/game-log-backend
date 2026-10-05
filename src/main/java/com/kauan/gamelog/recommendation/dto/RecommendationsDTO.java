@@ -6,14 +6,15 @@ import java.util.List;
  * "Você poderá gostar" (RF61).
  *
  * @param personalized {@code false} quando a biblioteca ainda não diz nada do gosto e as sugestões são só os populares
- * @param source {@code SEARCH} (a busca, com motivo por template) ou {@code CLAUDE} (escolhidas e explicadas por ele)
- * @param curating o Claude está escolhendo em segundo plano; vale perguntar de novo em alguns segundos
+ * @param source {@code SEARCH} (a busca, com motivo por template) ou {@code AI} (escolhidas e explicadas pelo modelo)
+ * @param curator o modelo que escolhe, "Gemini" ou "Claude"; {@code null} sem a chave da API
+ * @param curating o modelo está escolhendo em segundo plano; vale perguntar de novo em alguns segundos
  */
 public record RecommendationsDTO(
-        List<SuggestionDTO> suggestions, boolean personalized, Source source, boolean curating) {
+        List<SuggestionDTO> suggestions, boolean personalized, Source source, String curator, boolean curating) {
 
     public enum Source {
         SEARCH,
-        CLAUDE
+        AI
     }
 }

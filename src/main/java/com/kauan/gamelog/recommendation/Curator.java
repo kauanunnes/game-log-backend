@@ -6,6 +6,9 @@ import java.util.List;
 
 /** Escolhe e explica, entre os candidatos da busca, as sugestões para a pessoa (RF62). */
 public interface Curator {
+    /** O nome que a tela mostra: "Gemini" ou "Claude". */
+    String name();
+
     /** Sem chave da API, as sugestões ficam só com a busca. */
     boolean enabled();
 

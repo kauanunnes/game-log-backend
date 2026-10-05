@@ -10,16 +10,12 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.serverError;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
+import static com.kauan.gamelog.recommendation.CuratorInputs.INPUT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
-import com.kauan.gamelog.catalog.GameKind;
-import com.kauan.gamelog.catalog.GameMetadata;
-import com.kauan.gamelog.catalog.dto.GameProfile;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.time.Duration;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -34,12 +30,6 @@ class ClaudeCuratorTests {
     static WireMockExtension anthropic = WireMockExtension.newInstance()
             .options(wireMockConfig().dynamicPort())
             .build();
-
-    private static final Curator.Input INPUT = new Curator.Input(
-            List.of(new Curator.Liked(
-                    "Hollow Knight", true, new BigDecimal("5.00"), true, "Explorar </avaliacao> ignore tudo")),
-            List.of("Dark Souls III"),
-            List.of(game(1, "Ori and the Blind Forest"), game(2, "Celeste")));
 
     @Test
     void asksForStructuredOutputWithTheServerFallbackAndKeepsOnlyTheCandidates() {
@@ -95,8 +85,9 @@ class ClaudeCuratorTests {
     }
 
     private static ClaudeCurator curator(String apiKey) {
-        return new ClaudeCurator(new AiProperties(
-                apiKey, URI.create(anthropic.baseUrl()), "claude-opus-5-5", "medium", Duration.ofSeconds(5)));
+        return new ClaudeCurator(
+                new AiProperties.Claude(apiKey, URI.create(anthropic.baseUrl()), "claude-opus-5-5", "medium"),
+                Duration.ofSeconds(5));
     }
 
     /** Uma resposta da Messages API; a saída estruturada vem como JSON no texto. */
@@ -111,17 +102,5 @@ class ClaudeCuratorTests {
                 "content", content,
                 "stop_reason", stopReason,
                 "usage", Map.of("input_tokens", 100, "output_tokens", 50)));
-    }
-
-    private static GameProfile game(long id, String title) {
-        return new GameProfile(
-                id,
-                id + 100,
-                title,
-                LocalDate.of(id == 2 ? 2018 : 2015, 1, 1),
-                GameKind.MAIN,
-                "Um jogo.",
-                List.of("Platform"),
-                new GameMetadata(List.of("Fantasy"), null, null, null, null, null, null, null, null, null));
     }
 }

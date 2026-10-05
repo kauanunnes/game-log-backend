@@ -24,8 +24,9 @@ import org.springframework.context.annotation.Import;
             // Nada de baixar o modelo do perfil local: os testes usam o FakeEmbeddingModel
             "spring.ai.model.embedding=none",
             "game-log.embeddings.model=teste",
-            // Nada de chamar o Claude de verdade: os testes usam o FakeCurator
-            "game-log.ai.api-key="
+            // Nada de chamar um modelo de verdade: os testes usam o FakeCurator
+            "game-log.ai.gemini.api-key=",
+            "game-log.ai.claude.api-key="
         })
 @AutoConfigureMockMvc
 @Import({TestcontainersConfiguration.class, RecordingMailer.class, FakeEmbeddingModel.class, FakeCurator.class})

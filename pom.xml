@@ -22,6 +22,7 @@
 		<wiremock.version>3.13.2</wiremock.version>
 		<spring-ai.version>2.0.1</spring-ai.version>
 		<anthropic-java.version>2.68.0</anthropic-java.version>
+		<google-genai.version>1.75.0</google-genai.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -60,6 +61,11 @@
 			<groupId>com.anthropic</groupId>
 			<artifactId>anthropic-java</artifactId>
 			<version>${anthropic-java.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.genai</groupId>
+			<artifactId>google-genai</artifactId>
+			<version>${google-genai.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

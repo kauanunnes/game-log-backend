@@ -31,13 +31,13 @@ import org.springframework.transaction.annotation.Transactional;
  * uma se juntam por Reciprocal Rank Fusion, pesados pelo gosto. Saem o que já está na biblioteca, o que fica mais perto
  * de um jogo de que ela não gostou do que da semente que o trouxe, expansões, edições do que ela já tem e jogos não
  * lançados, e entram no máximo dois por série.
- * Sem vetores, os {@code similar_games} do IGDB fazem o papel dos vizinhos. Com a chave da API, o Claude escolhe e explica
- * as melhores entre os candidatos, em segundo plano ({@link Curations}). Ver 06 · Recomendações.
+ * Sem vetores, os {@code similar_games} do IGDB fazem o papel dos vizinhos. Com a chave da API, um modelo (o Gemini ou o
+ * Claude) escolhe e explica as melhores entre os candidatos, em segundo plano ({@link Curations}). Ver 06 · Recomendações.
  */
 @Service
 public class Recommendations {
     static final int SIZE = 20;
-    /** Quantos candidatos da busca vão para o Claude escolher. */
+    /** Quantos candidatos da busca vão para o modelo escolher. */
     private static final int CANDIDATES = 40;
 
     private static final int SEEDS = 10;
@@ -62,19 +62,20 @@ public class Recommendations {
         this.curations = curations;
     }
 
-    /** As escolhidas pelo Claude, se já existem; senão, a busca, e a curadoria começa em segundo plano. */
+    /** As escolhidas pelo modelo, se já existem; senão, a busca, e a curadoria começa em segundo plano. */
     @Transactional(readOnly = true)
     public RecommendationsDTO forUser(long userId) {
         List<SuggestionDTO> curated = curations.curated(userId);
         if (curated != null) {
-            return new RecommendationsDTO(curated, true, Source.CLAUDE, false);
+            return new RecommendationsDTO(curated, true, Source.AI, curations.curator(), false);
         }
         Search search = search(userId);
         boolean curating = search.personalized() && curations.start(userId, search.input());
-        return new RecommendationsDTO(search.suggestions(), search.personalized(), Source.SEARCH, curating);
+        return new RecommendationsDTO(
+                search.suggestions(), search.personalized(), Source.SEARCH, curations.curator(), curating);
     }
 
-    /** A lista da busca e o que vai para o Claude: o gosto da pessoa e os primeiros candidatos. */
+    /** A lista da busca e o que vai para o modelo: o gosto da pessoa e os primeiros candidatos. */
     record Search(List<SuggestionDTO> suggestions, boolean personalized, Curator.Input input) {}
 
     Search search(long userId) {

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.event.TransactionalEventListener;
 
 /**
- * A curadoria do Claude roda em segundo plano, porque a chamada leva alguns segundos: enquanto isso, a tela mostra a
+ * A curadoria do modelo roda em segundo plano, porque a chamada leva alguns segundos: enquanto isso, a tela mostra a
  * busca e pergunta de novo. O resultado vale por 24 h ou até a biblioteca mudar; depois de uma falha, a próxima tentativa
  * espera 10 minutos. Uma pessoa tem no máximo uma curadoria rodando.
  */
@@ -49,9 +49,14 @@ class Curations {
         this.games = games;
     }
 
-    /** @return as sugestões escolhidas pelo Claude, ou {@code null} se ainda não há */
+    /** @return as sugestões escolhidas pelo modelo, ou {@code null} se ainda não há */
     List<SuggestionDTO> curated(long userId) {
         return curated.getIfPresent(userId);
+    }
+
+    /** @return o nome do modelo que escolhe, ou {@code null} sem a chave da API */
+    String curator() {
+        return curator.enabled() ? curator.name() : null;
     }
 
     /** @return se há uma curadoria em andamento para a pessoa */
