@@ -9,6 +9,7 @@ import com.kauan.gamelog.library.EntryStatus;
 import com.kauan.gamelog.library.LibraryService;
 import com.kauan.gamelog.library.dto.TasteSignal;
 import com.kauan.gamelog.recommendation.dto.RecommendationsDTO;
+import com.kauan.gamelog.recommendation.dto.RecommendationsDTO.Source;
 import com.kauan.gamelog.recommendation.dto.SuggestionDTO;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -30,12 +31,17 @@ import org.springframework.transaction.annotation.Transactional;
  * uma se juntam por Reciprocal Rank Fusion, pesados pelo gosto. Saem o que já está na biblioteca, o que fica mais perto
  * de um jogo de que ela não gostou do que da semente que o trouxe, expansões, edições do que ela já tem e jogos não
  * lançados, e entram no máximo dois por série.
- * Sem vetores, os {@code similar_games} do IGDB fazem o papel dos vizinhos. Ver 06 · Recomendações.
+ * Sem vetores, os {@code similar_games} do IGDB fazem o papel dos vizinhos. Com a chave da API, o Claude escolhe e explica
+ * as melhores entre os candidatos, em segundo plano ({@link Curations}). Ver 06 · Recomendações.
  */
 @Service
 public class Recommendations {
     static final int SIZE = 20;
+    /** Quantos candidatos da busca vão para o Claude escolher. */
+    private static final int CANDIDATES = 40;
+
     private static final int SEEDS = 10;
+    private static final int REVIEW_CHARS = 300;
     private static final int NEIGHBORS = 40;
     /** A constante do Reciprocal Rank Fusion: com ela, o primeiro lugar não pesa demais. */
     private static final int RRF_K = 60;
@@ -47,15 +53,31 @@ public class Recommendations {
     private final LibraryService library;
     private final GameService games;
     private final GameEmbeddings embeddings;
+    private final Curations curations;
 
-    Recommendations(LibraryService library, GameService games, GameEmbeddings embeddings) {
+    Recommendations(LibraryService library, GameService games, GameEmbeddings embeddings, Curations curations) {
         this.library = library;
         this.games = games;
         this.embeddings = embeddings;
+        this.curations = curations;
     }
 
+    /** As escolhidas pelo Claude, se já existem; senão, a busca, e a curadoria começa em segundo plano. */
     @Transactional(readOnly = true)
     public RecommendationsDTO forUser(long userId) {
+        List<SuggestionDTO> curated = curations.curated(userId);
+        if (curated != null) {
+            return new RecommendationsDTO(curated, true, Source.CLAUDE, false);
+        }
+        Search search = search(userId);
+        boolean curating = search.personalized() && curations.start(userId, search.input());
+        return new RecommendationsDTO(search.suggestions(), search.personalized(), Source.SEARCH, curating);
+    }
+
+    /** A lista da busca e o que vai para o Claude: o gosto da pessoa e os primeiros candidatos. */
+    record Search(List<SuggestionDTO> suggestions, boolean personalized, Curator.Input input) {}
+
+    Search search(long userId) {
         List<TasteSignal> taste = library.taste(userId);
         Set<Long> owned = taste.stream().map(TasteSignal::gameId).collect(Collectors.toSet());
         Map<Long, GameProfile> mine = byId(games.profiles(owned));
@@ -105,15 +127,19 @@ public class Recommendations {
                         .reversed()
                         .thenComparing(Comparator.naturalOrder()))
                 .toList();
+        List<GameProfile> candidates = new ArrayList<>();
         Map<Long, String> reasons = new LinkedHashMap<>();
         Map<String, Integer> perSeries = new HashMap<>();
         for (GameProfile candidate : inOrder(ranked)) {
-            if (reasons.size() == SIZE) {
+            if (candidates.size() == CANDIDATES) {
                 break;
             }
             if (suggestable(candidate, ownedIgdbIds) && fitsSeries(candidate, perSeries)) {
-                TasteSignal seed = because.get(candidate.id());
-                reasons.put(candidate.id(), reason(mine.get(seed.gameId()).title(), seed));
+                candidates.add(candidate);
+                if (reasons.size() < SIZE) {
+                    TasteSignal seed = because.get(candidate.id());
+                    reasons.put(candidate.id(), reason(mine.get(seed.gameId()).title(), seed));
+                }
             }
         }
         if (seeds.size() < MIN_SEEDS || reasons.isEmpty()) {
@@ -133,7 +159,27 @@ public class Recommendations {
         for (GameSummaryDTO game : games.summaries(List.copyOf(reasons.keySet()))) {
             suggestions.add(new SuggestionDTO(game, reasons.get(game.id())));
         }
-        return new RecommendationsDTO(suggestions, !seeds.isEmpty());
+        List<Curator.Liked> liked = seeds.stream()
+                .map(seed -> new Curator.Liked(
+                        mine.get(seed.gameId()).title(),
+                        seed.favorite(),
+                        seed.rating(),
+                        seed.recommends(),
+                        excerpt(seed.review())))
+                .toList();
+        List<String> dislikedTitles = taste.stream()
+                .filter(Recommendations::disliked)
+                .limit(SEEDS)
+                .map(signal -> mine.get(signal.gameId()).title())
+                .toList();
+        return new Search(suggestions, !seeds.isEmpty(), new Curator.Input(liked, dislikedTitles, candidates));
+    }
+
+    private static String excerpt(String review) {
+        if (review == null || review.isBlank()) {
+            return null;
+        }
+        return review.length() > REVIEW_CHARS ? review.substring(0, REVIEW_CHARS) + "..." : review;
     }
 
     /** Quanto a entrada diz do gosto: 0 quando não diz nada de bom (ver os pesos em 06 · Recomendações). */

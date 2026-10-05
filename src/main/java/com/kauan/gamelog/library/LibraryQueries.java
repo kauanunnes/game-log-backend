@@ -124,7 +124,7 @@ class LibraryQueries {
 
     List<TasteSignal> taste(long userId) {
         return jdbc.sql("""
-                        SELECT game_id, status, favorite, rating, recommends, updated_at
+                        SELECT game_id, status, favorite, rating, recommends, review_text, updated_at
                         FROM library_entries WHERE user_id = :userId
                         """)
                 .param("userId", userId)
@@ -134,6 +134,7 @@ class LibraryQueries {
                         rs.getBoolean("favorite"),
                         rs.getBigDecimal("rating"),
                         rs.getObject("recommends", Boolean.class),
+                        rs.getString("review_text"),
                         rs.getObject("updated_at", OffsetDateTime.class).toInstant()))
                 .list();
     }

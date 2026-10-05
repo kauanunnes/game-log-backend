@@ -68,6 +68,8 @@ class RecommendationsTests {
         String json = recommendations(ana)
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.personalized").value(true))
+                .andExpect(jsonPath("$.source").value("SEARCH"))
+                .andExpect(jsonPath("$.curating").value(false))
                 .andReturn()
                 .getResponse()
                 .getContentAsString();
@@ -153,7 +155,7 @@ class RecommendationsTests {
 
     private static TasteSignal signal(EntryStatus status, boolean favorite, String rating, Boolean recommends) {
         return new TasteSignal(
-                1, status, favorite, rating == null ? null : new BigDecimal(rating), recommends, Instant.now());
+                1, status, favorite, rating == null ? null : new BigDecimal(rating), recommends, null, Instant.now());
     }
 
     private ResultActions recommendations(Account account) throws Exception {
