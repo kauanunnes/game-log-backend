@@ -152,7 +152,7 @@ Detalhes em [06 · Recomendações com IA](06-recomendacoes-ia.md).
 - [x] 3.2 pgvector, embeddings dos jogos e job de reindexação por hash (com um modelo local, por enquanto só para teste)
 - [x] 3.3 Jogos parecidos (RF60), comparados com o `similar_games` do IGDB
 - [x] 3.4 "Você poderá gostar" só com busca (RF61)
-- [x] 3.5 O Claude reordena e explica, com saída estruturada e fallback (RF62)
+- [x] 3.5 O modelo (o Gemini, por padrão, ou o Claude) reordena e explica, com saída estruturada e fallback (RF62)
 - [ ] 3.6 Feedback nas sugestões (RF63) e tela de primeiros passos (RF64)
 - [ ] 3.7 Avaliação offline (Recall@10) e métricas de uso
 - [ ] 3.8 (Opcional) Busca em linguagem natural (RF65)

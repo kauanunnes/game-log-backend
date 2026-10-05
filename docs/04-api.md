@@ -207,7 +207,7 @@ A distribuição tem uma faixa a cada meia estrela, de 0 a 5 (11 faixas; o exemp
 
 | Método | Rota | Acesso | Descrição |
 |---|---|---|---|
-| GET | `/me/recommendations` | usuário | `{ suggestions: [{ game, reason }], personalized }` (RF61): até 20 sugestões calculadas na hora a partir da biblioteca, cada uma com um motivo que cita um jogo da pessoa ("Parecido com Hollow Knight, que você favoritou."). Com menos de 3 jogos que dizem do gosto, os populares completam a lista; `personalized` é `false` quando a biblioteca não diz nada. Com a chave da API, o Claude escolhe até 10 entre os candidatos e escreve o motivo (3.5): enquanto ele escolhe, em segundo plano, a resposta traz a busca com `source: "SEARCH"` e `curating: true`; depois, `source: "CLAUDE"`, que vale 24 h ou até a biblioteca mudar |
+| GET | `/me/recommendations` | usuário | `{ suggestions: [{ game, reason }], personalized }` (RF61): até 20 sugestões calculadas na hora a partir da biblioteca, cada uma com um motivo que cita um jogo da pessoa ("Parecido com Hollow Knight, que você favoritou."). Com menos de 3 jogos que dizem do gosto, os populares completam a lista; `personalized` é `false` quando a biblioteca não diz nada. Com a chave da API, um modelo escolhe até 10 entre os candidatos e escreve o motivo (3.5), e `curator` diz qual (`"Gemini"` ou `"Claude"`; `null` sem a chave): enquanto ele escolhe, em segundo plano, a resposta traz a busca com `source: "SEARCH"` e `curating: true`; depois, `source: "AI"`, que vale 24 h ou até a biblioteca mudar |
 | POST | `/me/recommendations/feedback` | usuário | `{ "gameId": 1942, "type": "NOT_INTERESTED" }` ou `ALREADY_PLAYED` |
 
 ### Administração

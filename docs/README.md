@@ -37,7 +37,7 @@ Referências de produto: Letterboxd (filmes), Backloggd e HowLongToBeat (jogos).
 | D8 | Sessão | Access token JWT curto + refresh token em cookie HttpOnly, com front e API no mesmo site | Refresh token no corpo da resposta | proposta |
 | D9 | Front-end | Vue 3 + TypeScript com pnpm, no repositório separado `game-log-frontend`; visual Windows 95/98 com acentos vaporwave ([08](08-frontend.md)) | — | aceita |
 | D10 | Hospedagem | Neon (PostgreSQL) + Render ou Cloud Run (API) + Vercel (front) | Railway, Fly.io | proposta |
-| D11 | IA (Fase 3) | Spring AI 2.0 + pgvector; Claude Opus 5.5 para gerar as sugestões | Embeddings e modelo definidos na Fase 3 | adiada |
+| D11 | IA (Fase 3) | Spring AI 2.0 + pgvector; Gemini 3.8 Flash (padrão, com nível gratuito) ou Claude Opus 5.5 para gerar as sugestões | Embeddings e modelo definidos na Fase 3 | adiada |
 | D12 | Gênero do usuário | Opcional: Feminino, Masculino, Não binário, Outro ou não informado ([RN14](01-requisitos.md#regras-de-negócio)) | — | aceita |
 | D13 | Nome | Game Log (`game-log` em identificadores técnicos) | — | aceita |
 

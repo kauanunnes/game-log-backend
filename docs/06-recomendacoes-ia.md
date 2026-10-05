@@ -8,7 +8,7 @@
 |---|---|---|
 | Jogos parecidos (página do jogo) | Vizinhos mais próximos do jogo no espaço de embeddings | Não |
 | Você poderá gostar (só busca) | Vizinhos dos jogos que o usuário curtiu, menos o que ele já tem | Não |
-| Você poderá gostar (RAG) | A busca acima gera candidatos; o Claude escolhe os melhores e explica o motivo | Sim |
+| Você poderá gostar (RAG) | A busca acima gera candidatos; um modelo (o Gemini ou o Claude) escolhe os melhores e explica o motivo | Sim |
 | Busca em linguagem natural (opcional) | "terror curto para jogar em dupla" vira um embedding e é buscado no catálogo | Opcional |
 
 Cada etapa funciona sozinha e já entrega valor. A versão com LLM é uma camada em cima da busca, não um substituto dela.
@@ -37,7 +37,7 @@ flowchart TB
         sinais --> knn[Busca vizinhos]
         knn --> filtro[Remove o que já está na biblioteca]
         filtro --> cand[~40 candidatos]
-        cand --> llm[Claude escolhe até 10 e explica]
+        cand --> llm[O modelo escolhe até 10 e explica]
         llm --> valida[Valida os ids]
         valida --> cache[(Cache de 24 h)]
     end
@@ -103,7 +103,7 @@ Depois da busca:
 
 Sobram cerca de 40 candidatos.
 
-**Como está na 3.4 (só busca, sem o Claude):**
+**Como está na 3.4 (só busca, sem o modelo):**
 
 - As 10 entradas de maior peso viram sementes, e cada uma traz os 40 vizinhos mais próximos. As listas se juntam por *Reciprocal Rank Fusion*: cada semente soma `peso / (60 + posição)` a cada vizinho.
 - O sinal negativo é relativo: sai o candidato que fica mais perto de um jogo de que a pessoa não gostou do que da semente que o trouxe. Ele não depende de um limite de distância, que mudaria com o modelo.
@@ -112,7 +112,7 @@ Sobram cerca de 40 candidatos.
 - Sem vetores (em produção, enquanto os embeddings estão desligados), os `similar_games` do IGDB de cada semente fazem o papel dos vizinhos.
 - Com menos de 3 sementes, os populares completam a lista até 20.
 
-## 4. Geração com o Claude
+## 4. Geração com o Gemini ou o Claude
 
 O prompt leva:
 
@@ -141,23 +141,26 @@ Cuidados:
 
 **Como está na 3.5:**
 
-- A chamada usa o SDK oficial da Anthropic para Java (`anthropic-java`), com saída estruturada: o SDK gera o JSON Schema a partir de dois records (`Choices` e `Choice`) e devolve a resposta já convertida. Vão para o Claude as 10 sementes, os jogos de que a pessoa não gostou e os 40 primeiros candidatos da busca, e ele escolhe até 10.
-- O pedido leva `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`). Se o classificador de segurança recusar, a própria API tenta de novo no modelo que indica para o caso. Uma recusa final, um erro ou uma escolha fora dos candidatos não chegam à tela: a lista fica com a busca.
+- O modelo vem de `game-log.ai.provider` (`AI_PROVIDER`): o **Gemini** (`gemini`, o padrão) ou o **Claude** (`claude`). Cada um liga com a própria chave, `GEMINI_API_KEY` ou `ANTHROPIC_API_KEY`; sem a chave do escolhido, nada disso roda, e as sugestões são as da busca (3.4).
+- Os dois recebem o mesmo pedido (`ModelCurator`): as 10 sementes, os jogos de que a pessoa não gostou e os 40 primeiros candidatos da busca, e escolhem até 10. O JSON Schema vai escrito à mão, e a resposta é conferida no mesmo lugar: sai a escolha fora dos candidatos, repetida ou sem motivo.
+- **Gemini:** SDK oficial do Google (`google-genai`), com `responseMimeType: application/json` e `responseJsonSchema`. Em 429 e 5xx, tenta 3 vezes, com espera crescente. Um pedido bloqueado ou uma resposta que não termina em `STOP` não chega à tela.
+- **Claude:** SDK oficial da Anthropic (`anthropic-java`), com o schema em `output_config.format` e `fallbacks: "default"` (beta `server-side-fallback-2026-07-01`): se o classificador de segurança recusar, a própria API tenta de novo no modelo que indica para o caso. O schema não sai de records porque o SDK usaria a biblioteca victools 4, e o Spring AI fixa a 5.
+- Uma recusa final, um erro ou uma escolha fora dos candidatos não chegam à tela: a lista fica com a busca.
 - O texto da pessoa vai entre `<avaliacao>`, sem os sinais `<` e `>`, para não fechar a tag antes da hora. O pedido de sistema diz que ele é dado, não instrução.
-- A chamada leva alguns segundos, então roda em segundo plano. A primeira resposta traz a busca com `curating: true`, e a tela pergunta de novo a cada 3 segundos. As escolhidas ficam em memória por 24 h ou até a biblioteca mudar; depois de uma falha, a próxima tentativa espera 10 minutos.
-- Sem `ANTHROPIC_API_KEY`, nada disso roda, e as sugestões são as da busca (3.4).
-- Não há cache de prompt: a parte fixa (instruções e schema) fica abaixo do mínimo que a API guarda.
+- A chamada leva alguns segundos, então roda em segundo plano. A primeira resposta traz a busca com `curating: true` e o nome do modelo em `curator`, e a tela pergunta de novo a cada 3 segundos. As escolhidas ficam em memória por 24 h ou até a biblioteca mudar; depois de uma falha, a próxima tentativa espera 10 minutos.
+- Não há cache de prompt: a parte fixa (instruções e schema) fica abaixo do mínimo que as APIs guardam.
 
 ## Modelo e custo
 
-- Modelo padrão: **Claude Opus 5.5** (`claude-opus-5-5`), a US$ 4 por milhão de tokens de entrada e US$ 20 por milhão de saída.
-- Estimativa por geração: ~5 mil tokens de entrada e 1 a 2 mil de saída (incluindo o raciocínio do modelo), o que dá **US$ 0,04 a 0,06**.
+- Estimativa por geração: ~5 mil tokens de entrada e 1 a 2 mil de saída (incluindo o raciocínio do modelo).
+- **Gemini 3.8 Flash** (`gemini-3.8-flash`), o padrão: tem nível gratuito, com limites que o AI Studio mostra e que o Google muda de tempos em tempos. No nível pago, custa US$ 0,75 por milhão de tokens de entrada e US$ 3,75 por milhão de saída (preço promocional até 31/12/2026), cerca de **US$ 0,01** por geração. No nível gratuito, o Google pode usar o que recebe para melhorar os produtos dele; com usuários de verdade, use o nível pago ou avise na política de privacidade.
+- **Claude Opus 5.5** (`claude-opus-5-5`): US$ 4 por milhão de tokens de entrada e US$ 20 por milhão de saída, **US$ 0,04 a 0,06** por geração, sem nível gratuito.
 - Para controlar o custo:
   - guardar as sugestões por até 24 h e só gerar de novo se a biblioteca mudou;
   - gerar só quando o usuário abre a seção, não para todo mundo;
-  - se um dia as sugestões forem geradas em lote durante a noite, a **Batch API** cobra metade;
+  - se um dia as sugestões forem geradas em lote durante a noite, as duas APIs têm um modo em lote pela metade do preço;
   - *prompt caching* só compensa se a parte fixa do prompt (instruções + schema) ficar grande.
-- Modelos mais baratos (Claude Sonnet 5.5 ou Haiku 4.5) talvez deem conta desse caso. A troca é decisão sua; para decidir, compare as sugestões dos dois modelos nos mesmos usuários de teste.
+- Outros modelos entram por `game-log.ai.gemini.model` e `game-log.ai.claude.model` (Claude Sonnet 5.5 ou Haiku 4.5, por exemplo). A troca é decisão sua; para decidir, compare as sugestões nos mesmos usuários de teste, com `AI_PROVIDER=gemini` e `AI_PROVIDER=claude`.
 
 ## Usuário novo (cold start)
 
@@ -177,15 +180,15 @@ Com menos de 3 jogos curtidos, não há sinal suficiente. As opções, em ordem:
 2. `similar_games` do IGDB;
 3. centroide;
 4. vários vetores;
-5. vários vetores + Claude.
+5. vários vetores + o modelo (Gemini ou Claude).
 
 **Depois de lançar (online):** % de sugestões clicadas, % adicionadas à biblioteca e % marcadas como "não tenho interesse".
 
 ## Tecnologia
 
-- **Spring AI 2.0** (GA em junho de 2026, exige Spring Boot 4): `EmbeddingModel` (hoje, o modelo local) e `ChatClient` com o Claude, convertendo a saída direto para records Java. A tabela dos vetores é nossa, sem o `VectorStore`: o jogo é a chave, e a busca precisa de filtros.
+- **Spring AI 2.0** (GA em junho de 2026, exige Spring Boot 4): o `EmbeddingModel` (hoje, o modelo local). A tabela dos vetores é nossa, sem o `VectorStore`: o jogo é a chave, e a busca precisa de filtros.
 - A busca de candidatos é nossa (SQL com pgvector e filtros), e não o *advisor* genérico de perguntas e respostas, porque aqui a "pergunta" é o perfil do usuário.
-- A geração usa o SDK oficial da Anthropic para Java (`anthropic-java`), e não o `ChatClient` do Spring AI, por ser o cliente oficial e já trazer saída estruturada a partir de records e o fallback do servidor.
+- A geração usa os SDKs oficiais do Google (`google-genai`) e da Anthropic (`anthropic-java`), e não o `ChatClient` do Spring AI: cada um traz o que só a sua API tem, como as novas tentativas do Gemini e o fallback do servidor do Claude, e o mesmo schema escrito à mão serve aos dois.
 
 ## O que o MVP já precisa fazer
 

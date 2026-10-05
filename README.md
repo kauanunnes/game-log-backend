@@ -49,11 +49,20 @@ No perfil local, a API calcula os embeddings dos jogos com um modelo pequeno que
 SPRING_AI_MODEL_EMBEDDING=none ./mvnw spring-boot:run
 ```
 
-### Sugestões com o Claude (Fase 3)
+### Sugestões com IA (Fase 3)
 
-Com uma chave da API da Anthropic no `.env`, o Claude escolhe e explica as sugestões de "Para você" (`claude-opus-5-5`, alguns centavos de dólar por pessoa a cada 24 h ou mudança na biblioteca). Sem ela, as sugestões vêm só da busca por semelhança.
+Com uma chave no `.env`, um modelo escolhe e explica as sugestões de "Para você", uma vez por pessoa a cada 24 h ou mudança na biblioteca. Sem ela, as sugestões vêm só da busca por semelhança.
+
+O padrão é o Gemini (`gemini-3.8-flash`), que tem nível gratuito: a chave sai do [Google AI Studio](https://aistudio.google.com/apikey), sem cartão.
 
 ```dotenv
+GEMINI_API_KEY=...
+```
+
+Para usar o Claude (`claude-opus-5-5`, alguns centavos de dólar por geração), troque o modelo e use a chave da Anthropic:
+
+```dotenv
+AI_PROVIDER=claude
 ANTHROPIC_API_KEY=...
 ```
 

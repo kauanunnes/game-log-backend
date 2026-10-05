@@ -9,7 +9,7 @@ flowchart LR
     api --> db[("PostgreSQL<br/>Neon")]
     api -->|busca e importação| igdb[IGDB API]
     api -.->|Fase 3| emb[Modelo de embeddings]
-    api -.->|Fase 3| llm[Claude]
+    api -.->|Fase 3| llm[Gemini ou Claude]
 ```
 
 É um **monólito modular**: um único deploy, com o código separado por funcionalidade. Para o tamanho do projeto, é o que dá menos trabalho para operar. Como os módulos ficam bem separados, dá para extrair algum deles depois, se um dia fizer sentido.
@@ -30,7 +30,7 @@ flowchart LR
 | Documentação | springdoc-openapi | Swagger UI gerado do código |
 | Testes | JUnit, AssertJ, Mockito, Testcontainers, WireMock | Banco real nos testes e IGDB simulado |
 | Qualidade | Spotless, JaCoCo, Dependabot, CodeQL | Formatação, cobertura e alertas de segurança automáticos |
-| IA (Fase 3) | Spring AI 2.0 + pgvector | Embeddings (por enquanto, um modelo local, só no perfil local), busca vetorial e chamadas ao Claude |
+| IA (Fase 3) | Spring AI 2.0 + pgvector | Embeddings (por enquanto, um modelo local, só no perfil local), busca vetorial e chamadas ao Gemini ou ao Claude |
 
 ## Organização do código
 
@@ -161,7 +161,9 @@ Os testes rodam contra a mesma imagem de PostgreSQL usada em desenvolvimento, se
 | `MAIL_FROM` | `Game Log <nao-responda@seu-dominio>` | remetente |
 | `APP_URL` | `https://gamelog.vercel.app` | endereço do front, usado nos links dos e-mails |
 | `SPRING_AI_MODEL_EMBEDDING` | `none` | `transformers` liga o modelo de embeddings dentro da API; é o padrão só no perfil local |
-| `ANTHROPIC_API_KEY` | | liga a curadoria do Claude em "Para você" (3.5); sem ela, as sugestões ficam só com a busca. Modelo e esforço em `game-log.ai.model` (`claude-opus-5-5`) e `game-log.ai.effort` (`medium`) |
+| `AI_PROVIDER` | `gemini` / `claude` | o modelo que escolhe e explica as sugestões de "Para você" (3.5); o padrão é `gemini` |
+| `GEMINI_API_KEY` | | liga a curadoria com o Gemini, do Google AI Studio; sem ela, as sugestões ficam só com a busca. Modelo em `game-log.ai.gemini.model` (`gemini-3.8-flash`) |
+| `ANTHROPIC_API_KEY` | | liga a curadoria com o Claude, quando `AI_PROVIDER=claude`. Modelo e esforço em `game-log.ai.claude.model` (`claude-opus-5-5`) e `game-log.ai.claude.effort` (`medium`) |
 
 As variáveis `SPRING_DATASOURCE_*` são lidas pelo Spring sem nenhuma linha no `application.properties`.
 
